@@ -8,6 +8,7 @@ public class Monster{
 
 	public enum StatusType : int {moving = 0, waiting, finished}
 
+	public int Id { get; set; }
 	public double MovementIncrement = .01;
 	public int MonsterType { get; set; }
 	public int StartingPosX { get; set; }
@@ -53,9 +54,10 @@ public class Monster{
 
 	public Monster(){}
 
-	public Monster(Instantiation parent, int type, int posX, int posY, int moveDirection)
+	public Monster(Instantiation parent, int id, int type, int posX, int posY, int moveDirection)
 	{
 		InstanceParent = parent;
+		Id = id;
 		MonsterType = type;
 		StartingPosX = posX;
 		StartingPosY = posY;

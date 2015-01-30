@@ -24,7 +24,7 @@ public class Instantiation : MonoBehaviour {
 	private List<Monster> MonsterList = new List<Monster>();
 	public int OFFSETX { get; set; }//set in start
 	public int OFFSETY { get; set; }//set in start
-
+	public int nextId { get; set; }
 	public int SpawnDelayTime = 10000;//lower if testing multiple spawns of monsters (time delay between spawns)
 
     enum TileTypes : int 
@@ -100,6 +100,7 @@ public class Instantiation : MonoBehaviour {
 	{
 		OFFSETX = 4;
 		OFFSETY = 4;
+		nextId = 0;
 		BoxOutline = Resources.Load("BoxOutline", typeof(Material)) as Material;
 		And = Resources.Load("And", typeof(Material)) as Material;
 		Or = Resources.Load("Or", typeof(Material)) as Material;
@@ -209,7 +210,8 @@ public class Instantiation : MonoBehaviour {
 	}
 	void Spawn(int type, int PosX, int PosY, int direction)//create the monster
 	{
-		MonsterList.Add (new Monster(this,type,PosX,PosY,direction));//Allan please replace 0 with enums for directions
+		MonsterList.Add (new Monster(this, nextId, type,PosX,PosY,direction));//Allan please replace 0 with enums for directions
+		nextId++;
 	}
 
 	void UpdateMonsterAction()//based on what it is currently doing, what should it do next?
@@ -247,17 +249,67 @@ public class Instantiation : MonoBehaviour {
 				break;
 			case (int)TileTypes.And:
 				monster.Status = (int)Monster.StatusType.waiting;
+				List<Monster> currentMonsters = new List<Monster>();
 				foreach(Monster m in MonsterList)
 				{
-					if(OFFSETX + m.MonsterGameObject.transform.position.x == tileX 
-				   		&& OFFSETY - m.MonsterGameObject.transform.position.y == tileY) //Allan please add logic
+					currentMonsters.Add(m);
+				}
+				bool remove = false;
+				int index = 0;
+				foreach(Monster m in currentMonsters)
+				{
+					if(OFFSETX + (int)Math.Round (m.MonsterGameObject.transform.position.x) == tileX 
+				   		&& OFFSETY - (int)Math.Round (m.MonsterGameObject.transform.position.y) == tileY
+				   		&& m.Id != monster.Id)
 					{
-						Spawn((int)TileTypes.Exit0, tileX, tileY, GridPieces[tileX, tileY].Direction);
+						remove = true;
+						index = MonsterList.IndexOf(m);
+						int type = 1;
+						if(monster.MonsterType == 2 && m.MonsterType == 2)
+						{
+							type = 2;
+						}
+						Spawn(type, tileX, tileY, GridPieces[tileX, tileY].Direction);
+						break;
 					}
+				}
+				if(remove)
+				{
+					MonsterList.RemoveAt(index);
+					MonsterList.Remove(monster);
 				}
 				break;
 			case (int)TileTypes.Or:
 				monster.Status = (int)Monster.StatusType.waiting;
+				currentMonsters = new List<Monster>();
+				foreach(Monster m in MonsterList)
+				{
+					currentMonsters.Add(m);
+				}
+				remove = false;
+				index = 0;
+				foreach(Monster m in currentMonsters)
+				{
+					if(OFFSETX + (int)Math.Round (m.MonsterGameObject.transform.position.x) == tileX 
+					   && OFFSETY - (int)Math.Round (m.MonsterGameObject.transform.position.y) == tileY
+					   && m.Id != monster.Id)
+					{
+						remove = true;
+						index = MonsterList.IndexOf(m);
+						int type = 1;
+						if(monster.MonsterType == 2 || m.MonsterType == 2)
+						{
+							type = 2;
+						}
+						Spawn(type, tileX, tileY, GridPieces[tileX, tileY].Direction);
+						break;
+					}
+				}
+				if(remove)
+				{
+					MonsterList.RemoveAt(index);
+					MonsterList.Remove(monster);
+				}
 				break;
 			default:
 				monster.Status = (int)Monster.StatusType.waiting;
