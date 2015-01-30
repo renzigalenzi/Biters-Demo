@@ -9,10 +9,10 @@ public class Instantiation : MonoBehaviour {
 
 	// We can create a material class later
 	public Material BoxOutline;
-	public Material AND;
-	public Material OR;
-	public Material BeltD;
-	public Material BeltL;
+	public Material And;
+	public Material Or;
+	public Material BeltX;
+	public Material BeltY;
 	public Material Enter0;
 	public Material Enter1;
 	public Material Exit0;
@@ -27,8 +27,10 @@ public class Instantiation : MonoBehaviour {
 
 	public int SpawnDelayTime = 10000;//lower if testing multiple spawns of monsters (time delay between spawns)
 
-    enum TileTypes : int {Blank=0, Enter0, Enter1, Exit0, Exit1, And, Or, BeltD, BeltL};
-
+    enum TileTypes : int 
+	{
+		Blank=0, Enter0, Enter1, Exit0, Exit1, And, Or, BeltX, BeltY
+	};
 
 	private void InitializeBoardGrid(string filePath)//open the file, read in the data and create grid size
 	{
@@ -73,7 +75,10 @@ public class Instantiation : MonoBehaviour {
 						string[] entries = line.Split(',');
 						for(int i = 0; i < entries.Length; i++)
 						{
-							CreateCube(i, y, Convert.ToInt32(entries[i]));
+							string[] subentries = entries[i].Split ('-');
+							int type = Convert.ToInt32(subentries[0]);
+							int direction = Convert.ToInt32(subentries[1]);
+							CreateCube(i, y, type, direction);
 						}
 					}
 					y++;
@@ -96,10 +101,10 @@ public class Instantiation : MonoBehaviour {
 		OFFSETX = 4;
 		OFFSETY = 4;
 		BoxOutline = Resources.Load("BoxOutline", typeof(Material)) as Material;
-		AND = Resources.Load("AND", typeof(Material)) as Material;
-		OR = Resources.Load("OR", typeof(Material)) as Material;
-		BeltD = Resources.Load("BeltD", typeof(Material)) as Material;
-		BeltL = Resources.Load("BeltL", typeof(Material)) as Material;
+		And = Resources.Load("And", typeof(Material)) as Material;
+		Or = Resources.Load("Or", typeof(Material)) as Material;
+		BeltX = Resources.Load("BeltX", typeof(Material)) as Material;
+		BeltY = Resources.Load("BeltY", typeof(Material)) as Material;
 		Enter0 = Resources.Load("Enter0", typeof(Material)) as Material;
 		Enter1 = Resources.Load("Enter1", typeof(Material)) as Material;
 		Exit0 = Resources.Load("Exit0", typeof(Material)) as Material;
@@ -107,12 +112,11 @@ public class Instantiation : MonoBehaviour {
 
 		Biter0 = Resources.Load("Biter0", typeof(Material)) as Material;
 
-
-		SelectedMaterial = AND;
+		SelectedMaterial = And;
 		LoadLevel ("filelevel.txt");
 
 	}
-	void CreateCube(int x, int y, int type)//creates a cube(can be temp) in space and applies texture to it
+	void CreateCube(int x, int y, int type, int direction)//creates a cube(can be temp) in space and applies texture to it
 	{
 		GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
 		switch (type) 
@@ -133,21 +137,21 @@ public class Instantiation : MonoBehaviour {
 				cube.renderer.material = Exit1;
 				break;
 			case (int)TileTypes.And:
-				cube.renderer.material = AND;
+				cube.renderer.material = And;
 				break;
 			case (int)TileTypes.Or:
-				cube.renderer.material = OR;
+				cube.renderer.material = Or;
 				break;
-			case (int)TileTypes.BeltD:
-				cube.renderer.material = BeltD;
+			case (int)TileTypes.BeltY:
+				cube.renderer.material = BeltY;
 				break;
-			case (int)TileTypes.BeltL:
-				cube.renderer.material = BeltL;
+			case (int)TileTypes.BeltX:
+				cube.renderer.material = BeltX;
 				break;
 		}
 		cube.transform.position = new Vector3(x-OFFSETX, OFFSETY-y, 0);
 		BoardGrid[x,y] = cube;
-		GridPieces [x, y] = new GridSquare (type, false, x, y);
+		GridPieces [x, y] = new GridSquare (type, direction, false, x, y);
 
 	}
 	
@@ -188,12 +192,12 @@ public class Instantiation : MonoBehaviour {
 			{
 				if(GridPieces[x,y].Type == (int)TileTypes.Enter0 && GridPieces[x,y].Count == 0)
 				{
-					Spawn((int)TileTypes.Enter0, x, y);
+					Spawn((int)TileTypes.Enter0, x, y, GridPieces[x,y].Direction);
 					GridPieces[x,y].Count=SpawnDelayTime;
 				}
 				else if(GridPieces[x,y].Type == (int)TileTypes.Enter1 && GridPieces[x,y].Count == 0)
 				{
-					Spawn((int)TileTypes.Enter1, x, y);
+					Spawn((int)TileTypes.Enter1, x, y, GridPieces[x,y].Direction);
 					GridPieces[x,y].Count=SpawnDelayTime;
 				}
 				else if(GridPieces[x,y].Type == (int)TileTypes.Enter0 || GridPieces[x,y].Type == (int)TileTypes.Enter1)
@@ -203,9 +207,9 @@ public class Instantiation : MonoBehaviour {
 			}
 		}
 	}
-	void Spawn(int type, int PosX, int PosY)//create the monster
+	void Spawn(int type, int PosX, int PosY, int direction)//create the monster
 	{
-		MonsterList.Add (new Monster(this,type,PosX,PosY,0));//Allan please replace 0 with enums for directions
+		MonsterList.Add (new Monster(this,type,PosX,PosY,direction));//Allan please replace 0 with enums for directions
 	}
 
 	void UpdateMonsterAction()//based on what it is currently doing, what should it do next?
@@ -233,16 +237,24 @@ public class Instantiation : MonoBehaviour {
 
 		switch (GridPieces [tileX, tileY].Type) 
 		{
-			case (int)TileTypes.BeltD:
-				monster.MovementDirection=0;
+			case (int)TileTypes.BeltY:
+				monster.MovementDirection = GridPieces [tileX, tileY].Direction;
 				monster.Status = (int)Monster.StatusType.moving;
 				break;
-			case (int)TileTypes.BeltL:
-				monster.MovementDirection=2;
+			case (int)TileTypes.BeltX:
+				monster.MovementDirection = GridPieces [tileX, tileY].Direction;
 				monster.Status = (int)Monster.StatusType.moving;
 				break;
 			case (int)TileTypes.And:
 				monster.Status = (int)Monster.StatusType.waiting;
+				foreach(Monster m in MonsterList)
+				{
+					if(OFFSETX + m.MonsterGameObject.transform.position.x == tileX 
+				   		&& OFFSETY - m.MonsterGameObject.transform.position.y == tileY) //Allan please add logic
+					{
+						Spawn((int)TileTypes.Exit0, tileX, tileY, GridPieces[tileX, tileY].Direction);
+					}
+				}
 				break;
 			case (int)TileTypes.Or:
 				monster.Status = (int)Monster.StatusType.waiting;
@@ -252,18 +264,19 @@ public class Instantiation : MonoBehaviour {
 				break;
 		}
 	}
+
 	void MoveMonsters(Monster monster)//move the monster object slowly in a direction then check if it is on a new tile.
 	{
 		int moveX = 0;
 		int moveY = 0;
 
-		if (monster.MovementDirection == 0)
-				moveY = -1;
 		if (monster.MovementDirection == 1)
 				moveY = 1;
 		if (monster.MovementDirection == 2)
 				moveX = 1;
 		if (monster.MovementDirection == 3)
+				moveY = -1;
+		if (monster.MovementDirection == 4)
 				moveX = -1;
 
 		monster.MonsterGameObject.transform.position += 
