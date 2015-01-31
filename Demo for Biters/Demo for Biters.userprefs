@@ -1,11 +1,11 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Resources\filelevel.txt">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Instantiation.cs">
     <Files>
       <File FileName="Assets\Scripts\GridSquare.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Monster.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Instantiation.cs" Line="1" Column="1" />
-      <File FileName="Assets\Resources\filelevel.txt" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Instantiation.cs" Line="185" Column="51" />
+      <File FileName="Assets\Resources\filelevel.txt" Line="8" Column="32" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

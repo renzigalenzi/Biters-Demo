@@ -182,6 +182,7 @@ public class Instantiation : MonoBehaviour {
 				// interfere with changing gates
 				GameObject pObject = hit.transform.gameObject;
 				pObject.renderer.material = SelectedMaterial;
+				// Something here to change gate functionality
 				print ("IM HIT!");
 			}
 		}
