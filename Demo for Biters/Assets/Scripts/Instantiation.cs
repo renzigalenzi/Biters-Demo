@@ -18,6 +18,7 @@ public class Instantiation : MonoBehaviour {
 	public Material Exit0;
 	public Material Exit1;
 	public Material Biter0;
+	public Material Biter1;
 	public Material SelectedMaterial;
 	private GameObject[,] BoardGrid; // used for textures, the actual cube
 	private GridSquare[,] GridPieces; // used for the functionality of the grid - what the piece does
@@ -112,8 +113,9 @@ public class Instantiation : MonoBehaviour {
 		Exit1 = Resources.Load("Exit1", typeof(Material)) as Material;
 
 		Biter0 = Resources.Load("Biter0", typeof(Material)) as Material;
+		Biter1 = Resources.Load("Biter1", typeof(Material)) as Material;
 
-		SelectedMaterial = And;
+		SelectedMaterial = Or;
 		LoadLevel ("filelevel.txt");
 
 	}

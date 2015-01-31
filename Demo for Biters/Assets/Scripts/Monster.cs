@@ -67,7 +67,14 @@ public class Monster{
 
 		MonsterGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
 		MonsterGameObject.transform.position = new Vector3(posX-InstanceParent.OFFSETX, InstanceParent.OFFSETY-posY, -1);
-		MonsterGameObject.renderer.material = InstanceParent.Biter0;
+		if (type == 1)
+		{
+			MonsterGameObject.renderer.material = InstanceParent.Biter0;
+		}
+		else if (type == 2)
+		{
+			MonsterGameObject.renderer.material = InstanceParent.Biter1;
+		}
 		MonsterGameObject.transform.localScale = new Vector3(.5F, .5F, .1F);
 
 		PosX = (int)Math.Round(MonsterGameObject.transform.position.x);
