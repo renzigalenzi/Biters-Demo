@@ -6,7 +6,7 @@ using System;
 
 public class Monster{
 
-	public enum StatusType : int {moving = 0, waiting, finished}
+	public enum StatusType : int {moving, waiting, finished}
 
 	public int Id { get; set; }
 	public double MovementIncrement = .01;

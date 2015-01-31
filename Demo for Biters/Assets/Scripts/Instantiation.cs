@@ -26,7 +26,7 @@ public class Instantiation : MonoBehaviour {
 	public int OFFSETX { get; set; }//set in start
 	public int OFFSETY { get; set; }//set in start
 	public int nextId { get; set; }
-	public int SpawnDelayTime = 10000;//lower if testing multiple spawns of monsters (time delay between spawns)
+	public int SpawnDelayTime = 1;//lower if testing multiple spawns of monsters (time delay between spawns)
 
     enum TileTypes : int 
 	{
@@ -182,6 +182,16 @@ public class Instantiation : MonoBehaviour {
 				// interfere with changing gates
 				GameObject pObject = hit.transform.gameObject;
 				pObject.renderer.material = SelectedMaterial;
+				int type = 0;
+				if(SelectedMaterial == Or)
+				{
+					type = (int)TileTypes.Or;
+				}
+				else if(SelectedMaterial == And)
+				{
+					type = (int)TileTypes.And;
+				}
+				GridPieces[OFFSETX + (int)pObject.transform.position.x, OFFSETY - (int)pObject.transform.position.y].Type = type;
 				// Something here to change gate functionality
 				print ("IM HIT!");
 			}
@@ -239,6 +249,9 @@ public class Instantiation : MonoBehaviour {
 	{
 		int tileX = OFFSETX + (int)Math.Round (monster.MonsterGameObject.transform.position.x);
 		int tileY = OFFSETY - (int)Math.Round (monster.MonsterGameObject.transform.position.y);
+		int index1 = 0;
+		int index2 = 0;
+		bool remove = false;
 
 		switch (GridPieces [tileX, tileY].Type) 
 		{
@@ -257,16 +270,17 @@ public class Instantiation : MonoBehaviour {
 				{
 					currentMonsters.Add(m);
 				}
-				bool remove = false;
-				int index = 0;
+				remove = false;
+				index1 = 0;
 				foreach(Monster m in currentMonsters)
 				{
 					if(OFFSETX + (int)Math.Round (m.MonsterGameObject.transform.position.x) == tileX 
 				   		&& OFFSETY - (int)Math.Round (m.MonsterGameObject.transform.position.y) == tileY
-				   		&& m.Id != monster.Id)
+				   		&& m.Id != monster.Id
+				   		&& m.Status == (int)Monster.StatusType.waiting)
 					{
 						remove = true;
-						index = MonsterList.IndexOf(m);
+						index1 = MonsterList.IndexOf(m);
 						int type = 1;
 						if(monster.MonsterType == 2 && m.MonsterType == 2)
 						{
@@ -278,11 +292,22 @@ public class Instantiation : MonoBehaviour {
 				}
 				if(remove)
 				{
-					MonsterList.RemoveAt(index);
-					MonsterList.Remove(monster);
+					index2 = MonsterList.IndexOf(monster);
+					Destroy(MonsterList[index1].MonsterGameObject,0f);
+					Destroy(MonsterList[index2].MonsterGameObject,0f);
+					if(index1 > index2)
+					{
+						MonsterList.RemoveAt(index1);
+						MonsterList.RemoveAt(index2);
+					}
+					else if(index2 > index1)
+					{
+						MonsterList.RemoveAt(index2);
+						MonsterList.RemoveAt(index1);
+					}
 				}
-				break;
-			case (int)TileTypes.Or:
+			break;
+		case (int)TileTypes.Or:
 				monster.Status = (int)Monster.StatusType.waiting;
 				currentMonsters = new List<Monster>();
 				foreach(Monster m in MonsterList)
@@ -290,15 +315,16 @@ public class Instantiation : MonoBehaviour {
 					currentMonsters.Add(m);
 				}
 				remove = false;
-				index = 0;
+				index1 = 0;
 				foreach(Monster m in currentMonsters)
 				{
 					if(OFFSETX + (int)Math.Round (m.MonsterGameObject.transform.position.x) == tileX 
-					   && OFFSETY - (int)Math.Round (m.MonsterGameObject.transform.position.y) == tileY
-					   && m.Id != monster.Id)
+					   	&& OFFSETY - (int)Math.Round (m.MonsterGameObject.transform.position.y) == tileY
+					   	&& m.Id != monster.Id
+				   		&& m.Status == (int)Monster.StatusType.waiting)
 					{
 						remove = true;
-						index = MonsterList.IndexOf(m);
+						index1 = MonsterList.IndexOf(m);
 						int type = 1;
 						if(monster.MonsterType == 2 || m.MonsterType == 2)
 						{
@@ -310,10 +336,32 @@ public class Instantiation : MonoBehaviour {
 				}
 				if(remove)
 				{
-					MonsterList.RemoveAt(index);
-					MonsterList.Remove(monster);
+					index2 = MonsterList.IndexOf(monster);
+					Destroy(MonsterList[index1].MonsterGameObject,0f);
+					Destroy(MonsterList[index2].MonsterGameObject,0f);
+					if(index1 > index2)
+					{
+						MonsterList.RemoveAt(index1);
+						MonsterList.RemoveAt(index2);
+					}
+					else if(index2 > index1)
+					{
+						MonsterList.RemoveAt(index2);
+						MonsterList.RemoveAt(index1);
+					}
 				}
 				break;
+			case (int)TileTypes.Exit0:
+			case (int)TileTypes.Exit1:
+			if((monster.MonsterType == 1 && GridPieces [tileX, tileY].Type == (int)TileTypes.Exit0)
+			   || (monster.MonsterType == 2 && GridPieces [tileX, tileY].Type == (int)TileTypes.Exit1))
+				p ("Yay!");
+			else
+			{
+				p ("Oh no");
+
+			}
+			break;
 			default:
 				monster.Status = (int)Monster.StatusType.waiting;
 				break;
