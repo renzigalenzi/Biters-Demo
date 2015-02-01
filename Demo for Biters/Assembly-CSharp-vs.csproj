@@ -49,7 +49,7 @@
      <Compile Include="Assets\Scripts\GridSquare.cs" />
      <Compile Include="Assets\Scripts\Instantiation.cs" />
      <Compile Include="Assets\Scripts\Monster.cs" />
-     <None Include="Assets\Resources\filelevel.txt" />
+     <None Include="Assets\Resources\Level1.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/4.6.2/UnityEngine.UI.dll</HintPath>
  </Reference>

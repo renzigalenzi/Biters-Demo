@@ -5,412 +5,294 @@ using System.Text;
 using System.IO;
 using System;
 
-public class Instantiation : MonoBehaviour {
+public class Instantiation : MonoBehaviour
+{
+    public GameObject[,] InstantiationGridSquareGameObjectGrid { get; set; }    // Textures
+    public GridSquare[,] InstantiationGridSquareGrid { get; set; }              // Functionality
+    public int InstantiationGridWidth { get; set; }
+    public int InstantiationGridHeight { get; set; }
+    public List<Monster> InstantiationMonsters { get; set; }
+    public int InstantiationNextMonsterId { get; set; }
+    public int InstantiationSpawnDelay { get; set; }
+    public int InstantiationTimeToNextSpawn { get; set; }
 
-	// We can create a material class later
-	public Material BoxOutline;
-	public Material And;
-	public Material Or;
-	public Material Enter0;
-	public Material Enter1;
-	public Material Exit0;
-	public Material Exit1;
-	public Material Biter0;
-	public Material Biter1;
-	public Material BeltL;
-	public Material BeltR;
-	public Material BeltU;
-	public Material BeltD;
-	public Material SelectedMaterial;
-	private GameObject[,] BoardGrid; // used for textures, the actual cube
-	private GridSquare[,] GridPieces; // used for the functionality of the grid - what the piece does
-	public List<Monster> MonsterList = new List<Monster>();
-	public int OFFSETX { get; set; }//set in start
-	public int OFFSETY { get; set; }//set in start
-	public int nextId { get; set; }
-	public int SpawnDelayTime = 1;//lower if testing multiple spawns of monsters (time delay between spawns)
+    public Material Blank;
+    public Material EnterZero;
+    public Material EnterOne;
+    public Material ExitZero;
+    public Material ExitOne;
+    public Material And;
+    public Material Or;
+    public Material BeltUp;
+    public Material BeltRight;
+    public Material BeltDown;
+    public Material BeltLeft;
+    public Material BiterZero;
+    public Material BiterOne;
+    public Material SelectedMaterial;
 
-    public enum TileTypes : int 
+    public void Start()
+    {
+        InstantiationMonsters = new List<Monster>();
+        InstantiationNextMonsterId = 0;
+        InstantiationSpawnDelay = 10000;
+        InstantiationTimeToNextSpawn = 0;
+        Blank = Resources.Load("Blank", typeof(Material)) as Material;
+        EnterZero = Resources.Load("EnterZero", typeof(Material)) as Material;
+        EnterOne = Resources.Load("EnterOne", typeof(Material)) as Material;
+        ExitZero = Resources.Load("ExitZero", typeof(Material)) as Material;
+        ExitOne = Resources.Load("ExitOne", typeof(Material)) as Material;
+        And = Resources.Load("And", typeof(Material)) as Material;
+        Or = Resources.Load("Or", typeof(Material)) as Material;
+        BeltUp = Resources.Load("BeltUp", typeof(Material)) as Material;
+        BeltRight = Resources.Load("BeltRight", typeof(Material)) as Material;
+        BeltDown = Resources.Load("BeltDown", typeof(Material)) as Material;
+        BeltLeft = Resources.Load("BeltLeft", typeof(Material)) as Material;
+        BiterZero = Resources.Load("BiterZero", typeof(Material)) as Material;
+        BiterOne = Resources.Load("BiterOne", typeof(Material)) as Material;
+        SelectedMaterial = Or;
+
+        LoadLevel("Level1.txt");
+    }
+
+    public bool LoadLevel(string fileName)
+    {
+        string filePath = "Assets/Resourves/" + fileName;
+        try
+        {
+            InitializeGrid(filePath);
+            StreamReader reader = new StreamReader(filePath, Encoding.Default);
+            using(reader)
+            {
+                int y = 0;
+                string line = reader.ReadLine();
+                while(line != null)
+                {
+                    string[] entries = line.Split(',');
+                    for(int x = 0; x < entries.Length; x++)
+                    {
+                        int intType = Convert.ToInt32(entries[x]);
+                        new GridSquare(this, (TileType)intType, x, y);
+                    }
+                    y++;
+                }
+                reader.Close();
+                return true;
+            }
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine("There was a problem during file reading", e.Message);
+            return false;
+        }
+    }
+
+    private void InitializeGrid(string filePath)
 	{
-		Blank=0, Enter0, Enter1, Exit0, Exit1, And, Or, BeltU, BeltR, BeltD, BeltL
-	};
-
-	private void InitializeBoardGrid(string filePath)//open the file, read in the data and create grid size
-	{
-		var GridHeight = 0;
-		var GridWidth = 0;
-		using (var reader = File.OpenText(filePath))
+		InstantiationGridWidth = 0;
+		InstantiationGridHeight = 0;
+        StreamReader reader = new StreamReader(filePath, Encoding.Default);
+		using(reader)
 		{
 			string line = reader.ReadLine();
-
-			if(line != null)//get the width of the grid in the file
+			if(line != null)
 			{
 				string[] entries = line.Split(',');
-				GridWidth = entries.Length;
-				GridHeight++;
+                InstantiationGridWidth = entries.Length;
+                InstantiationGridHeight++;
 			}
-			while (reader.ReadLine() != null)//get the height of the grid in the file
+            line = reader.ReadLine();
+			while(line != null)
 			{
-				GridHeight++;
+                InstantiationGridHeight++;
+                line = reader.ReadLine();
 			}
 		}
-		print ("GridWidth = " + GridWidth + " and GridHeight = " + GridHeight); 
-		BoardGrid = new GameObject[GridWidth,GridHeight];
-		GridPieces = new GridSquare[GridWidth,GridHeight];
-	}
-	private bool LoadLevel(string fileLevel)//load in the data file entries and create the field
-	{
-		int y = 0;
-		print("Loading file:" + fileLevel);
-		string filePath = "Assets/Resources/"+fileLevel;
-		try
-		{
-			string line;
-			StreamReader theReader = new StreamReader(filePath, Encoding.Default);
-			InitializeBoardGrid(filePath);
-			using (theReader)
-			{
-				do
-				{
-					line = theReader.ReadLine();
-					if (line != null)
-					{
-						string[] entries = line.Split(',');
-						for(int i = 0; i < entries.Length; i++)
-						{
-							int type = Convert.ToInt32(entries[i]);
-							CreateCube(i, y, type);
-						}
-					}
-					y++;
-				}
-				while (line != null);  
-				theReader.Close();
-				return true;
-			}
-		}
-		catch (Exception e)
-		{
-			print ("poo it failed" + e.Message);
-			Console.WriteLine("failed\n", e.Message);
-			return false;
-		}
-	}
-
-	void Start() //called at initialization, basically the init function
-	{
-		OFFSETX = 4;
-		OFFSETY = 4;
-		nextId = 0;
-		BoxOutline = Resources.Load("BoxOutline", typeof(Material)) as Material;
-		And = Resources.Load("And", typeof(Material)) as Material;
-		Or = Resources.Load("Or", typeof(Material)) as Material;
-		BeltL = Resources.Load("BeltL", typeof(Material)) as Material;
-		BeltR = Resources.Load("BeltR", typeof(Material)) as Material;
-		BeltU = Resources.Load("BeltU", typeof(Material)) as Material;
-		BeltD = Resources.Load("BeltD", typeof(Material)) as Material;
-		Enter0 = Resources.Load("Enter0", typeof(Material)) as Material;
-		Enter1 = Resources.Load("Enter1", typeof(Material)) as Material;
-		Exit0 = Resources.Load("Exit0", typeof(Material)) as Material;
-		Exit1 = Resources.Load("Exit1", typeof(Material)) as Material;
-
-		Biter0 = Resources.Load("Biter0", typeof(Material)) as Material;
-		Biter1 = Resources.Load("Biter1", typeof(Material)) as Material;
-
-		SelectedMaterial = Or;
-		LoadLevel ("filelevel.txt");
-
-	}
-	void CreateCube(int x, int y, int type)//creates a cube(can be temp) in space and applies texture to it
-	{
-		GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		switch (type) 
-		{
-			case (int)TileTypes.Blank:
-				cube.renderer.material = BoxOutline;
-				break;
-			case (int)TileTypes.Enter0:
-				cube.renderer.material = Enter0;
-				break;
-			case (int)TileTypes.Enter1:
-				cube.renderer.material = Enter1;
-				break;
-			case (int)TileTypes.Exit0:
-				cube.renderer.material = Exit0;
-				break;
-			case (int)TileTypes.Exit1:
-				cube.renderer.material = Exit1;
-				break;
-			case (int)TileTypes.And:
-				cube.renderer.material = And;
-				break;
-			case (int)TileTypes.Or:
-				cube.renderer.material = Or;
-				break;
-			case (int)TileTypes.BeltU:
-				cube.renderer.material = BeltU;
-				break;
-			case (int)TileTypes.BeltR:
-				cube.renderer.material = BeltR;
-				break;
-			case (int)TileTypes.BeltD:
-				cube.renderer.material = BeltD;
-				break;
-			case (int)TileTypes.BeltL:
-				cube.renderer.material = BeltL;
-				break;
-			default:
-				//cube.renderer.material = Belt;
-				break;
-		}
-		cube.transform.position = new Vector3(x-OFFSETX, OFFSETY-y, 0);
-		BoardGrid[x,y] = cube;
-		GridPieces [x, y] = new GridSquare (type, false, x, y, this);
-
+        InstantiationGridSquareGameObjectGrid = new GameObject[InstantiationGridWidth, InstantiationGridHeight];
+        InstantiationGridSquareGrid = new GridSquare[InstantiationGridWidth, InstantiationGridHeight];
 	}
 	
-	
-	// Update is called once per frame
 	void Update () 
 	{
-		GetMouseRays ();
-		UpdateSpawnTile ();
-		UpdateMonsterAction ();
+		GetMouseRays();
+		UpdateSpawnTile();
+		UpdateMonsterAction();
 	}
 
-
-	void GetMouseRays()//if mouse is clicked find out which thing it was clicked on
+	void GetMouseRays()
 	{
-		//get the mouse clicked on a square and react to it
-		if( Input.GetMouseButtonDown(0) )
+		if(Input.GetMouseButtonDown(0))
 		{
-			Ray ray = Camera.main.ScreenPointToRay( Input.mousePosition );
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 			RaycastHit hit;
-			
-			if( Physics.Raycast( ray, out hit, 100 ) )
+			if(Physics.Raycast(ray, out hit, 100))
 			{
-				// all cubes will need a ray layer later so that when you click the monster sprites wont  
-				// interfere with changing gates
+				// All cubes will need a ray layer later so that when you click the monster sprites, it won't interfere with changing gates
 				GameObject pObject = hit.transform.gameObject;
 				pObject.renderer.material = SelectedMaterial;
-				int type = 0;
+                TileType type = TileType.Or;
 				if(SelectedMaterial == Or)
 				{
-					type = (int)TileTypes.Or;
+					type = TileType.Or;
 				}
 				else if(SelectedMaterial == And)
 				{
-					type = (int)TileTypes.And;
+					type = TileType.And;
 				}
-				GridPieces[OFFSETX + (int)pObject.transform.position.x, OFFSETY - (int)pObject.transform.position.y].Type = type;
-				// Something here to change gate functionality
-				print ("IM HIT!");
+                InstantiationGridSquareGrid[(int)pObject.transform.position.x, (int)pObject.transform.position.y].GridSquareTileType = type;
 			}
 		}
 	}
-	void UpdateSpawnTile()//spawn monsters from the starting points
+
+	void UpdateSpawnTile()
 	{
-		//every frame see if you should spawn an enemy
-		for (int x = 0; x < GridPieces.GetLength(0); x++) 
+		for(int x = 0; x < InstantiationGridWidth; x++) 
 		{
-			for (int y = 0; y < GridPieces.GetLength(1); y++) 
+            for(int y = 0; y < InstantiationGridHeight; y++) 
 			{
-				if(GridPieces[x,y].Type == (int)TileTypes.Enter0 && GridPieces[x,y].Count == 0)
+                if(InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterZero && InstantiationTimeToNextSpawn == 0)
 				{
-					Monster mTemp = Spawn((int)TileTypes.Enter0, x, y, GridPieces[x,y].Direction);
-					GridPieces [x, y].FindNewDirection(x,y,GridPieces,ref mTemp, ref MonsterList);
-					GridPieces[x,y].Count=SpawnDelayTime;
+					Monster monster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, NumberType.Zero, x, y, MovementDirection.None);
+                    InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
+                    InstantiationTimeToNextSpawn = InstantiationSpawnDelay;
 				}
-				else if(GridPieces[x,y].Type == (int)TileTypes.Enter1 && GridPieces[x,y].Count == 0)
+                else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne && InstantiationTimeToNextSpawn == 0)
 				{
-					Monster mTemp = Spawn((int)TileTypes.Enter1, x, y, GridPieces[x,y].Direction);
-					GridPieces [x, y].FindNewDirection(x,y,GridPieces,ref mTemp, ref MonsterList);
-					GridPieces[x,y].Count=SpawnDelayTime;
+                    Monster monster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, NumberType.One, x, y, MovementDirection.None);
+                    InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
+                    InstantiationTimeToNextSpawn = InstantiationSpawnDelay;
 				}
-				else if(GridPieces[x,y].Type == (int)TileTypes.Enter0 || GridPieces[x,y].Type == (int)TileTypes.Enter1)
+                else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterZero || InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne)
 				{
-					GridPieces[x,y].Count--;
+                    InstantiationTimeToNextSpawn--;
 				}
 			}
 		}
 	}
-	public Monster Spawn(int type, int PosX, int PosY, int direction)//create the monster
+
+	void UpdateMonsterAction()
 	{
-		Monster m = new Monster (this, nextId, type, PosX, PosY, direction);
-		MonsterList.Add (m);//Allan please replace 0 with enums for directions
-		nextId++;
-		return m;
+        foreach(Monster monster in InstantiationMonsters)
+        {
+            switch(monster.MonsterMovementType)
+            {
+                case MovementType.Moving:
+                    MoveMonster(monster);
+                    break;
+                case MovementType.Waiting:
+                    AssignNewStatus(monster);
+                    break;
+                default:
+                    Instantiation.PrintMessage("Invalid MonsterMovementType - UpdateMonsterAction()");
+                    break;
+            }
+        }
 	}
 
-	void UpdateMonsterAction()//based on what it is currently doing, what should it do next?
+	void AssignNewStatus(Monster monster)
 	{
-		for (int i = 0; i < MonsterList.Count; i++) 
-		{
-			switch(MonsterList[i].Status)
-			{
-				case (int)Monster.StatusType.moving:
-					MoveMonsters(MonsterList[i]);
-					break;
-				case (int)Monster.StatusType.waiting:
-					AssignNewStatus(MonsterList[i]);
-					break;
-				case (int)Monster.StatusType.finished:
-					MoveMonsters(MonsterList[i]);
-					break;
-			}
-		}
-	}
-	void AssignNewStatus(Monster monster)// find out the tile the monster is on and assign it a task accordingly
-	{
-		int tileX = OFFSETX + (int)Math.Round (monster.MonsterGameObject.transform.position.x);
-		int tileY = OFFSETY - (int)Math.Round (monster.MonsterGameObject.transform.position.y);
-		int index1 = 0;
-		int index2 = 0;
-		bool remove = false;
-
-		switch (GridPieces [tileX, tileY].Type) 
-		{
-			case (int)TileTypes.BeltU:
-			case (int)TileTypes.BeltR:
-			case (int)TileTypes.BeltL:
-			case (int)TileTypes.BeltD:
-				GridPieces [tileX, tileY].FindNewDirection(tileX,tileY,GridPieces,ref monster, ref MonsterList);
-				break;
-
-			case (int)TileTypes.And:
-				monster.Status = (int)Monster.StatusType.waiting;
-				List<Monster> currentMonsters = new List<Monster>();
-				foreach(Monster m in MonsterList)
-				{
-					currentMonsters.Add(m);
-				}
-				remove = false;
-				index1 = 0;
-				foreach(Monster m in currentMonsters)
-				{
-					if(OFFSETX + (int)Math.Round (m.MonsterGameObject.transform.position.x) == tileX 
-				   		&& OFFSETY - (int)Math.Round (m.MonsterGameObject.transform.position.y) == tileY
-				   		&& m.Id != monster.Id
-				   		&& m.Status == (int)Monster.StatusType.waiting)
-					{
-						remove = true;
-						index1 = MonsterList.IndexOf(m);
-						int type = 1;
-						if(monster.MonsterType == 2 && m.MonsterType == 2)
-						{
-							type = 2;
-						}
-						Monster mTemp = Spawn(type, tileX, tileY, GridPieces[tileX, tileY].Direction);
-						GridPieces [tileX, tileY].FindNewDirection(tileX,tileY,GridPieces,ref mTemp, ref MonsterList);
-						break;
-					}
-				}
-				if(remove)
-				{
-					index2 = MonsterList.IndexOf(monster);
-					Destroy(MonsterList[index1].MonsterGameObject,0f);
-					Destroy(MonsterList[index2].MonsterGameObject,0f);
-					if(index1 > index2)
-					{
-						MonsterList.RemoveAt(index1);
-						MonsterList.RemoveAt(index2);
-					}
-					else if(index2 > index1)
-					{
-						MonsterList.RemoveAt(index2);
-						MonsterList.RemoveAt(index1);
-					}
-				}
-			break;
-		case (int)TileTypes.Or:
-				monster.Status = (int)Monster.StatusType.waiting;
-				currentMonsters = new List<Monster>();
-				foreach(Monster m in MonsterList)
-				{
-					currentMonsters.Add(m);
-				}
-				remove = false;
-				index1 = 0;
-				foreach(Monster m in currentMonsters)
-				{
-					if(OFFSETX + (int)Math.Round (m.MonsterGameObject.transform.position.x) == tileX 
-					   	&& OFFSETY - (int)Math.Round (m.MonsterGameObject.transform.position.y) == tileY
-					   	&& m.Id != monster.Id
-				   		&& m.Status == (int)Monster.StatusType.waiting)
-					{
-						remove = true;
-						index1 = MonsterList.IndexOf(m);
-						int type = 1;
-						if(monster.MonsterType == 2 || m.MonsterType == 2)
-						{
-							type = 2;
-						}
-						Monster mTemp = Spawn(type, tileX, tileY, GridPieces[tileX, tileY].Direction);
-						GridPieces [tileX, tileY].FindNewDirection(tileX,tileY,GridPieces,ref mTemp, ref MonsterList);
-						break;
-					}
-				}
-				if(remove)
-				{
-					index2 = MonsterList.IndexOf(monster);
-					Destroy(MonsterList[index1].MonsterGameObject,0f);
-					Destroy(MonsterList[index2].MonsterGameObject,0f);
-					if(index1 > index2)
-					{
-						MonsterList.RemoveAt(index1);
-						MonsterList.RemoveAt(index2);
-					}
-					else if(index2 > index1)
-					{
-						MonsterList.RemoveAt(index2);
-						MonsterList.RemoveAt(index1);
-					}
-				}
-				break;
-			case (int)TileTypes.Exit0:
-			case (int)TileTypes.Exit1:
-			if((monster.MonsterType == 1 && GridPieces [tileX, tileY].Type == (int)TileTypes.Exit0)
-			   || (monster.MonsterType == 2 && GridPieces [tileX, tileY].Type == (int)TileTypes.Exit1))
-				p ("Yay!");
-			else
-			{
-				p ("Oh no");
-
-			}
-			break;
-			default:
-				monster.Status = (int)Monster.StatusType.waiting;
-				break;
-		}
+        int x = monster.MonsterXPosition;
+        int y = monster.MonsterYPosition;
+        switch(InstantiationGridSquareGrid[x, y].GridSquareTileType)
+        {
+            case TileType.ExitZero:
+                if(monster.MonsterNumberType == NumberType.Zero)
+                {
+                    PrintMessage("You win!");
+                }
+                break;
+            case TileType.ExitOne:
+                if(monster.MonsterNumberType == NumberType.One)
+                {
+                    PrintMessage("You lose!");
+                }
+                break;
+            case TileType.And:
+            case TileType.Or:
+                monster.MonsterMovementType = MovementType.Waiting;
+                bool shouldRemove = false;
+                int index1 = 0;
+                int index2 = 0;
+                foreach(Monster m in InstantiationMonsters)
+                {
+                    if(m.MonsterXPosition == x && m.MonsterYPosition == y && m.MonsterId != monster.MonsterId && m.MonsterMovementType == MovementType.Waiting)
+                    {
+                        shouldRemove = true;
+                        index1 = InstantiationMonsters.IndexOf(monster);
+                        index2 = InstantiationMonsters.IndexOf(m);
+                        NumberType numberType = NumberType.Zero;
+                        if(InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.And && monster.MonsterNumberType == NumberType.One && m.MonsterNumberType == NumberType.One)
+                        {
+                            numberType = NumberType.One;
+                        }
+                        else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.Or && (monster.MonsterNumberType == NumberType.One || m.MonsterNumberType == NumberType.One))
+                        {
+                            numberType = NumberType.One;
+                        }
+                        Monster tempMonster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, numberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.None);
+                        InstantiationGridSquareGrid[x, y].CalculateNewDirection(tempMonster);
+                        break;
+                    }
+                }
+                if(shouldRemove)
+                {
+                    if(index1 > index2)
+                    {
+                        InstantiationMonsters.RemoveAt(index1);
+                        InstantiationMonsters.RemoveAt(index2);
+                    }
+                    else
+                    {
+                        InstantiationMonsters.RemoveAt(index2);
+                        InstantiationMonsters.RemoveAt(index1);
+                    }
+                    Destroy(InstantiationMonsters[index1].MonsterGameObject, 0f);
+                    Destroy(InstantiationMonsters[index2].MonsterGameObject, 0f);
+                }
+                break;
+            case TileType.BeltUp:
+            case TileType.BeltRight:
+            case TileType.BeltDown:
+            case TileType.BeltLeft:
+                InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
+                break;
+            default:
+                Instantiation.PrintMessage("Invalid GridSquareTileType - AssignNewStatus(Monster monster)");
+                break;
+        }
 	}
 
-	void MoveMonsters(Monster monster)//move the monster object slowly in a direction then check if it is on a new tile.
+	void MoveMonster(Monster monster)
 	{
-		int moveX = 0;
-		int moveY = 0;
+        int moveX = 0;
+        int moveY = 0;
 
-		if (monster.MovementDirection == 0)
-				moveY = 1;
-		if (monster.MovementDirection == 1)
-				moveX = 1;
-		if (monster.MovementDirection == 2)
-				moveY = -1;
-		if (monster.MovementDirection == 3)
-				moveX = -1;
+        if(monster.MonsterMovementDirection == MovementDirection.Up)
+        {
+            moveY = 1;
+        }
+        else if (monster.MonsterMovementDirection == MovementDirection.Right)
+        {
+            moveX = 1;
+        }
+        else if (monster.MonsterMovementDirection == MovementDirection.Down)
+        {
+            moveY = -1;
+        }
+        else if (monster.MonsterMovementDirection == MovementDirection.Left)
+        {
+            moveX = -1;
+        }
 
-		monster.MonsterGameObject.transform.position += 
-			new Vector3 ((float)monster.MovementIncrement * moveX * monster.MovementSpeed, 
-			             (float)monster.MovementIncrement * moveY * monster.MovementSpeed, 0);
-		 
-		if (monster.FinishedMovingTile()) 
-		{
-			monster.Status = (int)Monster.StatusType.waiting;
-		}
+        monster.MonsterGameObject.transform.position += new Vector3(monster.MonsterMovementIncrement * moveX, monster.MonsterMovementIncrement * moveY, 0);
 
+        /*if(monster.FinishedMovingTile())
+        {
+            monster.MonsterMovementType = MovementType.Waiting;
+        }*/
 	}
 
-	//testing any class calls for objects
-	public void p(string printStatement)
+	public static void PrintMessage(string printStatement)
 	{
 		print (printStatement);
 	}

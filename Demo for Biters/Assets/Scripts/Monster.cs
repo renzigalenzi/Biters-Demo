@@ -4,83 +4,73 @@ using System.Text;
 using System.IO;
 using System;
 
-public class Monster{
+public enum NumberType
+{
+    Zero, One
+}
 
-	public enum StatusType : int {moving, waiting, finished}
+public enum MovementType
+{
+    Waiting, Moving
+}
 
-	public int Id { get; set; }
-	public double MovementIncrement = .01;
-	public int MonsterType { get; set; }
-	public int StartingPosX { get; set; }
-	public int StartingPosY { get; set; }
-	public int TargetPosX { get; set; }
-	public int TargetPosY { get; set; }
-	public int PosX { get; set; }
-	public int PosY { get; set; }
-	public int MovementDirection { get; set; }
-	public int MovementSpeed { get; set; }
-	public int Status { get; set; }
-	//public int MovementDirection { get; set; }
-	public Instantiation InstanceParent { get; set; }
+public enum MovementDirection
+{
+    None, Up, Right, Down, Left
+}
 
-	public GameObject MonsterGameObject{ get; set; }
+public class Monster
+{
+    public GameObject MonsterGameObject { get; set; }
+    public Instantiation MonsterInstantiation { get; set; }
+    public int MonsterId { get; set; }
+    public MovementType MonsterMovementType { get; set; }
+    public NumberType MonsterNumberType { get; set; }
+    public int MonsterXPosition { get; set; }
+    public int MonsterYPosition { get; set; }
+    public MovementDirection MonsterMovementDirection { get; set; }
+    public float MonsterMovementIncrement { get; set; }
 
-	public bool FinishedMovingTile()//has the monster reached a new tile?
-	{
-		bool bReturn;
-		float currX = MonsterGameObject.transform.position.x;
-		float currY = MonsterGameObject.transform.position.y;
+    public Monster()
+    {
+        MonsterInstantiation = new Instantiation();
+        MonsterId = 0;
+        MonsterMovementType = MovementType.Waiting;
+        MonsterNumberType = NumberType.Zero;
+        MonsterXPosition = 0;
+        MonsterYPosition = 0;
+        MonsterMovementDirection = MovementDirection.None;
+        MonsterMovementIncrement = 0.0F;
+    }
 
-		//since the space of a block is broken down into integers, if the distance traveled by a piece is 
-		//an integer and not equal to its starting position, then it has moved 1 unit
-		
-		if (currX == StartingPosX && currY == StartingPosY) 
-		{
-			bReturn = false;
-		}
-		else if (Math.Abs (PosX - currX)>=1 || Math.Abs (PosY - currY)>=1) 
-		{
-			PosX = (int)Math.Round (currX);
-			PosY = (int)Math.Round (currY);
-			bReturn = true;
-		} 
-		else 
-		{
-			bReturn = false;
-		}
-		return bReturn;
-	}
+    public Monster(Instantiation monsterInstantiation, int monsterId, MovementType monsterMovementType, NumberType monsterNumberType, int monsterXPosition, int monsterYPosition, MovementDirection monsterMovementDirection)
+    {
+        MonsterGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        MonsterInstantiation = monsterInstantiation;
+        MonsterId = monsterId;
+        MonsterMovementType = monsterMovementType;
+        MonsterNumberType = monsterNumberType;
+        MonsterXPosition = monsterXPosition;
+        MonsterYPosition = monsterYPosition;
+        MonsterMovementDirection = monsterMovementDirection;
+        MonsterMovementIncrement = 0.01F;
 
+        MonsterGameObject.transform.position = new Vector3(MonsterXPosition, MonsterYPosition, -1);
+        MonsterGameObject.transform.localScale = new Vector3(0.5F, 0.5F, 0.1F);
+        switch(MonsterNumberType)
+        {
+            case NumberType.Zero:
+                MonsterGameObject.renderer.material = MonsterInstantiation.BiterZero;
+                break;
+            case NumberType.One:
+                MonsterGameObject.renderer.material = MonsterInstantiation.BiterOne;
+                break;
+            default:
+                Instantiation.PrintMessage("Invalid MonsterNumberType - Monster(Instantiation monsterInstantiation, int monsterId, MovementType monsterMovementType, NumberType monsterNumberType, int monsterXPosition, int monsterYPosition, MovementDirection monsterMovementDirection)");
+                break;
+        }
 
-	public Monster(){}
-
-	public Monster(Instantiation parent, int id, int type, int posX, int posY, int moveDirection)
-	{
-		InstanceParent = parent;
-		Id = id;
-		MonsterType = type;
-		StartingPosX = posX;
-		StartingPosY = posY;
-		MovementDirection = moveDirection;
-		Status = (int)StatusType.moving;
-		MovementSpeed = 1;
-
-		MonsterGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		MonsterGameObject.transform.position = new Vector3(posX-InstanceParent.OFFSETX, InstanceParent.OFFSETY-posY, -1);
-		if (type == 1)
-		{
-			MonsterGameObject.renderer.material = InstanceParent.Biter0;
-		}
-		else if (type == 2)
-		{
-			MonsterGameObject.renderer.material = InstanceParent.Biter1;
-		}
-		MonsterGameObject.transform.localScale = new Vector3(.5F, .5F, .1F);
-
-		PosX = (int)Math.Round(MonsterGameObject.transform.position.x);
-		PosY = (int)Math.Round(MonsterGameObject.transform.position.y);
-
-
-		//MonsterGameObject.transform.position = new Vector3(posX-InstanceParent.OFFSETX, InstanceParent.OFFSETY-posY, -1);
-	}
+        MonsterInstantiation.InstantiationMonsters.Add(this);
+        MonsterInstantiation.InstantiationNextMonsterId++;
+    }
 }
