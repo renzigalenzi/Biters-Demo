@@ -87,15 +87,15 @@ public class GridSquare
         {
             neighbors.Add(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition - 1, GridSquareYPosition]);
         }
-        else if (GridSquareXPosition < GridSquareInstantiation.InstantiationGridWidth - 1 && GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition + 1, GridSquareYPosition].GridSquareTileType == TileType.BeltRight)
+        if (GridSquareXPosition < GridSquareInstantiation.InstantiationGridWidth - 1 && GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition + 1, GridSquareYPosition].GridSquareTileType == TileType.BeltRight)
         {
             neighbors.Add(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition + 1, GridSquareYPosition]);
         }
-        else if (GridSquareYPosition > 0 && GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition - 1].GridSquareTileType == TileType.BeltUp)
+        if (GridSquareYPosition > 0 && GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition - 1].GridSquareTileType == TileType.BeltUp)
         {
             neighbors.Add(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition - 1]);
         }
-        else if (GridSquareYPosition < GridSquareInstantiation.InstantiationGridHeight - 1 && GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition + 1].GridSquareTileType == TileType.BeltDown)
+        if (GridSquareYPosition < GridSquareInstantiation.InstantiationGridHeight - 1 && GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition + 1].GridSquareTileType == TileType.BeltDown)
         {
             neighbors.Add(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition + 1]);
         }
