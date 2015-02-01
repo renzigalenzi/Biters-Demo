@@ -206,6 +206,10 @@ public class Instantiation : MonoBehaviour
 		int y = YOFFSET - (int)Math.Round(monster.MonsterGameObject.transform.position.y);
         switch(InstantiationGridSquareGrid[x, y].GridSquareTileType)
         {
+			case TileType.EnterZero:
+			case TileType.EnterOne:
+				InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
+				break;
             case TileType.ExitZero:
                 if(monster.MonsterNumberType == NumberType.Zero)
                 {
@@ -250,8 +254,6 @@ public class Instantiation : MonoBehaviour
                         }
                         Monster tempMonster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, numberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.None);
 						InstantiationGridSquareGrid[x, y].CalculateNewDirection(tempMonster);
-						//InstantiationMonsters.Remove(tempMonster);
-						//Destroy(tempMonster.MonsterGameObject);
                         break;
                     }
                 }
@@ -259,7 +261,6 @@ public class Instantiation : MonoBehaviour
                 {
                     Destroy(InstantiationMonsters[index1].MonsterGameObject, 0f);
                     Destroy(InstantiationMonsters[index2].MonsterGameObject, 0f);
-
 					if(index1 > index2)
 					{
 						InstantiationMonsters.RemoveAt(index1);
@@ -278,10 +279,6 @@ public class Instantiation : MonoBehaviour
             case TileType.BeltLeft:
 				InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
                 break;
-			case TileType.EnterZero:
-			case TileType.EnterOne:
-				InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
-				break;
             default:
                 Instantiation.PrintMessage("Invalid GridSquareTileType - AssignNewStatus(Monster monster)");
                 break;
