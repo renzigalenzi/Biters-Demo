@@ -174,20 +174,29 @@ public class Instantiation : MonoBehaviour
 
 	void UpdateMonsterAction()
 	{
-        foreach(Monster monster in InstantiationMonsters)
+		List<Monster> tempList = new List<Monster>();
+		foreach (Monster monster in InstantiationMonsters)
+		{
+			tempList.Add (monster);
+		}
+        foreach(Monster m in tempList)
         {
-            switch(monster.MonsterMovementType)
-            {
-                case MovementType.Moving:
-                    MoveMonster(monster);
-                    break;
-                case MovementType.Waiting:
-                    AssignNewStatus(monster);
-                    break;
-                default:
-                    Instantiation.PrintMessage("Invalid MonsterMovementType - UpdateMonsterAction()");
-                    break;
-            }
+			Monster monster = InstantiationMonsters.Find(n => n.MonsterId == m.MonsterId); 
+            if(monster != null)
+			{
+				switch(monster.MonsterMovementType)
+	            {
+	                case MovementType.Moving:
+	                    MoveMonster(monster);
+	                    break;
+	                case MovementType.Waiting:
+	                    AssignNewStatus(monster);
+	                    break;
+	                default:
+	                    Instantiation.PrintMessage("Invalid MonsterMovementType - UpdateMonsterAction()");
+	                    break;
+	            }
+			}
         }
 	}
 
