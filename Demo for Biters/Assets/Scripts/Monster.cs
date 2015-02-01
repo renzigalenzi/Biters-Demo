@@ -26,8 +26,8 @@ public class Monster
     public int MonsterId { get; set; }
     public MovementType MonsterMovementType { get; set; }
     public NumberType MonsterNumberType { get; set; }
-	public int MonsterStartingXPosition { get; set;}
-	public int MonsterStartingYPosition { get; set; }
+	public float MonsterStartingXPosition { get; set;}
+	public float MonsterStartingYPosition { get; set; }
     public int MonsterXPosition { get; set; }
     public int MonsterYPosition { get; set; }
     public MovementDirection MonsterMovementDirection { get; set; }
@@ -52,10 +52,8 @@ public class Monster
         MonsterId = monsterId;
         MonsterMovementType = monsterMovementType;
         MonsterNumberType = monsterNumberType;
-		MonsterStartingXPosition = monsterXPosition;
-		MonsterStartingYPosition = monsterYPosition;
-        MonsterXPosition = monsterXPosition;
-        MonsterYPosition = monsterYPosition;
+		MonsterXPosition = monsterXPosition;
+		MonsterYPosition = monsterYPosition;
         MonsterMovementDirection = monsterMovementDirection;
         MonsterMovementIncrement = 0.01F;
 
@@ -74,6 +72,9 @@ public class Monster
                 break;
         }
 
+		MonsterStartingXPosition = MonsterGameObject.transform.position.x;
+		MonsterStartingYPosition = MonsterGameObject.transform.position.y;
+
         MonsterInstantiation.InstantiationMonsters.Add(this);
         MonsterInstantiation.InstantiationNextMonsterId++;
     }
@@ -83,14 +84,12 @@ public class Monster
 		float currentX = MonsterGameObject.transform.position.x;
 		float currentY = MonsterGameObject.transform.position.y;
 
-		if (currentX == MonsterStartingXPosition && currentY == MonsterStartingYPosition)
+		if(Math.Abs (MonsterStartingXPosition - currentX) >= 1 || Math.Abs (MonsterStartingYPosition - currentY) >= 1)
 		{
-			return false;
-		}
-		else if(Math.Abs (MonsterXPosition - currentX) >= 1 || Math.Abs (MonsterYPosition - currentY) >= 1)
-		{
-			MonsterXPosition = (int)Math.Round (currentX);
-			MonsterYPosition = (int)Math.Round (currentY);
+			MonsterStartingXPosition = (int)Math.Round (currentX);
+			MonsterStartingYPosition = (int)Math.Round (currentY);
+			MonsterXPosition = (int)Math.Round (currentX) + Instantiation.XOFFSET;
+			MonsterYPosition = Instantiation.YOFFSET - (int)Math.Round (currentY);
 			return true;
 		}
 		else

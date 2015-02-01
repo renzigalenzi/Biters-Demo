@@ -127,7 +127,7 @@ public class GridSquare
                     Instantiation.PrintMessage("Invalid GridSquareTileType - CalculateNewDirection(Monster monster)");
                     break;
             }
-            new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, movementDirection);
+			new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, movementDirection);
         }
         if(neighbors.Count == 0)
         {
@@ -150,7 +150,7 @@ public class GridSquare
                     Instantiation.PrintMessage("Invalid GridSquareTileType - CalculateNewDirection(Monster monster)");
                     break;
             }
-            new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, movementDirection);
+			new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, movementDirection);
         }
         GridSquareInstantiation.InstantiationMonsters.Remove(monster);
 		Instantiation.Destroy(monster.MonsterGameObject, 0f);

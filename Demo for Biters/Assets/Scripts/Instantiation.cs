@@ -11,7 +11,7 @@ public class Instantiation : MonoBehaviour
     public GridSquare[,] InstantiationGridSquareGrid { get; set; }              // Functionality
     public int InstantiationGridWidth { get; set; }
     public int InstantiationGridHeight { get; set; }
-    public List<Monster> InstantiationMonsters { get; set; }
+	public List<Monster> InstantiationMonsters { get; set; }
     public int InstantiationNextMonsterId { get; set; }
     public int InstantiationSpawnDelay { get; set; }
 
@@ -155,13 +155,13 @@ public class Instantiation : MonoBehaviour
 				if(InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterZero && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn == 0)
 				{
 					Monster monster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, NumberType.Zero, x, y, MovementDirection.None);
-                    InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
+					InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
                     InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn = InstantiationSpawnDelay;
 				}
 				else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn == 0)
 				{
                     Monster monster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, NumberType.One, x, y, MovementDirection.None);
-                    InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
+					InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
 					InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn = InstantiationSpawnDelay;
 				}
                 else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterZero || InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne)
@@ -202,12 +202,20 @@ public class Instantiation : MonoBehaviour
                 {
                     PrintMessage("You win!");
                 }
+				else
+				{
+					PrintMessage("You lose!");
+				}
                 break;
             case TileType.ExitOne:
                 if(monster.MonsterNumberType == NumberType.One)
-                {
-                    PrintMessage("You lose!");
-                }
+				{
+					PrintMessage("You win!");
+				}
+				else
+				{
+					PrintMessage("You lose!");
+				}
                 break;
             case TileType.And:
             case TileType.Or:
@@ -232,32 +240,39 @@ public class Instantiation : MonoBehaviour
                             numberType = NumberType.One;
                         }
                         Monster tempMonster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, numberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.None);
-                        InstantiationGridSquareGrid[x, y].CalculateNewDirection(tempMonster);
+						InstantiationGridSquareGrid[x, y].CalculateNewDirection(tempMonster);
+						//InstantiationMonsters.Remove(tempMonster);
+						//Destroy(tempMonster.MonsterGameObject);
                         break;
                     }
                 }
                 if(shouldRemove)
                 {
-                    if(index1 > index2)
-                    {
-                        InstantiationMonsters.RemoveAt(index1);
-                        InstantiationMonsters.RemoveAt(index2);
-                    }
-                    else
-                    {
-                        InstantiationMonsters.RemoveAt(index2);
-                        InstantiationMonsters.RemoveAt(index1);
-                    }
                     Destroy(InstantiationMonsters[index1].MonsterGameObject, 0f);
                     Destroy(InstantiationMonsters[index2].MonsterGameObject, 0f);
+
+					if(index1 > index2)
+					{
+						InstantiationMonsters.RemoveAt(index1);
+						InstantiationMonsters.RemoveAt(index2);
+					}
+					else
+					{
+						InstantiationMonsters.RemoveAt(index2);
+						InstantiationMonsters.RemoveAt(index1);
+					}
                 }
                 break;
             case TileType.BeltUp:
             case TileType.BeltRight:
             case TileType.BeltDown:
             case TileType.BeltLeft:
-                InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
+				InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
                 break;
+			case TileType.EnterZero:
+			case TileType.EnterOne:
+				InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
+				break;
             default:
                 Instantiation.PrintMessage("Invalid GridSquareTileType - AssignNewStatus(Monster monster)");
                 break;
@@ -289,7 +304,7 @@ public class Instantiation : MonoBehaviour
         monster.MonsterGameObject.transform.position += new Vector3(monster.MonsterMovementIncrement * moveX, monster.MonsterMovementIncrement * moveY, 0);
 
         if(monster.FinishedMovingTile())
-        {
+		{
             monster.MonsterMovementType = MovementType.Waiting;
         }
 	}
