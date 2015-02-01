@@ -1,12 +1,33 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GridSquare.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Instantiation.cs">
     <Files>
-      <File FileName="Assets\Scripts\GridSquare.cs" Line="151" Column="1" />
-      <File FileName="Assets\Scripts\Monster.cs" Line="60" Column="1" />
-      <File FileName="Assets\Scripts\Instantiation.cs" Line="374" Column="1" />
-      <File FileName="Assets\Resources\filelevel.txt" Line="8" Column="16" />
+      <File FileName="Assets\Scripts\GridSquare.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Monster.cs" Line="84" Column="34" />
+      <File FileName="Assets\Scripts\Instantiation.cs" Line="196" Column="91" />
+      <File FileName="Assets\Resources\Level1.txt" Line="1" Column="1" />
     </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Assembly-CSharp" expanded="True">
+            <Node name="Resources" expanded="True" />
+            <Node name="Scripts" expanded="True">
+              <Node name="Instantiation.cs" selected="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State>
+          <Value>GridSquareInstantiation.InstantiationGridSquareGrid[0, 0].GridSquareTileType</Value>
+          <Value>InstantiationGridSquareGrid[0, 0].GridSquareTileType</Value>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

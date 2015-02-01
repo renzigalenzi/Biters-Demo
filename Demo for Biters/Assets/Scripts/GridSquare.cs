@@ -14,6 +14,7 @@ public class GridSquare
     public TileType GridSquareTileType { get; set; }
     public int GridSquareXPosition { get; set; }
     public int GridSquareYPosition { get; set; }
+	public int GridSquareTimeToNextSpawn { get; set; }
 
     public GridSquare()
     {
@@ -22,6 +23,7 @@ public class GridSquare
         GridSquareTileType = TileType.Blank;
         GridSquareXPosition = 0;
         GridSquareYPosition = 0;
+		GridSquareTimeToNextSpawn = 0;
     }
 
     public GridSquare(Instantiation gridSquareInstantiation, TileType gridSquareTileType, int gridSquareXPosition, int gridSquareYPosition)
@@ -31,8 +33,9 @@ public class GridSquare
         GridSquareTileType = gridSquareTileType;
         GridSquareXPosition = gridSquareXPosition;
         GridSquareYPosition = gridSquareYPosition;
+		GridSquareTimeToNextSpawn = 0;
 
-        GridSquareGameObject.transform.position = new Vector3(GridSquareXPosition, GridSquareYPosition, 0);
+        GridSquareGameObject.transform.position = new Vector3(GridSquareXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - GridSquareYPosition, 0);
         switch(GridSquareTileType)
         {
             case TileType.Blank:

@@ -14,7 +14,6 @@ public class Instantiation : MonoBehaviour
     public List<Monster> InstantiationMonsters { get; set; }
     public int InstantiationNextMonsterId { get; set; }
     public int InstantiationSpawnDelay { get; set; }
-    public int InstantiationTimeToNextSpawn { get; set; }
 
     public Material Blank;
     public Material EnterZero;
@@ -31,12 +30,14 @@ public class Instantiation : MonoBehaviour
     public Material BiterOne;
     public Material SelectedMaterial;
 
+	public const int XOFFSET = 4;
+	public const int YOFFSET = 4;
+
     public void Start()
     {
         InstantiationMonsters = new List<Monster>();
         InstantiationNextMonsterId = 0;
         InstantiationSpawnDelay = 10000;
-        InstantiationTimeToNextSpawn = 0;
         Blank = Resources.Load("Blank", typeof(Material)) as Material;
         EnterZero = Resources.Load("EnterZero", typeof(Material)) as Material;
         EnterOne = Resources.Load("EnterOne", typeof(Material)) as Material;
@@ -57,7 +58,7 @@ public class Instantiation : MonoBehaviour
 
     public bool LoadLevel(string fileName)
     {
-        string filePath = "Assets/Resourves/" + fileName;
+        string filePath = "Assets/Resources/" + fileName;
         try
         {
             InitializeGrid(filePath);
@@ -71,10 +72,11 @@ public class Instantiation : MonoBehaviour
                     string[] entries = line.Split(',');
                     for(int x = 0; x < entries.Length; x++)
                     {
-                        int intType = Convert.ToInt32(entries[x]);
+						int intType = Convert.ToInt32(entries[x]);
                         new GridSquare(this, (TileType)intType, x, y);
                     }
                     y++;
+					line = reader.ReadLine();
                 }
                 reader.Close();
                 return true;
@@ -139,7 +141,7 @@ public class Instantiation : MonoBehaviour
 				{
 					type = TileType.And;
 				}
-                InstantiationGridSquareGrid[(int)pObject.transform.position.x, (int)pObject.transform.position.y].GridSquareTileType = type;
+                InstantiationGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = type;
 			}
 		}
 	}
@@ -150,21 +152,21 @@ public class Instantiation : MonoBehaviour
 		{
             for(int y = 0; y < InstantiationGridHeight; y++) 
 			{
-                if(InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterZero && InstantiationTimeToNextSpawn == 0)
+				if(InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterZero && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn == 0)
 				{
 					Monster monster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, NumberType.Zero, x, y, MovementDirection.None);
                     InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
-                    InstantiationTimeToNextSpawn = InstantiationSpawnDelay;
+                    InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn = InstantiationSpawnDelay;
 				}
-                else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne && InstantiationTimeToNextSpawn == 0)
+				else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn == 0)
 				{
                     Monster monster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, NumberType.One, x, y, MovementDirection.None);
                     InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
-                    InstantiationTimeToNextSpawn = InstantiationSpawnDelay;
+					InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn = InstantiationSpawnDelay;
 				}
                 else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterZero || InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne)
 				{
-                    InstantiationTimeToNextSpawn--;
+					InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn--;
 				}
 			}
 		}
@@ -191,8 +193,8 @@ public class Instantiation : MonoBehaviour
 
 	void AssignNewStatus(Monster monster)
 	{
-        int x = monster.MonsterXPosition;
-        int y = monster.MonsterYPosition;
+        int x = XOFFSET + (int)Math.Round(monster.MonsterGameObject.transform.position.x);
+		int y = YOFFSET - (int)Math.Round(monster.MonsterGameObject.transform.position.y);
         switch(InstantiationGridSquareGrid[x, y].GridSquareTileType)
         {
             case TileType.ExitZero:
@@ -286,10 +288,10 @@ public class Instantiation : MonoBehaviour
 
         monster.MonsterGameObject.transform.position += new Vector3(monster.MonsterMovementIncrement * moveX, monster.MonsterMovementIncrement * moveY, 0);
 
-        /*if(monster.FinishedMovingTile())
+        if(monster.FinishedMovingTile())
         {
             monster.MonsterMovementType = MovementType.Waiting;
-        }*/
+        }
 	}
 
 	public static void PrintMessage(string printStatement)
