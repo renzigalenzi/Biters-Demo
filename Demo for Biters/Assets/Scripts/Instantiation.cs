@@ -117,8 +117,10 @@ public class Instantiation : MonoBehaviour
 	void Update () 
 	{
 		GetMouseRays();
+		GetKeyboard(); // @RCH: Temporary way to change selected gate
 		UpdateSpawnTile();
 		UpdateMonsterAction();
+		// @RCH: Check for win condition
 	}
 
 	void GetMouseRays()
@@ -143,6 +145,18 @@ public class Instantiation : MonoBehaviour
 				}
                 InstantiationGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = type;
 			}
+		}
+	}
+
+	void GetKeyboard() // @RCH: Temporary way to change selected gate
+	{
+		if(Input.GetKeyDown(KeyCode.Alpha1))
+		{
+			SelectedMaterial = And;
+		}
+		else if(Input.GetKeyDown(KeyCode.Alpha2))
+		{
+			SelectedMaterial = Or;
 		}
 	}
 
@@ -210,7 +224,7 @@ public class Instantiation : MonoBehaviour
 			case TileType.EnterOne:
 				InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
 				break;
-            case TileType.ExitZero:
+            case TileType.ExitZero: // @RCH: Once win condition is set, remove this
                 if(monster.MonsterNumberType == NumberType.Zero)
                 {
                     PrintMessage("You win!");
@@ -220,7 +234,7 @@ public class Instantiation : MonoBehaviour
 					PrintMessage("You lose!");
 				}
                 break;
-            case TileType.ExitOne:
+			case TileType.ExitOne: // @RCH: Once win condition is set, remove this
                 if(monster.MonsterNumberType == NumberType.One)
 				{
 					PrintMessage("You win!");
