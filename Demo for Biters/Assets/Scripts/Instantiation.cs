@@ -133,6 +133,10 @@ public class Instantiation : MonoBehaviour
 			{
 				// All cubes will need a ray layer later so that when you click the monster sprites, it won't interfere with changing gates
 				GameObject pObject = hit.transform.gameObject;
+				if(pObject.renderer.sharedMaterial != And && pObject.renderer.sharedMaterial != Or)
+				{
+					return;
+				}
 				pObject.renderer.material = SelectedMaterial;
                 TileType type = TileType.Or;
 				if(SelectedMaterial == Or)
