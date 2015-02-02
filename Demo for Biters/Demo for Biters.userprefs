@@ -1,17 +1,15 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Monster.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Instantiation.cs">
     <Files>
-      <File FileName="Assets\Scripts\Instantiation.cs" Line="211" Column="23" />
-      <File FileName="Assets\Scripts\GridSquare.cs" Line="64" Column="21" />
-      <File FileName="Assets\Scripts\Monster.cs" Line="85" Column="13" />
-      <File FileName="Assets\Resources\Level1.txt" Line="8" Column="16" />
+      <File FileName="Assets\Scripts\Instantiation.cs" Line="136" Column="81" />
+      <File FileName="Assets\Scripts\GridSquare.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Monster.cs" Line="1" Column="1" />
+      <File FileName="Assets\Resources\Level1.txt" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="C:\Users\Public\Documents\Unity Projects\Demo for Biters\Assets\Scripts\Instantiation.cs" line="194" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

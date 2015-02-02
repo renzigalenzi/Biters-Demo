@@ -57,7 +57,7 @@ public class Monster
         MonsterMovementDirection = monsterMovementDirection;
         MonsterMovementIncrement = 0.01F;
 
-        MonsterGameObject.transform.position = new Vector3(MonsterXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - MonsterYPosition, -1);
+        MonsterGameObject.transform.position = new Vector3(MonsterXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - MonsterYPosition, 1);
         MonsterGameObject.transform.localScale = new Vector3(0.5F, 0.5F, 0.1F);
         switch(MonsterNumberType)
         {
@@ -71,7 +71,6 @@ public class Monster
                 Instantiation.PrintMessage("Invalid MonsterNumberType - Monster(Instantiation monsterInstantiation, int monsterId, MovementType monsterMovementType, NumberType monsterNumberType, int monsterXPosition, int monsterYPosition, MovementDirection monsterMovementDirection)");
                 break;
         }
-
 		MonsterStartingXPosition = MonsterGameObject.transform.position.x;
 		MonsterStartingYPosition = MonsterGameObject.transform.position.y;
 
@@ -86,8 +85,8 @@ public class Monster
 
 		if(Math.Abs (MonsterStartingXPosition - currentX) >= 1 || Math.Abs (MonsterStartingYPosition - currentY) >= 1)
 		{
-			MonsterStartingXPosition = (int)Math.Round (currentX);
-			MonsterStartingYPosition = (int)Math.Round (currentY);
+			MonsterStartingXPosition = (int)Math.Round(currentX);
+			MonsterStartingYPosition = (int)Math.Round(currentY);
 			MonsterXPosition = (int)Math.Round (currentX) + Instantiation.XOFFSET;
 			MonsterYPosition = Instantiation.YOFFSET - (int)Math.Round (currentY);
 			return true;

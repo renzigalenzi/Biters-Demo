@@ -117,8 +117,10 @@ public class Instantiation : MonoBehaviour
 	void Update () 
 	{
 		GetMouseRays();
+		GetKeyboard(); // @RCH: Temporary way to change selected gate
 		UpdateSpawnTile();
 		UpdateMonsterAction();
+		// @RCH: Check for win condition
 	}
 
 	void GetMouseRays()
@@ -131,6 +133,10 @@ public class Instantiation : MonoBehaviour
 			{
 				// All cubes will need a ray layer later so that when you click the monster sprites, it won't interfere with changing gates
 				GameObject pObject = hit.transform.gameObject;
+				if(pObject.renderer.sharedMaterial != And && pObject.renderer.sharedMaterial != Or)
+				{
+					return;
+				}
 				pObject.renderer.material = SelectedMaterial;
                 TileType type = TileType.Or;
 				if(SelectedMaterial == Or)
@@ -143,6 +149,18 @@ public class Instantiation : MonoBehaviour
 				}
                 InstantiationGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = type;
 			}
+		}
+	}
+
+	void GetKeyboard() // @RCH: Temporary way to change selected gate
+	{
+		if(Input.GetKeyDown(KeyCode.Alpha1))
+		{
+			SelectedMaterial = And;
+		}
+		else if(Input.GetKeyDown(KeyCode.Alpha2))
+		{
+			SelectedMaterial = Or;
 		}
 	}
 
@@ -174,20 +192,29 @@ public class Instantiation : MonoBehaviour
 
 	void UpdateMonsterAction()
 	{
-        foreach(Monster monster in InstantiationMonsters)
+		List<Monster> tempList = new List<Monster>();
+		foreach (Monster monster in InstantiationMonsters)
+		{
+			tempList.Add (monster);
+		}
+        foreach(Monster m in tempList)
         {
-            switch(monster.MonsterMovementType)
-            {
-                case MovementType.Moving:
-                    MoveMonster(monster);
-                    break;
-                case MovementType.Waiting:
-                    AssignNewStatus(monster);
-                    break;
-                default:
-                    Instantiation.PrintMessage("Invalid MonsterMovementType - UpdateMonsterAction()");
-                    break;
-            }
+			Monster monster = InstantiationMonsters.Find(n => n.MonsterId == m.MonsterId); 
+            if(monster != null)
+			{
+				switch(monster.MonsterMovementType)
+	            {
+	                case MovementType.Moving:
+	                    MoveMonster(monster);
+	                    break;
+	                case MovementType.Waiting:
+	                    AssignNewStatus(monster);
+	                    break;
+	                default:
+	                    Instantiation.PrintMessage("Invalid MonsterMovementType - UpdateMonsterAction()");
+	                    break;
+	            }
+			}
         }
 	}
 
@@ -197,7 +224,11 @@ public class Instantiation : MonoBehaviour
 		int y = YOFFSET - (int)Math.Round(monster.MonsterGameObject.transform.position.y);
         switch(InstantiationGridSquareGrid[x, y].GridSquareTileType)
         {
-            case TileType.ExitZero:
+			case TileType.EnterZero:
+			case TileType.EnterOne:
+				InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
+				break;
+            case TileType.ExitZero: // @RCH: Once win condition is set, remove this
                 if(monster.MonsterNumberType == NumberType.Zero)
                 {
                     PrintMessage("You win!");
@@ -207,7 +238,7 @@ public class Instantiation : MonoBehaviour
 					PrintMessage("You lose!");
 				}
                 break;
-            case TileType.ExitOne:
+			case TileType.ExitOne: // @RCH: Once win condition is set, remove this
                 if(monster.MonsterNumberType == NumberType.One)
 				{
 					PrintMessage("You win!");
@@ -241,8 +272,6 @@ public class Instantiation : MonoBehaviour
                         }
                         Monster tempMonster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, numberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.None);
 						InstantiationGridSquareGrid[x, y].CalculateNewDirection(tempMonster);
-						//InstantiationMonsters.Remove(tempMonster);
-						//Destroy(tempMonster.MonsterGameObject);
                         break;
                     }
                 }
@@ -250,7 +279,6 @@ public class Instantiation : MonoBehaviour
                 {
                     Destroy(InstantiationMonsters[index1].MonsterGameObject, 0f);
                     Destroy(InstantiationMonsters[index2].MonsterGameObject, 0f);
-
 					if(index1 > index2)
 					{
 						InstantiationMonsters.RemoveAt(index1);
@@ -269,10 +297,6 @@ public class Instantiation : MonoBehaviour
             case TileType.BeltLeft:
 				InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
                 break;
-			case TileType.EnterZero:
-			case TileType.EnterOne:
-				InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
-				break;
             default:
                 Instantiation.PrintMessage("Invalid GridSquareTileType - AssignNewStatus(Monster monster)");
                 break;

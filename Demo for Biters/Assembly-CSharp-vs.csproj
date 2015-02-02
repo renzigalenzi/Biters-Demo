@@ -49,6 +49,7 @@
      <Compile Include="Assets\Scripts\GridSquare.cs" />
      <Compile Include="Assets\Scripts\Instantiation.cs" />
      <Compile Include="Assets\Scripts\Monster.cs" />
+     <None Include="Assets\filelevel.txt" />
      <None Include="Assets\Resources\Level1.txt" />
      <None Include="Assets\Resources\filelevel.txt" />
  <Reference Include="UnityEngine.UI">
