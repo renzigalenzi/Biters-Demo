@@ -57,8 +57,9 @@ public class Monster
         MonsterMovementDirection = monsterMovementDirection;
         MonsterMovementIncrement = 0.01F;
 
-        MonsterGameObject.transform.position = new Vector3(MonsterXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - MonsterYPosition, 1);
-        MonsterGameObject.transform.localScale = new Vector3(0.5F, 0.5F, 0.1F);
+        MonsterGameObject.transform.position = new Vector3(MonsterXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - MonsterYPosition, -1);
+		MonsterGameObject.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+		MonsterGameObject.transform.localScale = new Vector3(0.5F, 0.5F, 0.1F);
         switch(MonsterNumberType)
         {
             case NumberType.Zero:

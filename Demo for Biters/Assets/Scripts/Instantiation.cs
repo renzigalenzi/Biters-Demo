@@ -70,7 +70,7 @@ public class Instantiation : MonoBehaviour
                 while(line != null)
                 {
                     string[] entries = line.Split(',');
-                    for(int x = 0; x < entries.Length; x++)
+					for(int x = 0; x < entries.Length; x++)
                     {
 						int intType = Convert.ToInt32(entries[x]);
                         new GridSquare(this, (TileType)intType, x, y);

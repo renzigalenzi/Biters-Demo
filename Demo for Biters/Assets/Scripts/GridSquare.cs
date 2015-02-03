@@ -42,6 +42,7 @@ public class GridSquare
 		GridSquareTimeToNextSpawn = 0;
 
         GridSquareGameObject.transform.position = new Vector3(GridSquareXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - GridSquareYPosition, 0);
+		GridSquareGameObject.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
         switch(GridSquareTileType)
         {
             case TileType.Blank:
