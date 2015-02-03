@@ -229,24 +229,8 @@ public class Instantiation : MonoBehaviour
 				InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
 				break;
             case TileType.ExitZero: // @RCH: Once win condition is set, remove this
-                if(monster.MonsterNumberType == NumberType.Zero)
-                {
-                    PrintMessage("You win!");
-                }
-				else
-				{
-					PrintMessage("You lose!");
-				}
-                break;
 			case TileType.ExitOne: // @RCH: Once win condition is set, remove this
-                if(monster.MonsterNumberType == NumberType.One)
-				{
-					PrintMessage("You win!");
-				}
-				else
-				{
-					PrintMessage("You lose!");
-				}
+				CheckForWin(x,y,monster);
                 break;
             case TileType.And:
             case TileType.Or:
@@ -331,6 +315,55 @@ public class Instantiation : MonoBehaviour
 		{
             monster.MonsterMovementType = MovementType.Waiting;
         }
+	}
+
+	void CheckForWin(int x, int y, Monster monster)
+	{
+		//assign the current tile to win or lose from blank. cant be assigned unless blank or win.(if you lose you lose)
+		//check all tiles, if any of the end pieces are lose then return you lose
+		//if the amount of winning tiles == the number of end pieces then you win
+		bool PlayerLost = false;
+		int numWinningExits = 0;
+		int totalNumExits = 0;
+
+		if(monster.MonsterNumberType == NumberType.One && InstantiationGridSquareGrid[x,y].GridSquareTileType == TileType.ExitOne || 
+		   monster.MonsterNumberType == NumberType.Zero && InstantiationGridSquareGrid[x,y].GridSquareTileType == TileType.ExitZero)
+		{
+			if(InstantiationGridSquareGrid[x,y].GridSquareHasWinningPiece != WinCondition.Incorrect)
+			{
+				InstantiationGridSquareGrid[x,y].GridSquareHasWinningPiece = WinCondition.Correct;
+			}
+		}
+		else
+		{
+			InstantiationGridSquareGrid[x,y].GridSquareHasWinningPiece = WinCondition.Incorrect;
+		}
+
+		for (int i = 0; i < InstantiationGridSquareGrid.GetLength(0); i++) 
+		{
+			for (int j = 0; j < InstantiationGridSquareGrid.GetLength(1); j++) 
+			{
+				if(InstantiationGridSquareGrid[i,j].GridSquareTileType == TileType.ExitOne ||
+				   InstantiationGridSquareGrid[i,j].GridSquareTileType == TileType.ExitZero)
+				{
+					if(InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece == WinCondition.Incorrect)
+						PlayerLost = true;
+					if(InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece == WinCondition.Correct)
+						numWinningExits ++;
+
+					totalNumExits++;
+				}
+			}
+		}
+
+		if (PlayerLost)
+			PrintMessage ("YOU LOSE!");
+		else if (numWinningExits == totalNumExits)
+			PrintMessage ("YOU WIN!");
+		else
+			PrintMessage ("GOOD JOB KEEP GOING!");
+
+		monster.DestroyEntirely ();
 	}
 
 	public static void PrintMessage(string printStatement)

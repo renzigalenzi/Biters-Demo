@@ -96,4 +96,9 @@ public class Monster
 			return false;
 		}
 	}
+	public void DestroyEntirely()
+	{
+		MonsterInstantiation.InstantiationMonsters.Remove(this);
+		Instantiation.Destroy(this.MonsterGameObject, 0f);
+	}
 }

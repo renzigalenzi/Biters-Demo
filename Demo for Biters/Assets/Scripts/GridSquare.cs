@@ -6,12 +6,17 @@ public enum TileType
 {
     Blank, EnterZero, EnterOne, ExitZero, ExitOne, And, Or, BeltUp, BeltRight, BeltDown, BeltLeft
 }
+public enum WinCondition
+{
+	NoPiece, Correct, Incorrect
+}
 
 public class GridSquare
 {
     public GameObject GridSquareGameObject { get; set; }
     public Instantiation GridSquareInstantiation { get; set; }
     public TileType GridSquareTileType { get; set; }
+	public WinCondition GridSquareHasWinningPiece { get; set; }
     public int GridSquareXPosition { get; set; }
     public int GridSquareYPosition { get; set; }
 	public int GridSquareTimeToNextSpawn { get; set; }
@@ -24,6 +29,7 @@ public class GridSquare
         GridSquareXPosition = 0;
         GridSquareYPosition = 0;
 		GridSquareTimeToNextSpawn = 0;
+		GridSquareHasWinningPiece = WinCondition.NoPiece;
     }
 
     public GridSquare(Instantiation gridSquareInstantiation, TileType gridSquareTileType, int gridSquareXPosition, int gridSquareYPosition)
@@ -75,6 +81,8 @@ public class GridSquare
                 Instantiation.PrintMessage("Invalid GridSquareTileType - GridSquare(Instantiation gridSquareInstantiation, TileType gridSquareTileType, int gridSquareXPosition, int gridSquareYPosition)");
                 break;
         }
+		GridSquareHasWinningPiece = WinCondition.NoPiece;
+
         GridSquareInstantiation.InstantiationGridSquareGameObjectGrid[GridSquareXPosition, GridSquareYPosition] = GridSquareGameObject;
         GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition] = this;
     }
