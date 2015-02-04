@@ -26,6 +26,18 @@ public class Instantiation : MonoBehaviour
     public Material BeltRight;
     public Material BeltDown;
     public Material BeltLeft;
+	public Material BeltUpLeft;
+	public Material BeltUpRight;
+	public Material BeltRightUp;
+	public Material BeltRightDown;
+	public Material BeltDownRight;
+	public Material BeltDownLeft;
+	public Material BeltLeftDown;
+	public Material BeltLeftUp;
+	public Material BeltUpT;
+	public Material BeltRightT;
+	public Material BeltDownT;
+	public Material BeltLeftT;
     public Material BiterZero;
     public Material BiterOne;
     public Material SelectedMaterial;
@@ -49,6 +61,18 @@ public class Instantiation : MonoBehaviour
         BeltRight = Resources.Load("BeltRight", typeof(Material)) as Material;
         BeltDown = Resources.Load("BeltDown", typeof(Material)) as Material;
         BeltLeft = Resources.Load("BeltLeft", typeof(Material)) as Material;
+		BeltUpLeft = Resources.Load("BeltUpLeft", typeof(Material)) as Material;
+		BeltUpRight = Resources.Load("BeltUpRight", typeof(Material)) as Material;
+		BeltRightUp = Resources.Load("BeltRightUp", typeof(Material)) as Material;
+		BeltRightDown = Resources.Load("BeltRightDown", typeof(Material)) as Material;
+		BeltDownRight = Resources.Load("BeltDownRight", typeof(Material)) as Material;
+		BeltDownLeft = Resources.Load("BeltDownLeft", typeof(Material)) as Material;
+		BeltLeftDown = Resources.Load("BeltLeftDown", typeof(Material)) as Material;
+		BeltLeftUp = Resources.Load("BeltLeftUp", typeof(Material)) as Material;
+		BeltUpT = Resources.Load("BeltUpT", typeof(Material)) as Material;
+		BeltRightT = Resources.Load("BeltRightT", typeof(Material)) as Material;
+		BeltDownT = Resources.Load("BeltDownT", typeof(Material)) as Material;
+		BeltLeftT = Resources.Load("BeltLeftT", typeof(Material)) as Material;
         BiterZero = Resources.Load("BiterZero", typeof(Material)) as Material;
         BiterOne = Resources.Load("BiterOne", typeof(Material)) as Material;
         SelectedMaterial = Or;
@@ -279,6 +303,18 @@ public class Instantiation : MonoBehaviour
             case TileType.BeltRight:
             case TileType.BeltDown:
             case TileType.BeltLeft:
+			case TileType.BeltUpLeft:
+			case TileType.BeltUpRight:
+			case TileType.BeltRightUp:
+			case TileType.BeltRightDown:
+			case TileType.BeltDownRight:
+			case TileType.BeltDownLeft:
+			case TileType.BeltLeftDown:
+			case TileType.BeltLeftUp:
+			case TileType.BeltUpT:
+			case TileType.BeltRightT:
+			case TileType.BeltDownT:
+			case TileType.BeltLeftT:
 				InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
                 break;
             default:
