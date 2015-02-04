@@ -40,7 +40,8 @@ public class Instantiation : MonoBehaviour
 	public Material BeltLeftT;
     public Material BiterZero;
     public Material BiterOne;
-    public Material SelectedMaterial;
+	public Material Lose;
+	public Material Win;
 
 	public const int XOFFSET = 4;
 	public const int YOFFSET = 4;
@@ -75,7 +76,8 @@ public class Instantiation : MonoBehaviour
 		BeltLeftT = Resources.Load("BeltLeftT", typeof(Material)) as Material;
         BiterZero = Resources.Load("BiterZero", typeof(Material)) as Material;
         BiterOne = Resources.Load("BiterOne", typeof(Material)) as Material;
-        SelectedMaterial = Or;
+		Lose = Resources.Load("Lose", typeof(Material)) as Material;
+		Win = Resources.Load("Win", typeof(Material)) as Material;
 
         LoadLevel("Level1.txt");
     }
@@ -141,10 +143,8 @@ public class Instantiation : MonoBehaviour
 	void Update () 
 	{
 		GetMouseRays();
-		GetKeyboard(); // @RCH: Temporary way to change selected gate
 		UpdateSpawnTile();
 		UpdateMonsterAction();
-		// @RCH: Check for win condition
 	}
 
 	void GetMouseRays()
@@ -161,30 +161,19 @@ public class Instantiation : MonoBehaviour
 				{
 					return;
 				}
-				pObject.renderer.material = SelectedMaterial;
-                TileType type = TileType.Or;
-				if(SelectedMaterial == Or)
+				TileType tileType = TileType.Or;
+				if(pObject.renderer.sharedMaterial == Or)
 				{
-					type = TileType.Or;
+					pObject.renderer.material = And;
+					tileType = TileType.And;
 				}
-				else if(SelectedMaterial == And)
+				else if(pObject.renderer.sharedMaterial == And)
 				{
-					type = TileType.And;
+					pObject.renderer.material = Or;
+					tileType = TileType.Or;
 				}
-                InstantiationGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = type;
+                InstantiationGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = tileType;
 			}
-		}
-	}
-
-	void GetKeyboard() // @RCH: Temporary way to change selected gate
-	{
-		if(Input.GetKeyDown(KeyCode.Alpha1))
-		{
-			SelectedMaterial = And;
-		}
-		else if(Input.GetKeyDown(KeyCode.Alpha2))
-		{
-			SelectedMaterial = Or;
 		}
 	}
 
@@ -393,11 +382,27 @@ public class Instantiation : MonoBehaviour
 		}
 
 		if (PlayerLost)
+		{
 			PrintMessage ("YOU LOSE!");
+			GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			cube.transform.position = new Vector3(0, 0, 0);
+			cube.transform.localScale = new Vector3(10, 10, 10);
+			cube.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+			cube.renderer.material = Lose;
+		}
 		else if (numWinningExits == totalNumExits)
+		{
 			PrintMessage ("YOU WIN!");
+			GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			cube.transform.position = new Vector3(0, 0, 0);
+			cube.transform.localScale = new Vector3(10, 10, 10);
+			cube.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+			cube.renderer.material = Win;
+		}
 		else
+		{
 			PrintMessage ("GOOD JOB KEEP GOING!");
+		}
 
 		monster.DestroyEntirely ();
 	}
