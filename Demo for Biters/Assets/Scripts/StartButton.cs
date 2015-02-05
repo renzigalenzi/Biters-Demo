@@ -7,7 +7,7 @@ public class StartButton : MonoBehaviour {
 	void Start () {
 
 		Time.timeScale = 1; 
-		AudioListener.volume = 50; 
+		AudioListener.volume = 10; 
 	
 	}
 	

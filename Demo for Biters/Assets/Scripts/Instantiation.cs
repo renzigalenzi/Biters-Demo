@@ -16,6 +16,9 @@ public class Instantiation : MonoBehaviour
     public int InstantiationSpawnDelay { get; set; }
 	private float timer = 60.0f; 
 
+	public AudioClip gateSound;
+	
+
     public Material Blank;
     public Material EnterZero;
     public Material EnterOne;
@@ -80,6 +83,7 @@ public class Instantiation : MonoBehaviour
 		Lose = Resources.Load("Lose", typeof(Material)) as Material;
 		Win = Resources.Load("Win", typeof(Material)) as Material;
 		Time.timeScale = 1.0f; 
+
 
         LoadLevel("Level1.txt");
     }
@@ -189,11 +193,13 @@ public class Instantiation : MonoBehaviour
 				{
 					pObject.renderer.material = And;
 					tileType = TileType.And;
+					AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
 				}
 				else if(pObject.renderer.sharedMaterial == And)
 				{
 					pObject.renderer.material = Or;
 					tileType = TileType.Or;
+					AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
 				}
                 InstantiationGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = tileType;
 			}
