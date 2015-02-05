@@ -14,6 +14,7 @@ public class Instantiation : MonoBehaviour
 	public List<Monster> InstantiationMonsters { get; set; }
     public int InstantiationNextMonsterId { get; set; }
     public int InstantiationSpawnDelay { get; set; }
+	private float timer = 60.0f; 
 
     public Material Blank;
     public Material EnterZero;
@@ -78,6 +79,7 @@ public class Instantiation : MonoBehaviour
         BiterOne = Resources.Load("BiterOne", typeof(Material)) as Material;
 		Lose = Resources.Load("Lose", typeof(Material)) as Material;
 		Win = Resources.Load("Win", typeof(Material)) as Material;
+		Time.timeScale = 1.0f; 
 
         LoadLevel("Level1.txt");
     }
@@ -145,6 +147,27 @@ public class Instantiation : MonoBehaviour
 		GetMouseRays();
 		UpdateSpawnTile();
 		UpdateMonsterAction();
+		timer -= Time.deltaTime; 
+		
+		if (timer <= 0) 
+		{ 
+			timer = 0.0f; 
+		} 
+	}
+	void PauseGame() 
+	{ 
+		Time.timeScale = 0.000001f; 
+	} 
+	void OnGUI () 
+	{
+		GUI.Box (new Rect (Screen.width - 50, 0, 50, 20), "" + timer.ToString ("f0")); 
+		if (timer <= 0) 
+		{ 
+			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 100, 25), "Try Again?")) 
+			{
+				Application.LoadLevel (Application.loadedLevelName); 
+			} 
+		} 
 	}
 
 	void GetMouseRays()
@@ -176,7 +199,6 @@ public class Instantiation : MonoBehaviour
 			}
 		}
 	}
-
 	void UpdateSpawnTile()
 	{
 		for(int x = 0; x < InstantiationGridWidth; x++) 
@@ -334,7 +356,7 @@ public class Instantiation : MonoBehaviour
             moveX = -1;
         }
 
-        monster.MonsterGameObject.transform.position += new Vector3(monster.MonsterMovementIncrement * moveX, monster.MonsterMovementIncrement * moveY, 0);
+		monster.MonsterGameObject.transform.position += new Vector3(monster.MonsterMovementIncrement * moveX * Time.timeScale, monster.MonsterMovementIncrement * moveY * Time.timeScale, 0);
 
         if(monster.FinishedMovingTile())
 		{
