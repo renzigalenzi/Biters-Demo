@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System;
@@ -31,6 +32,7 @@ public class Monster
     public int MonsterXPosition { get; set; }
     public int MonsterYPosition { get; set; }
     public MovementDirection MonsterMovementDirection { get; set; }
+	//public List<int> DirectionsNotToGo{ get; set; }
     public float MonsterMovementIncrement { get; set; }
 
     public Monster()
@@ -47,6 +49,8 @@ public class Monster
 
     public Monster(Instantiation monsterInstantiation, int monsterId, MovementType monsterMovementType, NumberType monsterNumberType, int monsterXPosition, int monsterYPosition, MovementDirection monsterMovementDirection)
     {
+		//DirectionsNotToGo.Add (monsterMovementDirection);
+
         MonsterGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
         MonsterInstantiation = monsterInstantiation;
         MonsterId = monsterId;
@@ -58,15 +62,15 @@ public class Monster
         MonsterMovementIncrement = 0.01F;
 
         MonsterGameObject.transform.position = new Vector3(MonsterXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - MonsterYPosition, -1);
-		MonsterGameObject.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+		MonsterGameObject.transform.rotation = Quaternion.AngleAxis(180, Vector3.back);
 		MonsterGameObject.transform.localScale = new Vector3(0.5F, 0.5F, 0.1F);
         switch(MonsterNumberType)
         {
             case NumberType.Zero:
-                MonsterGameObject.renderer.material = MonsterInstantiation.BiterZero;
+				MonsterGameObject.renderer.material = MonsterInstantiation.MaterialDictionary["BiterZero"];
                 break;
             case NumberType.One:
-                MonsterGameObject.renderer.material = MonsterInstantiation.BiterOne;
+				MonsterGameObject.renderer.material = MonsterInstantiation.MaterialDictionary["BiterOne"];
                 break;
             default:
                 Instantiation.PrintMessage("Invalid MonsterNumberType - Monster(Instantiation monsterInstantiation, int monsterId, MovementType monsterMovementType, NumberType monsterNumberType, int monsterXPosition, int monsterYPosition, MovementDirection monsterMovementDirection)");

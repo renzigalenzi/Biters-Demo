@@ -14,33 +14,12 @@ public class Instantiation : MonoBehaviour
 	public List<Monster> InstantiationMonsters { get; set; }
     public int InstantiationNextMonsterId { get; set; }
     public int InstantiationSpawnDelay { get; set; }
+	private float timer = 60.0f; 
 
-    public Material Blank;
-    public Material EnterZero;
-    public Material EnterOne;
-    public Material ExitZero;
-    public Material ExitOne;
-    public Material And;
-    public Material Or;
-    public Material BeltUp;
-    public Material BeltRight;
-    public Material BeltDown;
-    public Material BeltLeft;
-	public Material BeltUpLeft;
-	public Material BeltUpRight;
-	public Material BeltRightUp;
-	public Material BeltRightDown;
-	public Material BeltDownRight;
-	public Material BeltDownLeft;
-	public Material BeltLeftDown;
-	public Material BeltLeftUp;
-	public Material BeltUpT;
-	public Material BeltRightT;
-	public Material BeltDownT;
-	public Material BeltLeftT;
-    public Material BiterZero;
-    public Material BiterOne;
-    public Material SelectedMaterial;
+	public AudioClip gateSound;
+	
+	public Dictionary<string,Material> MaterialDictionary { get; set; }
+	
 
 	public const int XOFFSET = 4;
 	public const int YOFFSET = 4;
@@ -50,39 +29,25 @@ public class Instantiation : MonoBehaviour
         InstantiationMonsters = new List<Monster>();
         InstantiationNextMonsterId = 0;
         InstantiationSpawnDelay = 10000;
-        Blank = Resources.Load("Blank", typeof(Material)) as Material;
-        EnterZero = Resources.Load("EnterZero", typeof(Material)) as Material;
-        EnterOne = Resources.Load("EnterOne", typeof(Material)) as Material;
-        ExitZero = Resources.Load("ExitZero", typeof(Material)) as Material;
-        ExitOne = Resources.Load("ExitOne", typeof(Material)) as Material;
-        And = Resources.Load("And", typeof(Material)) as Material;
-        Or = Resources.Load("Or", typeof(Material)) as Material;
-        BeltUp = Resources.Load("BeltUp", typeof(Material)) as Material;
-        BeltRight = Resources.Load("BeltRight", typeof(Material)) as Material;
-        BeltDown = Resources.Load("BeltDown", typeof(Material)) as Material;
-        BeltLeft = Resources.Load("BeltLeft", typeof(Material)) as Material;
-		BeltUpLeft = Resources.Load("BeltUpLeft", typeof(Material)) as Material;
-		BeltUpRight = Resources.Load("BeltUpRight", typeof(Material)) as Material;
-		BeltRightUp = Resources.Load("BeltRightUp", typeof(Material)) as Material;
-		BeltRightDown = Resources.Load("BeltRightDown", typeof(Material)) as Material;
-		BeltDownRight = Resources.Load("BeltDownRight", typeof(Material)) as Material;
-		BeltDownLeft = Resources.Load("BeltDownLeft", typeof(Material)) as Material;
-		BeltLeftDown = Resources.Load("BeltLeftDown", typeof(Material)) as Material;
-		BeltLeftUp = Resources.Load("BeltLeftUp", typeof(Material)) as Material;
-		BeltUpT = Resources.Load("BeltUpT", typeof(Material)) as Material;
-		BeltRightT = Resources.Load("BeltRightT", typeof(Material)) as Material;
-		BeltDownT = Resources.Load("BeltDownT", typeof(Material)) as Material;
-		BeltLeftT = Resources.Load("BeltLeftT", typeof(Material)) as Material;
-        BiterZero = Resources.Load("BiterZero", typeof(Material)) as Material;
-        BiterOne = Resources.Load("BiterOne", typeof(Material)) as Material;
-        SelectedMaterial = Or;
 
-        LoadLevel("Level1.txt");
+		MaterialDictionary = new Dictionary<string, Material> ();
+		UnityEngine.Object[] Materials = Resources.LoadAll("", typeof(Material));
+		//Object[] Materials = Resources.LoadAll("Materials", typeof(Material));
+		foreach(Material mat in Materials)
+		{
+			MaterialDictionary.Add(mat.name, mat);
+		}
+
+       
+		Time.timeScale = 1.0f; 
+
+
+        LoadLevel("Level - 1.csv");
     }
 
     public bool LoadLevel(string fileName)
     {
-        string filePath = "Assets/Resources/" + fileName;
+        string filePath = "Assets/Levels/" + fileName;
         try
         {
             InitializeGrid(filePath);
@@ -103,6 +68,11 @@ public class Instantiation : MonoBehaviour
 					line = reader.ReadLine();
                 }
                 reader.Close();
+
+				foreach (GridSquare square in InstantiationGridSquareGrid) 
+				{
+					square.AssignDirection();
+				}
                 return true;
             }
         }
@@ -111,6 +81,8 @@ public class Instantiation : MonoBehaviour
             Console.WriteLine("There was a problem during file reading", e.Message);
             return false;
         }
+
+
     }
 
     private void InitializeGrid(string filePath)
@@ -141,10 +113,29 @@ public class Instantiation : MonoBehaviour
 	void Update () 
 	{
 		GetMouseRays();
-		GetKeyboard(); // @RCH: Temporary way to change selected gate
 		UpdateSpawnTile();
 		UpdateMonsterAction();
-		// @RCH: Check for win condition
+		timer -= Time.deltaTime; 
+		
+		if (timer <= 0) 
+		{ 
+			timer = 0.0f; 
+		} 
+	}
+	void PauseGame() 
+	{ 
+		Time.timeScale = 0.000001f; 
+	} 
+	void OnGUI () 
+	{
+		GUI.Box (new Rect (Screen.width - 50, 0, 50, 20), "" + timer.ToString ("f0")); 
+		if (timer <= 0) 
+		{ 
+			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 100, 25), "Try Again?")) 
+			{
+				Application.LoadLevel (Application.loadedLevelName); 
+			} 
+		} 
 	}
 
 	void GetMouseRays()
@@ -157,37 +148,27 @@ public class Instantiation : MonoBehaviour
 			{
 				// All cubes will need a ray layer later so that when you click the monster sprites, it won't interfere with changing gates
 				GameObject pObject = hit.transform.gameObject;
-				if(pObject.renderer.sharedMaterial != And && pObject.renderer.sharedMaterial != Or)
+				if(pObject.renderer.sharedMaterial != MaterialDictionary["And"] && pObject.renderer.sharedMaterial != MaterialDictionary["Or"])
 				{
 					return;
 				}
-				pObject.renderer.material = SelectedMaterial;
-                TileType type = TileType.Or;
-				if(SelectedMaterial == Or)
+				TileType tileType = TileType.Or;
+				if(pObject.renderer.sharedMaterial == MaterialDictionary["Or"])
 				{
-					type = TileType.Or;
+					pObject.renderer.material = MaterialDictionary["And"];
+					tileType = TileType.And;
+					AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
 				}
-				else if(SelectedMaterial == And)
+				else if(pObject.renderer.sharedMaterial == MaterialDictionary["And"])
 				{
-					type = TileType.And;
+					pObject.renderer.material = MaterialDictionary["Or"];
+					tileType = TileType.Or;
+					AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
 				}
-                InstantiationGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = type;
+                InstantiationGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = tileType;
 			}
 		}
 	}
-
-	void GetKeyboard() // @RCH: Temporary way to change selected gate
-	{
-		if(Input.GetKeyDown(KeyCode.Alpha1))
-		{
-			SelectedMaterial = And;
-		}
-		else if(Input.GetKeyDown(KeyCode.Alpha2))
-		{
-			SelectedMaterial = Or;
-		}
-	}
-
 	void UpdateSpawnTile()
 	{
 		for(int x = 0; x < InstantiationGridWidth; x++) 
@@ -266,6 +247,8 @@ public class Instantiation : MonoBehaviour
                 {
                     if(m.MonsterXPosition == x && m.MonsterYPosition == y && m.MonsterId != monster.MonsterId && m.MonsterMovementType == MovementType.Waiting)
                     {
+						InstantiationGridSquareGrid[x, y].SubtractDirection(m);
+						InstantiationGridSquareGrid[x, y].SubtractDirection(monster);
                         shouldRemove = true;
                         index1 = InstantiationMonsters.IndexOf(monster);
                         index2 = InstantiationMonsters.IndexOf(m);
@@ -299,18 +282,12 @@ public class Instantiation : MonoBehaviour
 					}
                 }
                 break;
-            case TileType.BeltUp:
-            case TileType.BeltRight:
-            case TileType.BeltDown:
-            case TileType.BeltLeft:
 			case TileType.BeltUpLeft:
 			case TileType.BeltUpRight:
-			case TileType.BeltRightUp:
-			case TileType.BeltRightDown:
 			case TileType.BeltDownRight:
 			case TileType.BeltDownLeft:
-			case TileType.BeltLeftDown:
-			case TileType.BeltLeftUp:
+			case TileType.BeltHorizontal:
+			case TileType.BeltVertical:
 			case TileType.BeltUpT:
 			case TileType.BeltRightT:
 			case TileType.BeltDownT:
@@ -345,7 +322,7 @@ public class Instantiation : MonoBehaviour
             moveX = -1;
         }
 
-        monster.MonsterGameObject.transform.position += new Vector3(monster.MonsterMovementIncrement * moveX, monster.MonsterMovementIncrement * moveY, 0);
+		monster.MonsterGameObject.transform.position += new Vector3(monster.MonsterMovementIncrement * moveX * Time.timeScale, monster.MonsterMovementIncrement * moveY * Time.timeScale, 0);
 
         if(monster.FinishedMovingTile())
 		{
@@ -393,11 +370,27 @@ public class Instantiation : MonoBehaviour
 		}
 
 		if (PlayerLost)
+		{
 			PrintMessage ("YOU LOSE!");
+			GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			cube.transform.position = new Vector3(0, 0, 0);
+			cube.transform.localScale = new Vector3(10, 10, 10);
+			cube.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+			cube.renderer.material = MaterialDictionary["Lose"];
+		}
 		else if (numWinningExits == totalNumExits)
+		{
 			PrintMessage ("YOU WIN!");
+			GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			cube.transform.position = new Vector3(0, 0, 0);
+			cube.transform.localScale = new Vector3(10, 10, 10);
+			cube.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+			cube.renderer.material = MaterialDictionary["Win"];
+		}
 		else
+		{
 			PrintMessage ("GOOD JOB KEEP GOING!");
+		}
 
 		monster.DestroyEntirely ();
 	}

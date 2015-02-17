@@ -46,9 +46,16 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\ContinueButton.cs" />
+     <Compile Include="Assets\Scripts\DeleteButton.cs" />
      <Compile Include="Assets\Scripts\GridSquare.cs" />
      <Compile Include="Assets\Scripts\Instantiation.cs" />
+     <Compile Include="Assets\Scripts\LevelConstructor.cs" />
+     <Compile Include="Assets\Scripts\LevelSelectButton.cs" />
      <Compile Include="Assets\Scripts\Monster.cs" />
+     <Compile Include="Assets\Scripts\Pause.cs" />
+     <Compile Include="Assets\Scripts\QuitButton.cs" />
+     <Compile Include="Assets\Scripts\StartButton.cs" />
      <None Include="Assets\Resources\Level1.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/4.6.1/UnityEngine.UI.dll</HintPath>

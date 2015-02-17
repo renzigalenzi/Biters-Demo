@@ -1,13 +1,22 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
+using System.IO;
+using System;
+using System.Collections.Specialized;
 
 public enum TileType
 {
-    Blank, EnterZero, EnterOne, ExitZero, ExitOne, And, Or, BeltUp, BeltRight, BeltDown, BeltLeft,
-	BeltUpLeft, BeltUpRight, BeltRightUp, BeltRightDown, BeltDownRight, BeltDownLeft, BeltLeftDown, BeltLeftUp,
-	BeltUpT, BeltRightT, BeltDownT, BeltLeftT
+    Blank, EnterZero, EnterOne, ExitZero, ExitOne, And, Or, BeltVertical, BeltHorizontal, 
+	BeltUpLeft, BeltUpRight, BeltDownRight, BeltDownLeft, 
+	BeltUpT, BeltRightT, BeltDownT, BeltLeftT, Count
 }
+
+
+
+
 public enum TileDirection
 {
 	None, Up, Right, Down, Left
@@ -27,6 +36,7 @@ public class GridSquare
     public int GridSquareXPosition { get; set; }
     public int GridSquareYPosition { get; set; }
 	public int GridSquareTimeToNextSpawn { get; set; }
+	public List<GridSquare> MovePossibilities = new List<GridSquare>();
 
     public GridSquare()
     {
@@ -39,9 +49,19 @@ public class GridSquare
 		GridSquareTimeToNextSpawn = 0;
 		GridSquareHasWinningPiece = WinCondition.NoPiece;
     }
+	public GridSquare(GameObject gObject)
+	{
+		GridSquareGameObject = gObject;
+		GridSquareTileType = TileType.Blank;
+		GridSquareTileDirection = TileDirection.None;
+		GridSquareXPosition = 0;
+		GridSquareYPosition = 0;
+		GridSquareTimeToNextSpawn = 0;
+		GridSquareHasWinningPiece = WinCondition.NoPiece;
+	}
 
-    public GridSquare(Instantiation gridSquareInstantiation, TileType gridSquareTileType, int gridSquareXPosition, int gridSquareYPosition)
-    {
+	public GridSquare(Instantiation gridSquareInstantiation, TileType gridSquareTileType, int gridSquareXPosition, int gridSquareYPosition)
+    { 
         GridSquareGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
         GridSquareInstantiation = gridSquareInstantiation;
 		GridSquareTileType = gridSquareTileType;
@@ -51,198 +71,177 @@ public class GridSquare
 
         GridSquareGameObject.transform.position = new Vector3(GridSquareXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - GridSquareYPosition, 0);
 		GridSquareGameObject.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
-        switch(GridSquareTileType)
-        {
-            case TileType.Blank:
-                GridSquareGameObject.renderer.material = GridSquareInstantiation.Blank;
-				GridSquareTileDirection = TileDirection.None;
-                break;
-            case TileType.EnterZero:
-                GridSquareGameObject.renderer.material = GridSquareInstantiation.EnterZero;
-				GridSquareTileDirection = TileDirection.None;
-				break;
-            case TileType.EnterOne:
-                GridSquareGameObject.renderer.material = GridSquareInstantiation.EnterOne;
-				GridSquareTileDirection = TileDirection.None;    
-				break;
-            case TileType.ExitZero:
-                GridSquareGameObject.renderer.material = GridSquareInstantiation.ExitZero;
-				GridSquareTileDirection = TileDirection.None;    
-				break;
-            case TileType.ExitOne:
-                GridSquareGameObject.renderer.material = GridSquareInstantiation.ExitOne;
-				GridSquareTileDirection = TileDirection.None;    
-				break;
-            case TileType.And:
-                GridSquareGameObject.renderer.material = GridSquareInstantiation.And;
-            	GridSquareTileDirection = TileDirection.None;    
-				break;
-            case TileType.Or:
-                GridSquareGameObject.renderer.material = GridSquareInstantiation.Or;
-				GridSquareTileDirection = TileDirection.None;    
-				break;
-            case TileType.BeltUp:
-                GridSquareGameObject.renderer.material = GridSquareInstantiation.BeltUp;
-				GridSquareTileDirection = TileDirection.Up;    
-				break;
-            case TileType.BeltRight:
-                GridSquareGameObject.renderer.material = GridSquareInstantiation.BeltRight;
-				GridSquareTileDirection = TileDirection.Right;    
-				break;
-            case TileType.BeltDown:
-                GridSquareGameObject.renderer.material = GridSquareInstantiation.BeltDown;
-				GridSquareTileDirection = TileDirection.Down;    
-				break;
-            case TileType.BeltLeft:
-                GridSquareGameObject.renderer.material = GridSquareInstantiation.BeltLeft;
-				GridSquareTileDirection = TileDirection.Left;    
-				break;
-			case TileType.BeltUpLeft:
-				GridSquareGameObject.renderer.material = GridSquareInstantiation.BeltUpLeft;
-				GridSquareTileDirection = TileDirection.Up;    
-				break;
-			case TileType.BeltUpRight:
-				GridSquareGameObject.renderer.material = GridSquareInstantiation.BeltUpRight;
-				GridSquareTileDirection = TileDirection.Up;    
-				break;
-			case TileType.BeltRightUp:
-				GridSquareGameObject.renderer.material = GridSquareInstantiation.BeltRightUp;
-				GridSquareTileDirection = TileDirection.Right;    
-				break;
-			case TileType.BeltRightDown:
-				GridSquareGameObject.renderer.material = GridSquareInstantiation.BeltRightDown;
-				GridSquareTileDirection = TileDirection.Right;    
-				break;
-			case TileType.BeltDownRight:
-				GridSquareGameObject.renderer.material = GridSquareInstantiation.BeltDownRight;
-				GridSquareTileDirection = TileDirection.Down;    
-				break;
-			case TileType.BeltDownLeft:
-				GridSquareGameObject.renderer.material = GridSquareInstantiation.BeltDownLeft;
-				GridSquareTileDirection = TileDirection.Down;    
-				break;
-			case TileType.BeltLeftDown:
-				GridSquareGameObject.renderer.material = GridSquareInstantiation.BeltLeftDown;
-				GridSquareTileDirection = TileDirection.Left;    
-				break;
-			case TileType.BeltLeftUp:
-				GridSquareGameObject.renderer.material = GridSquareInstantiation.BeltLeftUp;
-				GridSquareTileDirection = TileDirection.Left;    
-				break;
-			case TileType.BeltUpT:
-				GridSquareGameObject.renderer.material = GridSquareInstantiation.BeltUpT;
-				GridSquareTileDirection = TileDirection.Up;    
-				break;
-			case TileType.BeltRightT:
-				GridSquareGameObject.renderer.material = GridSquareInstantiation.BeltRightT;
-				GridSquareTileDirection = TileDirection.Right;    
-				break;
-			case TileType.BeltDownT:
-				GridSquareGameObject.renderer.material = GridSquareInstantiation.BeltDownT;
-				GridSquareTileDirection = TileDirection.Down;    
-				break;
-			case TileType.BeltLeftT:
-				GridSquareGameObject.renderer.material = GridSquareInstantiation.BeltLeftT;
-				GridSquareTileDirection = TileDirection.Left;    
-				break;
-            default:
-                Instantiation.PrintMessage("Invalid GridSquareTileType - GridSquare(Instantiation gridSquareInstantiation, TileType gridSquareTileType, int gridSquareXPosition, int gridSquareYPosition)");
-                break;
-        }
+		AssignMaterial ();
+		GridSquareTileDirection = TileDirection.None;
 		GridSquareHasWinningPiece = WinCondition.NoPiece;
 
         GridSquareInstantiation.InstantiationGridSquareGameObjectGrid[GridSquareXPosition, GridSquareYPosition] = GridSquareGameObject;
         GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition] = this;
     }
+	public void AssignMaterial()
+	{
+		GridSquareGameObject.renderer.material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
 
-    public List<GridSquare> GetNeighborsMovingAway()
-    {
-        List<GridSquare> neighbors = new List<GridSquare>();
+	}
+	public bool TileAccepts(GridSquare tile, TileDirection direction)
+	{
+		TileType type = tile.GridSquareTileType;
+		//if the tile is a gate return true
+		if (type == TileType.And || type == TileType.Or)
+			return true;
 
-        if (GridSquareXPosition > 0 && GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition - 1, GridSquareYPosition].GridSquareTileDirection == TileDirection.Left)
-        {
-            neighbors.Add(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition - 1, GridSquareYPosition]);
-        }
-		if (GridSquareXPosition < GridSquareInstantiation.InstantiationGridWidth - 1 && GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition + 1, GridSquareYPosition].GridSquareTileDirection == TileDirection.Right)
-        {
-            neighbors.Add(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition + 1, GridSquareYPosition]);
-        }
-		if (GridSquareYPosition > 0 && GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition - 1].GridSquareTileDirection == TileDirection.Up)
-        {
-            neighbors.Add(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition - 1]);
-        }
-		if (GridSquareYPosition < GridSquareInstantiation.InstantiationGridHeight - 1 && GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition + 1].GridSquareTileDirection == TileDirection.Down)
-        {
-            neighbors.Add(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition + 1]);
-        }
+		//if it is an end state return true
+		if (type == TileType.ExitOne || type == TileType.ExitZero)
+			return true;
 
-        return neighbors;
-    }
+		//otherwise loop through the possible directions
+		switch (direction) 
+		{
+			case TileDirection.Right:
+				if(type == TileType.BeltDownLeft||
+				   type == TileType.BeltRightT ||
+			       type == TileType.BeltUpT ||
+				   type == TileType.BeltUpLeft ||
+			   	   type == TileType.BeltDownT ||
+				   type == TileType.BeltHorizontal)
+				return true;
+				break;
+			case TileDirection.Left:
+			if(type == TileType.BeltDownRight||
+			   type == TileType.BeltLeftT ||
+			   type == TileType.BeltUpRight ||
+			   type == TileType.BeltDownT ||
+			   type == TileType.BeltHorizontal)
+				return true;
+			break;
+			case TileDirection.Up:
+			if(type == TileType.BeltUpRight||
+			   type == TileType.BeltUpT ||
+			   type == TileType.BeltLeftT ||
+			   type == TileType.BeltRightT ||
+			   type == TileType.BeltUpLeft ||
+			   type == TileType.BeltVertical)
+				return true;
+			break;
+			case TileDirection.Down:
+			if(type == TileType.BeltDownLeft||
+			   type == TileType.BeltDownT ||
+			   type == TileType.BeltLeftT ||
+			   type == TileType.BeltRightT ||
+			   type == TileType.BeltDownRight ||
+			   type == TileType.BeltVertical)
+				return true;
+			break;
+				
+		}
+		return false;
+	}
+
+	public void AssignDirection()
+	{
+		//look at neighboring pieces and see if there are any pieces that will accept movement, add to movement list
+		if (GridSquareXPosition > 0 && TileAccepts(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition - 1, GridSquareYPosition], TileDirection.Left) )
+		{
+			MovePossibilities.Add(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition - 1, GridSquareYPosition]);
+		}
+		if (GridSquareXPosition < GridSquareInstantiation.InstantiationGridWidth - 1 && TileAccepts(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition + 1, GridSquareYPosition], TileDirection.Right) )
+		{
+			MovePossibilities.Add(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition + 1, GridSquareYPosition]);
+		}
+		if (GridSquareYPosition > 0 && TileAccepts(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition - 1], TileDirection.Up) )
+		{
+			MovePossibilities.Add(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition - 1]);
+		}
+		if (GridSquareYPosition < GridSquareInstantiation.InstantiationGridHeight - 1 && TileAccepts(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition + 1], TileDirection.Down))
+		{
+			MovePossibilities.Add(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition + 1]);
+		}
+	}
+	public void AssignDirection(GridSquare[,] grid, int gridW, int gridH)
+	{
+		//look at neighboring pieces and see if there are any pieces that will accept movement, add to movement list
+		if (GridSquareXPosition > 0 && TileAccepts(grid[GridSquareXPosition - 1, GridSquareYPosition], TileDirection.Left) )
+		{
+			MovePossibilities.Add(grid[GridSquareXPosition - 1, GridSquareYPosition]);
+		}
+		if (GridSquareXPosition < gridW - 1 && TileAccepts(grid[GridSquareXPosition + 1, GridSquareYPosition], TileDirection.Right) )
+		{
+			MovePossibilities.Add(grid[GridSquareXPosition + 1, GridSquareYPosition]);
+		}
+		if (GridSquareYPosition > 0 && TileAccepts(grid[GridSquareXPosition, GridSquareYPosition - 1], TileDirection.Up) )
+		{
+			MovePossibilities.Add(grid[GridSquareXPosition, GridSquareYPosition - 1]);
+		}
+		if (GridSquareYPosition < gridH - 1 && TileAccepts(grid[GridSquareXPosition, GridSquareYPosition + 1], TileDirection.Down))
+		{
+			MovePossibilities.Add(grid[GridSquareXPosition, GridSquareYPosition + 1]);
+		}
+	}
+	public void SubtractDirection(Monster m)
+	{
+		TileDirection direction = (TileDirection)m.MonsterMovementDirection;
+		int x = 0;
+		int y = 0;
+
+		switch (direction) 
+		{
+		case TileDirection.Left:
+			x++;
+			break;
+		case TileDirection.Right:
+			x--;
+			break;
+		case TileDirection.Up:
+			y++;
+			break;
+		case TileDirection.Down:
+			y--;
+			break;
+		}
+		List<GridSquare> tempList = new List<GridSquare>();
+		foreach (GridSquare tile in MovePossibilities)
+		{
+			tempList.Add (tile);
+		}
+		foreach (GridSquare square in tempList) 
+		{
+			if(square == GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition + x, GridSquareYPosition + y])
+			{
+				MovePossibilities.Remove(square);
+			}
+		}
+
+		//a monster entered this tile from a direction, remove it from possible output directions
+	}
 
 	public void CalculateNewDirection(Monster monster) // @RCH: Fix this to work off of current tile's Out direction, instead of neighbors' in direction
 	{
-	    switch(GridSquareTileType)
-	    {
-	        case TileType.BeltUp:
-			case TileType.BeltRightUp:
-			case TileType.BeltLeftUp:
-				new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.Up);
-            	break;
-			case TileType.BeltRight:
-			case TileType.BeltUpRight:
-			case TileType.BeltDownRight:
-				new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.Right);
-            	break;
-			case TileType.BeltDown:
-			case TileType.BeltRightDown:
-			case TileType.BeltLeftDown:
-				new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.Down);
-            	break;
-			case TileType.BeltLeft:
-			case TileType.BeltUpLeft:
-			case TileType.BeltDownLeft:
-				new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.Left);
-            	break;
-			case TileType.BeltUpT:
-				new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.Left);
-				new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.Right);
-				break;
-			case TileType.BeltRightT:
-				new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.Up);
-				new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.Down);
-				break;
-			case TileType.BeltDownT:
-				new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.Right);
-				new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.Left);
-				break;
-			case TileType.BeltLeftT:
-				new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.Down);
-				new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.Up);
-				break;
-			case TileType.EnterZero:
-			case TileType.EnterOne:
-			case TileType.And:
-			case TileType.Or:
-				List<GridSquare> neighbors = GetNeighborsMovingAway();
-				foreach(GridSquare neighbor in neighbors)
-				{
-					MovementDirection direction = MovementDirection.None;
-					if(neighbor.GridSquareTileDirection == TileDirection.Up)
-						direction = MovementDirection.Up;
-					else if(neighbor.GridSquareTileDirection == TileDirection.Right)
-						direction = MovementDirection.Right;
-			       	else if(neighbor.GridSquareTileDirection == TileDirection.Down)
-						direction = MovementDirection.Down;
-			       	else if(neighbor.GridSquareTileDirection == TileDirection.Left)
-						direction = MovementDirection.Left;
-					new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, direction);
-				}
-				break;
-	        default:
-	            Instantiation.PrintMessage("Invalid GridSquareTileType - CalculateNewDirection(Monster monster)");
-	            break;
-    	}
+		SubtractDirection (monster);
+		foreach(GridSquare neighbor in MovePossibilities)
+		{
+			MovementDirection direction = MovementDirection.None;
+			if(neighbor.GridSquareYPosition < GridSquareYPosition)
+				direction = MovementDirection.Up;
+			else if(neighbor.GridSquareXPosition > GridSquareXPosition)
+				direction = MovementDirection.Right;
+			else if(neighbor.GridSquareYPosition > GridSquareYPosition)
+				direction = MovementDirection.Down;
+			else if(neighbor.GridSquareXPosition < GridSquareXPosition)
+				direction = MovementDirection.Left;
+			else
+				Instantiation.PrintMessage("Invalid GridSquareTileDirection - CalculateNewDirection(Monster monster)");
+
+			new Monster(GridSquareInstantiation, GridSquareInstantiation.InstantiationNextMonsterId, MovementType.Moving, monster.MonsterNumberType, monster.MonsterXPosition, monster.MonsterYPosition, direction);
+		}
         GridSquareInstantiation.InstantiationMonsters.Remove(monster);
 		Instantiation.Destroy(monster.MonsterGameObject, 0f);
+	}
+	public bool IsBelt()
+	{
+		List<TileType> Belts = new List<TileType> (new TileType[] {TileType.BeltVertical, TileType.BeltHorizontal, 
+			TileType.BeltUpLeft, TileType.BeltUpRight, TileType.BeltDownRight, TileType.BeltDownLeft, 
+			TileType.BeltUpT, TileType.BeltRightT, TileType.BeltDownT, TileType.BeltLeftT});
+
+		return Belts.Contains (GridSquareTileType);
 	}
 }
