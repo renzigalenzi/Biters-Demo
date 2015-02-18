@@ -9,7 +9,7 @@ using System.Collections.Specialized;
 
 public enum TileType
 {
-    Blank, EnterZero, EnterOne, ExitZero, ExitOne, And, Or, BeltVertical, BeltHorizontal, 
+    Blank, EnterZero, EnterOne, ExitZero, ExitOne, And, Or, Xor, Nand, BeltVertical, BeltHorizontal, 
 	BeltUpLeft, BeltUpRight, BeltDownRight, BeltDownLeft, 
 	BeltUpT, BeltRightT, BeltDownT, BeltLeftT, Count
 }
@@ -71,27 +71,30 @@ public class GridSquare
 
         GridSquareGameObject.transform.position = new Vector3(GridSquareXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - GridSquareYPosition, 0);
 		GridSquareGameObject.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
-		AssignMaterial ();
+		AssignMaterialToInstantiation ();
 		GridSquareTileDirection = TileDirection.None;
 		GridSquareHasWinningPiece = WinCondition.NoPiece;
 
         GridSquareInstantiation.InstantiationGridSquareGameObjectGrid[GridSquareXPosition, GridSquareYPosition] = GridSquareGameObject;
         GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition] = this;
     }
-	public void AssignMaterial()
+	public void AssignMaterialToInstantiation()
 	{
 		GridSquareGameObject.renderer.material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
-
+	}
+	public void AssignMaterialToLevelConstructor(LevelConstructor parent)
+	{
+		GridSquareGameObject.renderer.material = parent.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
 	}
 	public bool TileAccepts(GridSquare tile, TileDirection direction)
 	{
 		TileType type = tile.GridSquareTileType;
 		//if the tile is a gate return true
-		if (type == TileType.And || type == TileType.Or)
+		if (type == TileType.And || type == TileType.Or || type == TileType.Nand || type == TileType.Xor)
 			return true;
 
 		//if it is an end state return true
-		if (type == TileType.ExitOne || type == TileType.ExitZero)
+		if (type == TileType.ExitOne || type == TileType.ExitZero || type == TileType.EnterZero || type == TileType.EnterOne)
 			return true;
 
 		//otherwise loop through the possible directions
@@ -107,29 +110,30 @@ public class GridSquare
 				return true;
 				break;
 			case TileDirection.Left:
-			if(type == TileType.BeltDownRight||
-			   type == TileType.BeltLeftT ||
-			   type == TileType.BeltUpRight ||
-			   type == TileType.BeltDownT ||
-			   type == TileType.BeltHorizontal)
+				if(type == TileType.BeltDownRight||
+				   type == TileType.BeltLeftT ||
+			   	   type == TileType.BeltUpT ||
+				   type == TileType.BeltUpRight ||
+				   type == TileType.BeltDownT ||
+				   type == TileType.BeltHorizontal)
 				return true;
 			break;
 			case TileDirection.Up:
-			if(type == TileType.BeltUpRight||
-			   type == TileType.BeltUpT ||
-			   type == TileType.BeltLeftT ||
-			   type == TileType.BeltRightT ||
-			   type == TileType.BeltUpLeft ||
-			   type == TileType.BeltVertical)
+				if(type == TileType.BeltUpRight||
+				   type == TileType.BeltUpT ||
+				   type == TileType.BeltLeftT ||
+				   type == TileType.BeltRightT ||
+				   type == TileType.BeltUpLeft ||
+				   type == TileType.BeltVertical)
 				return true;
 			break;
 			case TileDirection.Down:
-			if(type == TileType.BeltDownLeft||
-			   type == TileType.BeltDownT ||
-			   type == TileType.BeltLeftT ||
-			   type == TileType.BeltRightT ||
-			   type == TileType.BeltDownRight ||
-			   type == TileType.BeltVertical)
+				if(type == TileType.BeltDownLeft||
+				   type == TileType.BeltDownT ||
+				   type == TileType.BeltLeftT ||
+				   type == TileType.BeltRightT ||
+				   type == TileType.BeltDownRight ||
+				   type == TileType.BeltVertical)
 				return true;
 			break;
 				
@@ -140,19 +144,19 @@ public class GridSquare
 	public void AssignDirection()
 	{
 		//look at neighboring pieces and see if there are any pieces that will accept movement, add to movement list
-		if (GridSquareXPosition > 0 && TileAccepts(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition - 1, GridSquareYPosition], TileDirection.Left) )
+		if (GridSquareXPosition > 0 && TileAccepts(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition], TileDirection.Right) && TileAccepts(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition - 1, GridSquareYPosition], TileDirection.Left) )
 		{
 			MovePossibilities.Add(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition - 1, GridSquareYPosition]);
 		}
-		if (GridSquareXPosition < GridSquareInstantiation.InstantiationGridWidth - 1 && TileAccepts(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition + 1, GridSquareYPosition], TileDirection.Right) )
+		if (GridSquareXPosition < GridSquareInstantiation.InstantiationGridWidth - 1 && TileAccepts(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition], TileDirection.Left) && TileAccepts(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition + 1, GridSquareYPosition], TileDirection.Right) )
 		{
 			MovePossibilities.Add(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition + 1, GridSquareYPosition]);
 		}
-		if (GridSquareYPosition > 0 && TileAccepts(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition - 1], TileDirection.Up) )
+		if (GridSquareYPosition > 0 && TileAccepts(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition], TileDirection.Down) && TileAccepts(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition - 1], TileDirection.Up) )
 		{
 			MovePossibilities.Add(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition - 1]);
 		}
-		if (GridSquareYPosition < GridSquareInstantiation.InstantiationGridHeight - 1 && TileAccepts(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition + 1], TileDirection.Down))
+		if (GridSquareYPosition < GridSquareInstantiation.InstantiationGridHeight - 1 && TileAccepts(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition], TileDirection.Up) && TileAccepts(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition + 1], TileDirection.Down))
 		{
 			MovePossibilities.Add(GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition + 1]);
 		}

@@ -26,10 +26,12 @@ public class LevelConstructor : MonoBehaviour {
 
 	public const int XOFFSET = 4;
 	public const int YOFFSET = 4;
-	public Vector2 scrollPosition = Vector2.zero;
+	private Vector2 scrollPosition = Vector2.zero;
 	private bool boolDragging = false;
 	private bool Saving = false;
 	private string SaveFileName = "Level - ";
+	private bool Loading = false;
+	private string LoadFileName = "Level - ";
 	public int[] LastClickedPoint{ get; set; }
 	
 	public void Start()
@@ -123,7 +125,8 @@ public class LevelConstructor : MonoBehaviour {
 	}
 	public bool LoadLevel(string fileName)
 	{
-		string filePath = "Assets/Levels/" + fileName;
+		LastClickedPoint = new int[] {-1,-1};
+		string filePath = "Assets/Levels/" + fileName + ".csv";
 		try
 		{
 			InitializeGrid(filePath);
@@ -139,12 +142,13 @@ public class LevelConstructor : MonoBehaviour {
 					{
 						int intType = Convert.ToInt32(entries[x]);
 						LevelConstructorGridSquareGameObjectGrid[x,y]=GameObject.CreatePrimitive(PrimitiveType.Cube);
+						LevelConstructorGridSquareGrid[x,y] = new GridSquare(LevelConstructorGridSquareGameObjectGrid[x,y]);
 						LevelConstructorGridSquareGrid[x,y].GridSquareTileType = (TileType)intType;
 						LevelConstructorGridSquareGrid[x,y].GridSquareXPosition = x;
 						LevelConstructorGridSquareGrid[x,y].GridSquareYPosition = y;
 						LevelConstructorGridSquareGrid[x,y].GridSquareGameObject.transform.position = new Vector3(x - XOFFSET, YOFFSET - y, 0);
 						LevelConstructorGridSquareGrid[x,y].GridSquareGameObject.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
-						LevelConstructorGridSquareGrid[x,y].AssignMaterial();
+						LevelConstructorGridSquareGrid[x,y].AssignMaterialToLevelConstructor(this);
 					}
 					y++;
 					line = reader.ReadLine();
@@ -179,6 +183,10 @@ public class LevelConstructor : MonoBehaviour {
 				LevelConstructorGridHeight++;
 				line = reader.ReadLine();
 			}
+		}
+		foreach(GameObject obj in LevelConstructorGridSquareGameObjectGrid)
+		{
+			Destroy(obj);
 		}
 		LevelConstructorGridSquareGameObjectGrid = new GameObject[LevelConstructorGridWidth, LevelConstructorGridHeight];
 		LevelConstructorGridSquareGrid = new GridSquare[LevelConstructorGridWidth, LevelConstructorGridHeight];
@@ -334,13 +342,14 @@ public class LevelConstructor : MonoBehaviour {
 	}
 	void GetMouseRays()
 	{
-		if(!Saving && Input.GetMouseButtonDown(0))
+		if(!Saving && !Loading && Input.GetMouseButtonDown(0))
 		{
 			boolDragging = true;
 		}
 		if (Input.GetMouseButtonUp (0)) 
 		{
 			boolDragging = false;
+			LastClickedPoint = new int[]{-1,-1};
 		}
 		if (boolDragging)
 		{
@@ -389,7 +398,28 @@ public class LevelConstructor : MonoBehaviour {
 		MakeMapControls ();
 		MakeSelected ();
 		MakeExportButton ();
-
+		MakeLoadLevelButton ();
+	}
+	void MakeLoadLevelButton()
+	{
+		if(GUI.Button (new Rect (Screen.width- 240, 40, 100, 20), "Load"))
+		{
+			Loading = true;
+		}
+		if(Loading)
+		{
+			LoadFileName = GUI.TextField(new Rect (Screen.width/2-100, Screen.height/2-20, 200, 40), LoadFileName);
+			if (GUI.Button (new Rect (Screen.width/2-100, Screen.height/2+20, 100, 40), "LOAD")) 
+			{
+				LoadLevel(LoadFileName);
+				print ("loaded file : " + LoadFileName);
+				Loading = false;
+			}
+			if (GUI.Button (new Rect (Screen.width/2, Screen.height/2+20, 100, 40), "CANCEL")) 
+			{
+				Loading = false;
+			}
+		}
 	}
 	void MakeExportButton()
 	{
@@ -484,6 +514,14 @@ public class LevelConstructor : MonoBehaviour {
 		}
 		GUI.EndScrollView();
 	}
+	/*public bool IsBeltMaterial(Material m)
+	{
+		List<TileType> Belts = new List<Materials> (new TileType[] {TileType.BeltVertical, TileType.BeltHorizontal, 
+			TileType.BeltUpLeft, TileType.BeltUpRight, TileType.BeltDownRight, TileType.BeltDownLeft, 
+			TileType.BeltUpT, TileType.BeltRightT, TileType.BeltDownT, TileType.BeltLeftT});
+		
+		return Belts.Contains (GridSquareTileType);
+	}*/
 	public static void PrintMessage(string printStatement)
 	{
 		print (printStatement);
