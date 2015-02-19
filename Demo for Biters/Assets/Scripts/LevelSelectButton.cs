@@ -35,7 +35,14 @@ public class LevelSelectButton : MonoBehaviour {
 		scrollPosition = GUI.BeginScrollView(new Rect(Math.Min(Screen.width-50,40), Math.Min(Screen.height,20),
 		                                              Screen.width-40, Screen.height-20), 
 		                                     		scrollPosition, new Rect(0, 0, Screen.width-90, levelsList.Count * 70));
-			int i = 0;
+			
+			GUI.color = Color.yellow;
+			if(GUI.Button(new Rect(0, 0, Screen.width-90, 60),"LevelCreator"))
+			{
+				Application.LoadLevel ("LevelBuilder"); 
+			}
+			int i = 1;
+			GUI.color = Color.white;
 			foreach(string levelName in levelsList)
 			{
 				if(GUI.Button(new Rect(0, i*70, Screen.width-90, 60),levelName))
@@ -46,13 +53,6 @@ public class LevelSelectButton : MonoBehaviour {
 				i++;
 			}
 		GUI.EndScrollView();
-
-
-		if (GUI.Button (new Rect ((Screen.width/2) - 50, (Screen.height/2) - 100, 100, 25), "Level 1")) { 
-			
-			Application.LoadLevel ("Demo"); 
-			
-		} // end if 
 
 		// button that closes Level Select Window 
 		if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 30, 100, 25), "Close")) {

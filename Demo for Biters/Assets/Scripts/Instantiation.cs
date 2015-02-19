@@ -160,9 +160,7 @@ public class Instantiation : MonoBehaviour
 					pObject.renderer.sharedMaterial != MaterialDictionary["And"] && 
 					pObject.renderer.sharedMaterial != MaterialDictionary["Or"] &&
 					pObject.renderer.sharedMaterial != MaterialDictionary["Nand"] &&
-					pObject.renderer.sharedMaterial != MaterialDictionary["Xor"] &&
-					pObject.renderer.sharedMaterial != MaterialDictionary["ExitZero"] && // @ RCH LPE: Take this out
-					pObject.renderer.sharedMaterial != MaterialDictionary["ExitOne"]
+					pObject.renderer.sharedMaterial != MaterialDictionary["Xor"]
 					)
 				{
 					return;
@@ -172,38 +170,23 @@ public class Instantiation : MonoBehaviour
 				{
 					pObject.renderer.material = MaterialDictionary["And"];
 					tileType = TileType.And;
-					AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
 				}
 				else if(pObject.renderer.sharedMaterial == MaterialDictionary["And"])
 				{
 					pObject.renderer.material = MaterialDictionary["Nand"];
 					tileType = TileType.Nand;
-					AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
 				}
 				else if(pObject.renderer.sharedMaterial == MaterialDictionary["Nand"])
 				{
 					pObject.renderer.material = MaterialDictionary["Xor"];
 					tileType = TileType.Xor;
-					AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
 				}
 				else if(pObject.renderer.sharedMaterial == MaterialDictionary["Xor"])
 				{
 					pObject.renderer.material = MaterialDictionary["Or"];
 					tileType = TileType.Nand;
-					AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
 				}
-				if(pObject.renderer.sharedMaterial == MaterialDictionary["ExitZero"])
-				{
-					pObject.renderer.material = MaterialDictionary["ExitOne"];
-					tileType = TileType.ExitOne;
-					AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
-				}
-				else if(pObject.renderer.sharedMaterial == MaterialDictionary["ExitOne"])
-				{
-					pObject.renderer.material = MaterialDictionary["ExitZero"];
-					tileType = TileType.ExitZero;
-					AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
-				}
+				AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
                 InstantiationGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = tileType;
 			}
 		}

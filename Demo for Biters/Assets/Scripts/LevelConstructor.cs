@@ -399,6 +399,14 @@ public class LevelConstructor : MonoBehaviour {
 		MakeSelected ();
 		MakeExportButton ();
 		MakeLoadLevelButton ();
+		MakeExitButton ();
+	}
+	void MakeExitButton()
+	{
+		if(GUI.Button(new Rect(Screen.width- 140, 0, 100, 20),"Main Menu"))
+		{
+			Application.LoadLevel ("MainMenu"); 
+		}
 	}
 	void MakeLoadLevelButton()
 	{
