@@ -160,7 +160,9 @@ public class Instantiation : MonoBehaviour
 					pObject.renderer.sharedMaterial != MaterialDictionary["And"] && 
 					pObject.renderer.sharedMaterial != MaterialDictionary["Or"] &&
 					pObject.renderer.sharedMaterial != MaterialDictionary["Nand"] &&
-					pObject.renderer.sharedMaterial != MaterialDictionary["Xor"]
+					pObject.renderer.sharedMaterial != MaterialDictionary["Xor"] &&
+					pObject.renderer.sharedMaterial != MaterialDictionary["Xnor"] &&
+					pObject.renderer.sharedMaterial != MaterialDictionary["Nor"]
 					)
 				{
 					return;
@@ -183,8 +185,18 @@ public class Instantiation : MonoBehaviour
 				}
 				else if(pObject.renderer.sharedMaterial == MaterialDictionary["Xor"])
 				{
+					pObject.renderer.material = MaterialDictionary["Xnor"];
+					tileType = TileType.Xnor;
+				}
+				else if(pObject.renderer.sharedMaterial == MaterialDictionary["Xnor"])
+				{
+					pObject.renderer.material = MaterialDictionary["Nor"];
+					tileType = TileType.Nor;
+				}
+				else if(pObject.renderer.sharedMaterial == MaterialDictionary["Nor"])
+				{
 					pObject.renderer.material = MaterialDictionary["Or"];
-					tileType = TileType.Nand;
+					tileType = TileType.Or;
 				}
 				AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
                 InstantiationGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = tileType;
@@ -193,16 +205,12 @@ public class Instantiation : MonoBehaviour
 		GameObject camera = GameObject.Find ("Main Camera");
 		int moveX = 0;
 		int moveY = 0;
-		float magicNumber = 40;
+		float magicNumber = 5;
 		
 		if( Input.mousePosition.x < magicNumber && Input.mousePosition.x >= 0 )
 			moveX = (int)(-1*magicNumber/(Input.mousePosition.x+1));
 		if( Input.mousePosition.x > Screen.width - magicNumber && Input.mousePosition.x <= Screen.width)
 			moveX = (int)(1*magicNumber/(Screen.width-Input.mousePosition.x+1));
-		if( Input.mousePosition.y < magicNumber && Input.mousePosition.y >= 0 ) 
-			moveY = (int)(-1*magicNumber/(Input.mousePosition.y+1));
-		if( Input.mousePosition.y > Screen.height - magicNumber && Input.mousePosition.y <= Screen.height ) 
-			moveY = (int)(1 * 20 / (Screen.height - Input.mousePosition.y + 1));
 		if (Input.GetAxis ("Mouse ScrollWheel") != 0) 
 		{
 			moveY = (int)(20*Input.GetAxis ("Mouse ScrollWheel"));
@@ -299,7 +307,9 @@ public class Instantiation : MonoBehaviour
             case TileType.Or:
 			case TileType.Nand:
 			case TileType.Xor:
-                monster.MonsterMovementType = MovementType.Waiting;
+			case TileType.Xnor:
+			case TileType.Nor:
+			monster.MonsterMovementType = MovementType.Waiting;
                 bool shouldRemove = false;
                 int index1 = 0;
                 int index2 = 0;
@@ -329,7 +339,15 @@ public class Instantiation : MonoBehaviour
 						{
 							numberType = NumberType.One;
 						}
-                        Monster tempMonster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, numberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.None);
+						else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.Xnor && ( (monster.MonsterNumberType == NumberType.One && m.MonsterNumberType == NumberType.One) || (monster.MonsterNumberType == NumberType.Zero && m.MonsterNumberType == NumberType.Zero) ) )
+						{
+							numberType = NumberType.One;
+						}
+						else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.Nor && (monster.MonsterNumberType == NumberType.Zero && m.MonsterNumberType == NumberType.Zero) )
+						{
+							numberType = NumberType.One;
+						}
+						Monster tempMonster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, numberType, monster.MonsterXPosition, monster.MonsterYPosition, MovementDirection.None);
 						InstantiationGridSquareGrid[x, y].CalculateNewDirection(tempMonster);
                         break;
                     }
@@ -350,6 +368,14 @@ public class Instantiation : MonoBehaviour
 					}
                 }
                 break;
+			case TileType.Not:
+			{
+				monster.MonsterNumberType = monster.MonsterNumberType == NumberType.Zero ? NumberType.One: NumberType.Zero; 
+				monster.MonsterGameObject.renderer.material = monster.MonsterGameObject.renderer.material == 
+							MaterialDictionary["BiterZero"] ? MaterialDictionary["BiterOne"] : MaterialDictionary["BiterZero"];
+				InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
+				break;
+			}
 			case TileType.BeltUpLeft:
 			case TileType.BeltUpRight:
 			case TileType.BeltDownRight:
@@ -360,6 +386,7 @@ public class Instantiation : MonoBehaviour
 			case TileType.BeltRightT:
 			case TileType.BeltDownT:
 			case TileType.BeltLeftT:
+			case TileType.BeltCross:
 				InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
                 break;
             default:

@@ -48,14 +48,21 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\ContinueButton.cs" />
      <Compile Include="Assets\Scripts\DeleteButton.cs" />
+     <Compile Include="Assets\Scripts\Game.cs" />
      <Compile Include="Assets\Scripts\GridSquare.cs" />
      <Compile Include="Assets\Scripts\Instantiation.cs" />
      <Compile Include="Assets\Scripts\LevelConstructor.cs" />
+     <Compile Include="Assets\Scripts\LevelMenu.cs" />
      <Compile Include="Assets\Scripts\LevelSelectButton.cs" />
      <Compile Include="Assets\Scripts\Monster.cs" />
+     <Compile Include="Assets\Scripts\NewGame.cs" />
      <Compile Include="Assets\Scripts\Pause.cs" />
      <Compile Include="Assets\Scripts\PersistentScript.cs" />
+     <Compile Include="Assets\Scripts\Player.cs" />
      <Compile Include="Assets\Scripts\QuitButton.cs" />
+     <Compile Include="Assets\Scripts\ReturnButton.cs" />
+     <Compile Include="Assets\Scripts\Save.cs" />
+     <Compile Include="Assets\Scripts\SelectSaveFile.cs" />
      <Compile Include="Assets\Scripts\StartButton.cs" />
      <None Include="Assets\Resources\Level1.txt" />
  <Reference Include="UnityEngine.UI">

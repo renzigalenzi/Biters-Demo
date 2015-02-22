@@ -10,7 +10,12 @@ public class DeleteButton : MonoBehaviour {
 	
 	public void OnClick() {
 		
-		PlayerPrefs.DeleteAll (); 
+		// PlayerPrefs.DeleteAll (); 
+		int temp = Game.current.id; 
+		Game.current = new Game ();
+		Game.current.id = temp; 
+		Save.SaveThis (); 
+		Application.LoadLevel ("MainMenu"); 
 		
 	} // end OnClick
 

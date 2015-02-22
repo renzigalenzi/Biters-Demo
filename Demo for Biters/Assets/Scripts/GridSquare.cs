@@ -9,9 +9,9 @@ using System.Collections.Specialized;
 
 public enum TileType
 {
-    Blank, EnterZero, EnterOne, ExitZero, ExitOne, And, Or, Xor, Nand, BeltVertical, BeltHorizontal, 
+    Blank, EnterZero, EnterOne, ExitZero, ExitOne, And, Xnor, Nor, Not, Or, Xor, Nand, BeltVertical, BeltHorizontal, 
 	BeltUpLeft, BeltUpRight, BeltDownRight, BeltDownLeft, 
-	BeltUpT, BeltRightT, BeltDownT, BeltLeftT, Count
+	BeltUpT, BeltRightT, BeltDownT, BeltLeftT, BeltCross, Count
 }
 
 
@@ -90,7 +90,7 @@ public class GridSquare
 	{
 		TileType type = tile.GridSquareTileType;
 		//if the tile is a gate return true
-		if (type == TileType.And || type == TileType.Or || type == TileType.Nand || type == TileType.Xor)
+		if (type == TileType.And || type == TileType.Or || type == TileType.Nand || type == TileType.Xor || type == TileType.Xnor || type == TileType.Nor || type == TileType.Not)
 			return true;
 
 		//if it is an end state return true
@@ -106,7 +106,8 @@ public class GridSquare
 			       type == TileType.BeltUpT ||
 				   type == TileType.BeltUpLeft ||
 			   	   type == TileType.BeltDownT ||
-				   type == TileType.BeltHorizontal)
+			  	   type == TileType.BeltHorizontal ||
+			  	   type == TileType.BeltCross)
 				return true;
 				break;
 			case TileDirection.Left:
@@ -115,7 +116,8 @@ public class GridSquare
 			   	   type == TileType.BeltUpT ||
 				   type == TileType.BeltUpRight ||
 				   type == TileType.BeltDownT ||
-				   type == TileType.BeltHorizontal)
+			   	   type == TileType.BeltHorizontal ||
+			       type == TileType.BeltCross)
 				return true;
 			break;
 			case TileDirection.Up:
@@ -124,16 +126,19 @@ public class GridSquare
 				   type == TileType.BeltLeftT ||
 				   type == TileType.BeltRightT ||
 				   type == TileType.BeltUpLeft ||
-				   type == TileType.BeltVertical)
+			   	   type == TileType.BeltVertical ||
+			   	   type == TileType.BeltCross)
 				return true;
 			break;
 			case TileDirection.Down:
-				if(type == TileType.BeltDownLeft||
+				if(
+				   type == TileType.BeltDownLeft||
 				   type == TileType.BeltDownT ||
 				   type == TileType.BeltLeftT ||
 				   type == TileType.BeltRightT ||
 				   type == TileType.BeltDownRight ||
-				   type == TileType.BeltVertical)
+				   type == TileType.BeltVertical ||
+				   type == TileType.BeltCross)
 				return true;
 			break;
 				
@@ -164,19 +169,19 @@ public class GridSquare
 	public void AssignDirection(GridSquare[,] grid, int gridW, int gridH)
 	{
 		//look at neighboring pieces and see if there are any pieces that will accept movement, add to movement list
-		if (GridSquareXPosition > 0 && TileAccepts(grid[GridSquareXPosition - 1, GridSquareYPosition], TileDirection.Left) )
+		if (GridSquareXPosition > 0 && TileAccepts(grid[GridSquareXPosition, GridSquareYPosition], TileDirection.Right) && TileAccepts(grid[GridSquareXPosition - 1, GridSquareYPosition], TileDirection.Left) )
 		{
 			MovePossibilities.Add(grid[GridSquareXPosition - 1, GridSquareYPosition]);
 		}
-		if (GridSquareXPosition < gridW - 1 && TileAccepts(grid[GridSquareXPosition + 1, GridSquareYPosition], TileDirection.Right) )
+		if (GridSquareXPosition < gridW - 1 && TileAccepts(grid[GridSquareXPosition, GridSquareYPosition], TileDirection.Left) && TileAccepts(grid[GridSquareXPosition + 1, GridSquareYPosition], TileDirection.Right) )
 		{
 			MovePossibilities.Add(grid[GridSquareXPosition + 1, GridSquareYPosition]);
 		}
-		if (GridSquareYPosition > 0 && TileAccepts(grid[GridSquareXPosition, GridSquareYPosition - 1], TileDirection.Up) )
+		if (GridSquareYPosition > 0 && TileAccepts(grid[GridSquareXPosition, GridSquareYPosition], TileDirection.Down) && TileAccepts(grid[GridSquareXPosition, GridSquareYPosition - 1], TileDirection.Up) )
 		{
 			MovePossibilities.Add(grid[GridSquareXPosition, GridSquareYPosition - 1]);
 		}
-		if (GridSquareYPosition < gridH - 1 && TileAccepts(grid[GridSquareXPosition, GridSquareYPosition + 1], TileDirection.Down))
+		if (GridSquareYPosition < gridH - 1 && TileAccepts(grid[GridSquareXPosition, GridSquareYPosition], TileDirection.Up) && TileAccepts(grid[GridSquareXPosition, GridSquareYPosition + 1], TileDirection.Down))
 		{
 			MovePossibilities.Add(grid[GridSquareXPosition, GridSquareYPosition + 1]);
 		}
@@ -244,7 +249,7 @@ public class GridSquare
 	{
 		List<TileType> Belts = new List<TileType> (new TileType[] {TileType.BeltVertical, TileType.BeltHorizontal, 
 			TileType.BeltUpLeft, TileType.BeltUpRight, TileType.BeltDownRight, TileType.BeltDownLeft, 
-			TileType.BeltUpT, TileType.BeltRightT, TileType.BeltDownT, TileType.BeltLeftT});
+			TileType.BeltUpT, TileType.BeltRightT, TileType.BeltDownT, TileType.BeltLeftT, TileType.BeltCross});
 
 		return Belts.Contains (GridSquareTileType);
 	}

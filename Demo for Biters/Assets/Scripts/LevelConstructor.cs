@@ -261,20 +261,42 @@ public class LevelConstructor : MonoBehaviour {
 		int x = LastClickedPoint [0];
 		int y = LastClickedPoint [1];
 
-		if (SelectedMaterial == MaterialDictionary ["BeltHorizontal"]) 
+		if (IsBeltMaterial(SelectedMaterial))
 		{
-			if (x < LevelConstructorGridWidth -1)
-				ChangePiece(x+1,y,x,y, TileDirection.Left);
-			if (x > 0)
-				ChangePiece(x-1,y,x,y, TileDirection.Right);
+			TileType temp = LevelConstructorGridSquareGrid[x,y].GridSquareTileType;
+			for(int tile = 0; tile < (int)TileType.Count; tile ++)
+			{
+				if(SelectedMaterial.name == Enum.GetName(typeof(TileType),(TileType)tile))
+					LevelConstructorGridSquareGrid[x,y].GridSquareTileType = (TileType)tile;
+			}
+			if (x < LevelConstructorGridWidth -1 && LevelConstructorGridSquareGrid[x,y].TileAccepts(LevelConstructorGridSquareGrid[x,y], TileDirection.Left))
+			{
+				LevelConstructorGridSquareGrid[x,y].GridSquareTileType = temp;
+				ChangePiece(x+1,y,x,y, TileDirection.Right);
+			}
+			if (x > 0 && LevelConstructorGridSquareGrid[x,y].TileAccepts(LevelConstructorGridSquareGrid[x,y], TileDirection.Right))
+			{
+				LevelConstructorGridSquareGrid[x,y].GridSquareTileType = temp;
+				ChangePiece(x-1,y,x,y, TileDirection.Left);
+			}
+			if (y < LevelConstructorGridHeight -1 && LevelConstructorGridSquareGrid[x,y].TileAccepts(LevelConstructorGridSquareGrid[x,y], TileDirection.Up))
+			{
+				LevelConstructorGridSquareGrid[x,y].GridSquareTileType = temp;
+				ChangePiece(x,y+1,x,y, TileDirection.Down);
+			}
+			if(y > 0 && LevelConstructorGridSquareGrid[x,y].TileAccepts(LevelConstructorGridSquareGrid[x,y], TileDirection.Down))
+			{
+				LevelConstructorGridSquareGrid[x,y].GridSquareTileType = temp;
+				ChangePiece(x,y-1,x,y, TileDirection.Up);
+			}
 		}
-		if (SelectedMaterial == MaterialDictionary ["BeltVertical"]) 
+		/*if (SelectedMaterial == MaterialDictionary ["BeltVertical"]) 
 		{
 			if (y < LevelConstructorGridHeight -1)
-				ChangePiece(x,y+1,x,y, TileDirection.Up);
+				ChangePiece(x,y+1,x,y, TileDirection.Down);
 			if(y > 0)
-				ChangePiece(x,y-1,x,y, TileDirection.Down);
-		}
+				ChangePiece(x,y-1,x,y, TileDirection.Up);
+		}*/
 	}
 	void ChangePiece(int Xnew, int Ynew, int Xclicked, int Yclicked, TileDirection direction)
 	{
@@ -291,10 +313,13 @@ public class LevelConstructor : MonoBehaviour {
 			LevelConstructorGridSquareGrid[Xnew,Ynew].MovePossibilities.Clear();
 			LevelConstructorGridSquareGrid[Xnew,Ynew].AssignDirection(LevelConstructorGridSquareGrid, LevelConstructorGridWidth, LevelConstructorGridHeight);
 			if(LevelConstructorGridSquareGrid[Xnew,Ynew].MovePossibilities.Count == 3)
-				return;
+			{
+				tempMat = MaterialDictionary["BeltCross"];
+				tempTile = TileType.BeltCross;
+			}
 			else if(LevelConstructorGridSquareGrid[Xnew,Ynew].MovePossibilities.Count == 2)
 			{
-				return;
+				MakeT(Xnew, Ynew, Xclicked, Yclicked, ref tempMat, ref tempTile);
 			}
 			else if(LevelConstructorGridSquareGrid[Xnew,Ynew].MovePossibilities.Count == 1)
 			{
@@ -302,7 +327,7 @@ public class LevelConstructor : MonoBehaviour {
 				int Xmove = LevelConstructorGridSquareGrid[Xnew,Ynew].MovePossibilities[0].GridSquareXPosition;
 				int Ymove = LevelConstructorGridSquareGrid[Xnew,Ynew].MovePossibilities[0].GridSquareYPosition;
 
-				makeCorner(Xnew - Xmove, Ynew-Ymove, Xnew-Xclicked, Ynew-Yclicked, ref tempMat, ref tempTile);
+				MakeCorner(Xnew - Xmove, Ynew-Ymove, Xnew-Xclicked, Ynew-Yclicked, ref tempMat, ref tempTile);
 			}
 
 
@@ -312,7 +337,7 @@ public class LevelConstructor : MonoBehaviour {
 				
 		}
 	}
-	void makeCorner(int dX1, int dY1, int dX2, int dY2, ref Material tempMat, ref TileType tempTile)
+	void MakeCorner(int dX1, int dY1, int dX2, int dY2, ref Material tempMat, ref TileType tempTile)
 	{
 		string key = "BeltUpRight";
 
@@ -332,6 +357,14 @@ public class LevelConstructor : MonoBehaviour {
 		{
 			key = "BeltDownLeft"; 
 		}
+		if( dX1  == 0 && dX2 == 0 ) 
+		{
+			key = "BeltVertical"; 
+		}
+		if( dY1  == 0 && dY2 == 0 )
+		{
+			key = "BeltHorizontal"; 
+		}
 
 		tempMat = MaterialDictionary [key]; 
 		for(int tile = 0; tile < (int)TileType.Count; tile ++)
@@ -339,6 +372,62 @@ public class LevelConstructor : MonoBehaviour {
 			if(key == Enum.GetName(typeof(TileType),(TileType)tile))
 				tempTile = (TileType)tile;
 		}
+	}
+	void MakeT (int x, int y, int Xclicked, int Yclicked, ref Material tempMat, ref TileType tempTile)
+	{
+		List<TileDirection> missingDirection = new List<TileDirection> ()
+		{TileDirection.Down,TileDirection.Up,TileDirection.Right,TileDirection.Left};
+
+		string key = "BeltUpT";
+		int Xmove;
+		int Ymove;
+		int dx, dy;
+		Xmove = Xclicked;
+		Ymove = Yclicked;
+		dx = x - Xmove;
+		dy = y-Ymove;
+		if (dx == -1)
+			missingDirection.Remove(TileDirection.Left);
+		if (dx == 1)
+			missingDirection.Remove(TileDirection.Right);
+		if (dy == -1)
+			missingDirection.Remove(TileDirection.Up);
+		if (dy == 1)
+			missingDirection.Remove(TileDirection.Down);
+		foreach (GridSquare square in LevelConstructorGridSquareGrid[x,y].MovePossibilities) 
+		{
+			Xmove = square.GridSquareXPosition;
+			Ymove = square.GridSquareYPosition;
+			dx = x - Xmove;
+			dy = y-Ymove;
+			if (dx == -1)
+				missingDirection.Remove(TileDirection.Left);
+			if (dx == 1)
+				missingDirection.Remove(TileDirection.Right);
+			if (dy == -1)
+				missingDirection.Remove(TileDirection.Up);
+			if (dy == 1)
+				missingDirection.Remove(TileDirection.Down);
+		}
+		if (missingDirection.Count != 1)
+			key = Enum.GetName(typeof(TileType),LevelConstructorGridSquareGrid[x,y].GridSquareTileType);
+		else if (missingDirection[0] == TileDirection.Left)
+			key = "BeltRightT";
+		else if (missingDirection[0] == TileDirection.Right)
+			key = "BeltLeftT";
+		else if (missingDirection[0] == TileDirection.Up)
+			key = "BeltDownT";
+		else if (missingDirection[0] == TileDirection.Down)
+			key = "BeltUpT";
+
+		tempMat = MaterialDictionary [key]; 
+		for(int tile = 0; tile < (int)TileType.Count; tile ++)
+		{
+			if(key == Enum.GetName(typeof(TileType),(TileType)tile))
+				tempTile = (TileType)tile;
+		}
+		
+		
 	}
 	void GetMouseRays()
 	{
@@ -358,16 +447,12 @@ public class LevelConstructor : MonoBehaviour {
 		GameObject camera = GameObject.Find ("Main Camera");
 		int moveX = 0;
 		int moveY = 0;
-		float magicNumber = 40;
+		float magicNumber = 5;
 
 		if( Input.mousePosition.x < magicNumber && Input.mousePosition.x >= 0 )
 			moveX = (int)(-1*magicNumber/(Input.mousePosition.x+1));
 		if( Input.mousePosition.x > Screen.width - magicNumber && Input.mousePosition.x <= Screen.width)
 			moveX = (int)(1*magicNumber/(Screen.width-Input.mousePosition.x+1));
-		if( Input.mousePosition.y < magicNumber && Input.mousePosition.y >= 0 ) 
-			moveY = (int)(-1*magicNumber/(Input.mousePosition.y+1));
-		if( Input.mousePosition.y > Screen.height - magicNumber && Input.mousePosition.y <= Screen.height ) 
-			moveY = (int)(1 * 20 / (Screen.height - Input.mousePosition.y + 1));
 		if (Input.GetAxis ("Mouse ScrollWheel") != 0) 
 		{
 			moveY = (int)(20*Input.GetAxis ("Mouse ScrollWheel"));
@@ -405,7 +490,7 @@ public class LevelConstructor : MonoBehaviour {
 	{
 		if(GUI.Button(new Rect(Screen.width- 140, 0, 100, 20),"Main Menu"))
 		{
-			Application.LoadLevel ("MainMenu"); 
+			Application.LoadLevel ("PlayerMenu"); 
 		}
 	}
 	void MakeLoadLevelButton()
@@ -522,14 +607,15 @@ public class LevelConstructor : MonoBehaviour {
 		}
 		GUI.EndScrollView();
 	}
-	/*public bool IsBeltMaterial(Material m)
+	public bool IsBeltMaterial(Material m)
 	{
-		List<TileType> Belts = new List<Materials> (new TileType[] {TileType.BeltVertical, TileType.BeltHorizontal, 
-			TileType.BeltUpLeft, TileType.BeltUpRight, TileType.BeltDownRight, TileType.BeltDownLeft, 
-			TileType.BeltUpT, TileType.BeltRightT, TileType.BeltDownT, TileType.BeltLeftT});
+		List<Material> Belts = new List<Material> (new Material[] {MaterialDictionary["BeltVertical"], MaterialDictionary["BeltHorizontal"], 
+			MaterialDictionary["BeltUpLeft"], MaterialDictionary["BeltUpRight"], MaterialDictionary["BeltDownRight"], MaterialDictionary["BeltDownLeft"], 
+			MaterialDictionary["BeltUpT"], MaterialDictionary["BeltRightT"], MaterialDictionary["BeltDownT"], MaterialDictionary["BeltLeftT"],
+			MaterialDictionary["BeltCross"]});
 		
-		return Belts.Contains (GridSquareTileType);
-	}*/
+		return Belts.Contains (m);
+	}
 	public static void PrintMessage(string printStatement)
 	{
 		print (printStatement);
