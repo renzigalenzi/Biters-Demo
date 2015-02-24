@@ -59,7 +59,7 @@ public class Pause : MonoBehaviour {
 		if (GUI.Button (new Rect ((Screen.width/2) - 50, (Screen.height/2) - 40, 100, 25), "Main Menu")) { 
 
 			UnPauseGame (); 
-			Application.LoadLevel ("MainMenu"); 
+			Application.LoadLevel ("PlayerMenu"); 
 			
 		} // end if 
 

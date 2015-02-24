@@ -50,7 +50,7 @@ public class Instantiation : MonoBehaviour
 		if(persistentScript != null && persistentScript.SelectedLevel != null)
         	LoadLevel(persistentScript.SelectedLevel);
 		else
-			LoadLevel("Level - 1.csv");
+			LoadLevel("Level - 05.csv");
     }
 
     public bool LoadLevel(string fileName)
