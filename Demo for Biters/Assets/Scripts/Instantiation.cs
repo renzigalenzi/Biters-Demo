@@ -16,6 +16,8 @@ public class Instantiation : MonoBehaviour
     public int InstantiationSpawnDelay { get; set; }
 	private float timer = 60.0f; 
 
+	bool bLevelWon = false;
+	bool bLevelLost = false;
 	PersistentScript persistentScript;
 
 	public AudioClip gateSound;
@@ -47,10 +49,7 @@ public class Instantiation : MonoBehaviour
        
 		Time.timeScale = 1.0f; 
 
-		if(persistentScript != null && persistentScript.SelectedLevel != null)
-        	LoadLevel(persistentScript.SelectedLevel);
-		else
-			LoadLevel("Level - 05.csv");
+		LoadLevel(Game.current.player.currLevel);
     }
 
     public bool LoadLevel(string fileName)
@@ -137,13 +136,21 @@ public class Instantiation : MonoBehaviour
 	void OnGUI () 
 	{
 		GUI.Box (new Rect (Screen.width - 50, 0, 50, 20), "" + timer.ToString ("f0")); 
-		if (timer <= 0) 
-		{ 
-			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 100, 25), "Try Again?")) 
+
+		if(bLevelWon)
+		{
+			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 100, 25), "Continue")) 
 			{
 				Application.LoadLevel (Application.loadedLevelName); 
 			} 
-		} 
+		}
+		else if(bLevelLost || timer <= 0)
+		{
+			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 100, 25), "Retry?")) 
+			{
+				Application.LoadLevel (Application.loadedLevelName); 
+			} 
+		}
 	}
 
 	void GetMouseRays()
@@ -467,6 +474,7 @@ public class Instantiation : MonoBehaviour
 		if (PlayerLost)
 		{
 			PrintMessage ("YOU LOSE!");
+			bLevelLost = true;
 			GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			cube.transform.position = new Vector3(0, 0, 0);
 			cube.transform.localScale = new Vector3(10, 10, 10);
@@ -476,6 +484,8 @@ public class Instantiation : MonoBehaviour
 		else if (numWinningExits == totalNumExits)
 		{
 			PrintMessage ("YOU WIN!");
+			SetNextPlayerLevel();
+			bLevelWon = true;
 			GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			cube.transform.position = new Vector3(0, 0, 0);
 			cube.transform.localScale = new Vector3(10, 10, 10);
@@ -488,6 +498,34 @@ public class Instantiation : MonoBehaviour
 		}
 
 		monster.DestroyEntirely ();
+	}
+	public void SetNextPlayerLevel()
+	{
+		List<string> levelsList = new List<string>();
+		GetLevels (ref levelsList);
+
+		for(int i = 0; i < levelsList.Count; i++)
+		{
+			if(Game.current.player.currLevel == levelsList[i] && i < levelsList.Count - 1)
+			{
+				if(levelsList[i+1] != null)
+					Game.current.player.currLevel = levelsList[i+1];
+				break;
+			}
+		}
+	}
+	void GetLevels(ref List<string> levelsList)
+	{
+		if (levelsList != null)
+			levelsList.Clear ();
+		levelsList = new List<string> ();
+		string dirName = Directory.GetCurrentDirectory () + "/Assets/Levels";
+		DirectoryInfo dir = new DirectoryInfo(dirName);
+		FileInfo[] info = dir.GetFiles("*.csv");
+		foreach (FileInfo f in info) 
+		{ 
+			levelsList.Add(f.Name);
+		}
 	}
 
 	public static void PrintMessage(string printStatement)

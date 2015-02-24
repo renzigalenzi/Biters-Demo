@@ -15,7 +15,7 @@ public class Player {
 		this.name = "New Game";
 		this.score = 0; 
 		this.unlockedLevel = 1; 
-		this.currLevel = "Level - 1.csv";
+		this.currLevel = "Level - 01.csv";
 
 	} // end constructor  
 

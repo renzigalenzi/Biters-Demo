@@ -1,13 +1,22 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Instantiation.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Instantiation.cs">
     <Files>
-      <File FileName="Assets/Scripts/LevelConstructor.cs" Line="530" Column="1" />
-      <File FileName="Assets/Scripts/Instantiation.cs" Line="53" Column="25" />
+      <File FileName="Assets\Scripts\Instantiation.cs" Line="246" Column="3" />
+      <File FileName="Assets\Scripts\LevelConstructor.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\LevelMenu.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\SelectSaveFile.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Game.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Save.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Player.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
+    <Watch file="Assets\Scripts\GridSquare.cs" line="213" offsetX="509" offsetY="3604" expression="MovePossibilities" liveUpdate="False" />
+    <Watch file="Assets\Scripts\Instantiation.cs" line="71" offsetX="589" offsetY="1190" expression="InstantiationGridSquareGrid" liveUpdate="False" />
+    <Watch file="Assets\Scripts\LevelConstructor.cs" line="149" offsetX="1197" offsetY="2516" expression="LevelConstructorGridSquareGrid" liveUpdate="False" />
+  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
 </Properties>

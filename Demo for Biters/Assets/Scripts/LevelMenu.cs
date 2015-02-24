@@ -62,7 +62,7 @@ public class LevelMenu : MonoBehaviour {
 		{
 			if(GUI.Button(new Rect(i*200, 0, 190, height-100),levelName))
 			{
-				persistentScript.SelectedLevel = levelName; 
+				Game.current.player.currLevel = levelName; 
 				Application.LoadLevel ("Demo"); 
 			}
 			i++;
