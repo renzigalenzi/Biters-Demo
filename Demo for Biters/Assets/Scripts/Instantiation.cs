@@ -49,6 +49,7 @@ public class Instantiation : MonoBehaviour
        
 		Time.timeScale = 1.0f; 
 
+		// PrintMessage("The currLevel is currently: " + Game.current.player.currLevel);
 		LoadLevel(Game.current.player.currLevel);
     }
 
@@ -499,6 +500,24 @@ public class Instantiation : MonoBehaviour
 
 		monster.DestroyEntirely ();
 	}
+
+	// returns true if the level has not already been reached by the Player -- Prevents duplicate entries 
+	public bool CheckLevel(string lvl) { 
+
+		for (int i = 0; i < Game.current.player.levelsList.Count; i++) { 
+
+			if (lvl == Game.current.player.levelsList[i]) { 
+
+				return false; 
+
+			} // end if statement 
+
+		} // end for loop  
+
+		return true; 
+
+	} // end CheckLevel  
+
 	public void SetNextPlayerLevel()
 	{
 		List<string> levelsList = new List<string>();
@@ -508,8 +527,15 @@ public class Instantiation : MonoBehaviour
 		{
 			if(Game.current.player.currLevel == levelsList[i] && i < levelsList.Count - 1)
 			{
-				if(levelsList[i+1] != null)
+				if(levelsList[i+1] != null) {
 					Game.current.player.currLevel = levelsList[i+1];
+					// Only call this if the level has not already been reached 
+					if (CheckLevel (levelsList[i+1])) { 
+						Game.current.player.highestLevel = levelsList[i+1];
+						Game.current.player.levelsList.Add(levelsList[i+1]); 
+					} // end if statement 
+					Save.SaveThis (); 
+				} // end if statement 
 				break;
 			}
 		}

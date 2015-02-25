@@ -42,7 +42,8 @@ public class LevelMenu : MonoBehaviour {
 		// instructions 
 		GUI.Box (new Rect ((Screen.width /2) - 50, 100, 150, 25), "Select a Level");
 
-		GetLevels();
+		// GetLevels();
+		levelsList = Game.current.player.levelsList; 
 		int xStart = Math.Min (Screen.width - 50, 40);
 		int yStart = Math.Min (Screen.height, 200);
 		int width = Screen.width - xStart - 40;

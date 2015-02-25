@@ -39,7 +39,7 @@ public static class Save {
 		Save.games.Add (Save.save3); 
 
 		BinaryFormatter bf = new BinaryFormatter (); 
-		FileStream file = File.Create (Application.persistentDataPath + "/saveFiles.dat");
+		FileStream file = File.Create (Application.persistentDataPath + "/savedFiles.dat");
 		bf.Serialize (file, games); 
 		file.Close (); 
 
@@ -47,10 +47,10 @@ public static class Save {
 
 	public static void LoadThis () { 
 
-		if (File.Exists (Application.persistentDataPath + "/saveFiles.dat")) { 
+		if (File.Exists (Application.persistentDataPath + "/savedFiles.dat")) { 
 
 			BinaryFormatter bf = new BinaryFormatter(); 
-			FileStream file = File.Open (Application.persistentDataPath + "/saveFiles.dat", FileMode.Open); 
+			FileStream file = File.Open (Application.persistentDataPath + "/savedFiles.dat", FileMode.Open); 
 			games = (List<Game>) bf.Deserialize (file); 
 			file.Close (); 
 

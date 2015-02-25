@@ -14,6 +14,8 @@ public class StartButton : MonoBehaviour {
 	// Update is called once per frame
 	public void OnClick () {
 
+		Game.current.player.currLevel = Game.current.player.highestLevel; 
+		Save.SaveThis ();
 		Application.LoadLevel ("Demo");
 	
 	}
