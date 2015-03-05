@@ -18,6 +18,7 @@ public class LevelConstructor : MonoBehaviour {
 	public List<Monster> LevelConstructorMonsters { get; set; }
 	public int LevelConstructorNextMonsterId { get; set; }
 	public int LevelConstructorSpawnDelay { get; set; }
+	public List<RotationGroup> LevelConstructorRotationGroups{ get; set; }
 	
 	public AudioClip gateSound;
 
@@ -26,14 +27,21 @@ public class LevelConstructor : MonoBehaviour {
 
 	public const int XOFFSET = 4;
 	public const int YOFFSET = 4;
-	private Vector2 scrollPosition = Vector2.zero;
+	private Vector2 TileScrollPosition = Vector2.zero;
+	private Vector2 GroupScrollPosition = Vector2.zero;
 	private bool boolDragging = false;
 	private bool Saving = false;
 	private string SaveFileName = "Level - ";
 	private bool Loading = false;
 	private string LoadFileName = "Level - ";
 	public int[] LastClickedPoint{ get; set; }
-	
+
+	//Light lightComp = lightGameObject.AddComponent<Light>();
+	//lightComp.color = Color.blue;
+	//lightGameObject.transform.position = new Vector3(0, 5, 0);/// <summary>
+	/// S//////////////////	/// </summary>
+
+
 	public void Start()
 	{
 		MaterialDictionary = new Dictionary<string, Material> ();
@@ -102,6 +110,13 @@ public class LevelConstructor : MonoBehaviour {
 	}
 	public void LoadBlankMap()
 	{
+		LevelConstructorRotationGroups = new List<RotationGroup> ();
+		RotationGroup g = new RotationGroup ();
+		LevelConstructorRotationGroups.Add (g);
+		LevelConstructorRotationGroups.Add (g);
+		LevelConstructorRotationGroups.Add (g);
+		LevelConstructorRotationGroups.Add (g);
+		LevelConstructorRotationGroups.Add (g);
 		LevelConstructorGridWidth = 8;
 		LevelConstructorGridHeight = 8;
 
@@ -125,6 +140,7 @@ public class LevelConstructor : MonoBehaviour {
 	}
 	public bool LoadLevel(string fileName)
 	{
+		LevelConstructorRotationGroups = new List<RotationGroup> ();
 		LastClickedPoint = new int[] {-1,-1};
 		string filePath = "Assets/Levels/" + fileName + ".csv";
 		try
@@ -479,7 +495,8 @@ public class LevelConstructor : MonoBehaviour {
 	}
 	void OnGUI () 
 	{
-		MakeScrollView ();
+		MakeTilesScrollView ();
+		MakeRotGroupScrollView ();
 		MakeMapControls ();
 		MakeSelected ();
 		MakeExportButton ();
@@ -585,12 +602,12 @@ public class LevelConstructor : MonoBehaviour {
 			Console.WriteLine("There was a problem during file reading", e.Message);
 		}
 	}
-	void MakeScrollView()
+	void MakeTilesScrollView()
 	{
 		int numButtons = (int)MaterialDictionary.Count;
-		scrollPosition = GUI.BeginScrollView(new Rect(Math.Min(Screen.width,40), Math.Min(Screen.height,20),
+		TileScrollPosition = GUI.BeginScrollView(new Rect(Math.Min(Screen.width,40), Math.Min(Screen.height,20),
 		                                              Math.Min(Screen.width-10,80), Screen.height-20), 
-		                                     scrollPosition, new Rect(0, 0, 100, numButtons * 70));
+		                                         TileScrollPosition, new Rect(0, 0, 100, numButtons * 70));
 		int i = 0;
 		foreach(string key in MaterialDictionary.Keys)
 		{
@@ -600,6 +617,28 @@ public class LevelConstructor : MonoBehaviour {
 				for(int tile = 0; tile < (int)TileType.Count; tile ++)
 				{
 					if(key == Enum.GetName(typeof(TileType),(TileType)tile))
+						SelectedTile = (TileType)tile;
+				}
+			}
+			i++;
+		}
+		GUI.EndScrollView();
+	}
+	void MakeRotGroupScrollView()
+	{
+		int numButtons = (int)LevelConstructorRotationGroups.Count;
+		GroupScrollPosition = GUI.BeginScrollView(new Rect(Math.Min(Screen.width-100,Screen.width), Math.Min(Screen.height,230),
+		                                              Math.Min(Screen.width-20,80), 250), 
+		                                          GroupScrollPosition, new Rect(0, 0, 100, numButtons * 70));
+		int i = 0;
+		foreach(RotationGroup group in LevelConstructorRotationGroups)
+		{
+			if(GUI.Button(new Rect(0, i*70, 60, 60),MaterialDictionary["Not"].mainTexture))
+			{
+				SelectedMaterial = MaterialDictionary["Not"]; 
+				for(int tile = 0; tile < (int)TileType.Count; tile ++)
+				{
+					if("Not" == Enum.GetName(typeof(TileType),(TileType)tile))
 						SelectedTile = (TileType)tile;
 				}
 			}

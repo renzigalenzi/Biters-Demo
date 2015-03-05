@@ -12,9 +12,10 @@ public class Instantiation : MonoBehaviour
     public int InstantiationGridWidth { get; set; }
     public int InstantiationGridHeight { get; set; }
 	public List<Monster> InstantiationMonsters { get; set; }
+	public List<RotationGroup> InstantiationRotationGroups{ get; set; }
     public int InstantiationNextMonsterId { get; set; }
     public int InstantiationSpawnDelay { get; set; }
-	private float timer = 60.0f; 
+	private float timer = 200.0f; 
 
 	bool bLevelWon = false;
 	bool bLevelLost = false;
@@ -35,6 +36,7 @@ public class Instantiation : MonoBehaviour
 			persistentScript = (PersistentScript)persistentGameObject.GetComponent(typeof(PersistentScript));
 
         InstantiationMonsters = new List<Monster>();
+		InstantiationRotationGroups = new List<RotationGroup> ();
         InstantiationNextMonsterId = 0;
         InstantiationSpawnDelay = 10000;
 
@@ -64,7 +66,7 @@ public class Instantiation : MonoBehaviour
             {
                 int y = 0;
                 string line = reader.ReadLine();
-                while(line != null)
+                while(line != null && line[0] != '#')
                 {
                     string[] entries = line.Split(',');
 					for(int x = 0; x < entries.Length; x++)
@@ -75,6 +77,21 @@ public class Instantiation : MonoBehaviour
                     y++;
 					line = reader.ReadLine();
                 }
+				if(line != null && line[0] == '#')
+				{
+					do
+					{
+						RotationGroup g = new RotationGroup();
+						line = line.Trim( new char[] {'#'});
+						string[] entries = line.Split(',');
+						for(int x = 0; x < entries.Length; x+=2)
+						{
+							g.Add(Convert.ToInt32(entries[x]), Convert.ToInt32(entries[x+1]));
+						}
+						InstantiationRotationGroups.Add(g);
+						line = reader.ReadLine();
+					}while(line != null);
+				}
                 reader.Close();
 
 				foreach (GridSquare square in InstantiationGridSquareGrid) 
@@ -101,14 +118,14 @@ public class Instantiation : MonoBehaviour
 		using(reader)
 		{
 			string line = reader.ReadLine();
-			if(line != null)
+			if(line != null && line[0] != '#')
 			{
 				string[] entries = line.Split(',');
                 InstantiationGridWidth = entries.Length;
                 InstantiationGridHeight++;
 			}
             line = reader.ReadLine();
-			while(line != null)
+			while(line != null && line[0] != '#')
 			{
                 InstantiationGridHeight++;
                 line = reader.ReadLine();
@@ -175,39 +192,48 @@ public class Instantiation : MonoBehaviour
 				{
 					return;
 				}
-				TileType tileType = TileType.Or;
-				if(pObject.renderer.sharedMaterial == MaterialDictionary["Or"])
+				RotationGroup rg;
+				rg = GetRotationalGroup(XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y);
+				if(rg != null)
 				{
-					pObject.renderer.material = MaterialDictionary["And"];
-					tileType = TileType.And;
+					RotateTiles(rg);
 				}
-				else if(pObject.renderer.sharedMaterial == MaterialDictionary["And"])
+				else
 				{
-					pObject.renderer.material = MaterialDictionary["Nand"];
-					tileType = TileType.Nand;
+					TileType tileType = TileType.Or;
+					if(pObject.renderer.sharedMaterial == MaterialDictionary["Or"])
+					{
+						pObject.renderer.material = MaterialDictionary["And"];
+						tileType = TileType.And;
+					}
+					else if(pObject.renderer.sharedMaterial == MaterialDictionary["And"])
+					{
+						pObject.renderer.material = MaterialDictionary["Nand"];
+						tileType = TileType.Nand;
+					}
+					else if(pObject.renderer.sharedMaterial == MaterialDictionary["Nand"])
+					{
+						pObject.renderer.material = MaterialDictionary["Xor"];
+						tileType = TileType.Xor;
+					}
+					else if(pObject.renderer.sharedMaterial == MaterialDictionary["Xor"])
+					{
+						pObject.renderer.material = MaterialDictionary["Xnor"];
+						tileType = TileType.Xnor;
+					}
+					else if(pObject.renderer.sharedMaterial == MaterialDictionary["Xnor"])
+					{
+						pObject.renderer.material = MaterialDictionary["Nor"];
+						tileType = TileType.Nor;
+					}
+					else if(pObject.renderer.sharedMaterial == MaterialDictionary["Nor"])
+					{
+						pObject.renderer.material = MaterialDictionary["Or"];
+						tileType = TileType.Or;
+					}
+					AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
+	                InstantiationGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = tileType;
 				}
-				else if(pObject.renderer.sharedMaterial == MaterialDictionary["Nand"])
-				{
-					pObject.renderer.material = MaterialDictionary["Xor"];
-					tileType = TileType.Xor;
-				}
-				else if(pObject.renderer.sharedMaterial == MaterialDictionary["Xor"])
-				{
-					pObject.renderer.material = MaterialDictionary["Xnor"];
-					tileType = TileType.Xnor;
-				}
-				else if(pObject.renderer.sharedMaterial == MaterialDictionary["Xnor"])
-				{
-					pObject.renderer.material = MaterialDictionary["Nor"];
-					tileType = TileType.Nor;
-				}
-				else if(pObject.renderer.sharedMaterial == MaterialDictionary["Nor"])
-				{
-					pObject.renderer.material = MaterialDictionary["Or"];
-					tileType = TileType.Or;
-				}
-				AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
-                InstantiationGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = tileType;
 			}
 		}
 		GameObject camera = GameObject.Find ("Main Camera");
@@ -255,13 +281,21 @@ public class Instantiation : MonoBehaviour
 					InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
                     InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn = InstantiationSpawnDelay;
 				}
-				else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn == 0)
+				if(InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn == 0)
 				{
-                    Monster monster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, NumberType.One, x, y, MovementDirection.None);
+					Monster monster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, NumberType.One, x, y, MovementDirection.None);
 					InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
 					InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn = InstantiationSpawnDelay;
 				}
-                else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterZero || InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne)
+				else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterRandom && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn == 0)
+				{
+					var number = UnityEngine.Random.Range(0,2);
+					NumberType numType = number == 0 ? NumberType.Zero : NumberType.One;
+					Monster monster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, numType, x, y, MovementDirection.None);
+					InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
+					InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn = InstantiationSpawnDelay;
+				}
+				else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterZero || InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne|| InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterRandom)
 				{
 					InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn--;
 				}
@@ -305,6 +339,7 @@ public class Instantiation : MonoBehaviour
         {
 			case TileType.EnterZero:
 			case TileType.EnterOne:
+			case TileType.EnterRandom:
 				InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
 				break;
             case TileType.ExitZero: // @RCH: Once win condition is set, remove this
@@ -553,7 +588,34 @@ public class Instantiation : MonoBehaviour
 			levelsList.Add(f.Name);
 		}
 	}
+	public RotationGroup GetRotationalGroup(int x, int y)
+	{
+		RotationGroup returnRotation = null;
+		foreach (RotationGroup r in InstantiationRotationGroups) 
+		{
+			if(r.Contains(x,y))
+				returnRotation = r;
+		}
+		return returnRotation;
+	}
+	public void RotateTiles (RotationGroup rg)
+	{
+		TileType tempTileType = InstantiationGridSquareGrid [rg.xAt (0), rg.yAt (0)].GridSquareTileType;
+		Material tempTileMaterial = InstantiationGridSquareGrid [rg.xAt (0), rg.yAt (0)].GridSquareGameObject.renderer.sharedMaterial;
 
+		for (int i = 0; i < rg.getCount() -1 ; i++) 
+		{
+			InstantiationGridSquareGrid [rg.xAt (i), rg.yAt (i)].GridSquareTileType = 
+				InstantiationGridSquareGrid [rg.xAt (i + 1), rg.yAt (i + 1)].GridSquareTileType;
+			InstantiationGridSquareGrid [rg.xAt (i), rg.yAt (i)].GridSquareGameObject.renderer.material = 
+				InstantiationGridSquareGrid [rg.xAt (i+1), rg.yAt (i+1)].GridSquareGameObject.renderer.sharedMaterial;
+		}
+
+		InstantiationGridSquareGrid [rg.xAt (rg.getCount () - 1), rg.yAt (rg.getCount () - 1)].GridSquareTileType = tempTileType;
+		InstantiationGridSquareGrid [rg.xAt (rg.getCount () - 1), rg.yAt (rg.getCount () - 1)].GridSquareGameObject.renderer.sharedMaterial = tempTileMaterial;
+		
+		
+	}
 	public static void PrintMessage(string printStatement)
 	{
 		print (printStatement);

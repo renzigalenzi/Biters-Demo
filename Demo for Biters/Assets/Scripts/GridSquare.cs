@@ -11,7 +11,7 @@ public enum TileType
 {
     Blank, EnterZero, EnterOne, ExitZero, ExitOne, And, Xnor, Nor, Not, Or, Xor, Nand, BeltVertical, BeltHorizontal, 
 	BeltUpLeft, BeltUpRight, BeltDownRight, BeltDownLeft, 
-	BeltUpT, BeltRightT, BeltDownT, BeltLeftT, BeltCross, Count
+	BeltUpT, BeltRightT, BeltDownT, BeltLeftT, BeltCross, EnterRandom, Count
 }
 
 
@@ -94,7 +94,7 @@ public class GridSquare
 			return true;
 
 		//if it is an end state return true
-		if (type == TileType.ExitOne || type == TileType.ExitZero || type == TileType.EnterZero || type == TileType.EnterOne)
+		if (type == TileType.ExitOne || type == TileType.ExitZero || type == TileType.EnterZero || type == TileType.EnterOne || type == TileType.EnterRandom)
 			return true;
 
 		//otherwise loop through the possible directions
