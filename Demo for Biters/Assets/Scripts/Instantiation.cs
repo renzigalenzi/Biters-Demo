@@ -153,6 +153,7 @@ public class Instantiation : MonoBehaviour
 	} 
 	void OnGUI () 
 	{
+		MakeMapControls ();
 		GUI.Box (new Rect (Screen.width - 50, 0, 50, 20), "" + timer.ToString ("f0")); 
 
 		if(bLevelWon)
@@ -269,6 +270,23 @@ public class Instantiation : MonoBehaviour
 			camera.transform.position = new Vector3(x, 0, z);
 		
 	}
+
+	void MakeMapControls()
+	{
+		if (GUI.Button (new Rect (Screen.width- 250, 50, 50, 20), ">")) 
+		{
+			Time.timeScale = 1.0f;
+		}
+		if (GUI.Button (new Rect (Screen.width- 200, 50, 50, 20), ">>")) 
+		{
+			Time.timeScale = 2.0f;
+		}
+		if (GUI.Button (new Rect (Screen.width- 150, 50, 50, 20), ">>>")) 
+		{
+			Time.timeScale = 4.0f;
+		}
+	}
+
 	void UpdateSpawnTile()
 	{
 		for(int x = 0; x < InstantiationGridWidth; x++) 

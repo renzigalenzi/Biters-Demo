@@ -24,6 +24,7 @@ public class LevelConstructor : MonoBehaviour {
 
 	public Material SelectedMaterial;
 	public TileType SelectedTile;
+	public RotationGroup currentRG;
 
 	public const int XOFFSET = 4;
 	public const int YOFFSET = 4;
@@ -49,16 +50,12 @@ public class LevelConstructor : MonoBehaviour {
 		//Object[] Materials = Resources.LoadAll("Materials", typeof(Material));
 		foreach(Material mat in Materials)
 		{
-			//check if material is a tile
-			for(int tile = 0; tile < (int)TileType.Count; tile ++)
-			{
-				if(mat.name == Enum.GetName(typeof(TileType),(TileType)tile))
-					MaterialDictionary.Add(mat.name, mat);
-			}
+			MaterialDictionary.Add(mat.name, mat);
 		}
 
 		SelectedMaterial = MaterialDictionary["Blank"];
 		SelectedTile = TileType.Blank;
+		currentRG = new RotationGroup ();
 
 		LoadBlankMap();
 	}
@@ -111,12 +108,6 @@ public class LevelConstructor : MonoBehaviour {
 	public void LoadBlankMap()
 	{
 		LevelConstructorRotationGroups = new List<RotationGroup> ();
-		RotationGroup g = new RotationGroup ();
-		LevelConstructorRotationGroups.Add (g);
-		LevelConstructorRotationGroups.Add (g);
-		LevelConstructorRotationGroups.Add (g);
-		LevelConstructorRotationGroups.Add (g);
-		LevelConstructorRotationGroups.Add (g);
 		LevelConstructorGridWidth = 8;
 		LevelConstructorGridHeight = 8;
 
@@ -219,17 +210,25 @@ public class LevelConstructor : MonoBehaviour {
 		if(Physics.Raycast(ray, out hit, 100))
 		{
 			GameObject pObject = hit.transform.gameObject;
-			if(LastClickedPoint[0] != -1 && WithinOneTile(pObject) && SelectedMaterial != MaterialDictionary["Blank"] )
+			if(SelectedMaterial != MaterialDictionary["RG"])
 			{
-				GetNewMaterial(pObject);
+				if(LastClickedPoint[0] != -1 && WithinOneTile(pObject) && SelectedMaterial != MaterialDictionary["Blank"] )
+				{
+					GetNewMaterial(pObject);
+				}
+				LastClickedPoint = new int[]{XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y};
+
+				UpdateTilesAroundClicked();
+
+				pObject.renderer.material = SelectedMaterial;
+				LevelConstructorGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = SelectedTile;
 			}
-			LastClickedPoint = new int[]{XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y};
-
-			UpdateTilesAroundClicked();
-
-			pObject.renderer.material = SelectedMaterial;
-			LevelConstructorGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = SelectedTile;
-
+			else
+			{
+				int x = XOFFSET + (int)pObject.transform.position.x;
+				int y = YOFFSET - (int)pObject.transform.position.y;
+				currentRG.Add (x, y);
+			}
 		}
 	}
 	bool WithinOneTile(GameObject pObject)
@@ -306,13 +305,6 @@ public class LevelConstructor : MonoBehaviour {
 				ChangePiece(x,y-1,x,y, TileDirection.Up);
 			}
 		}
-		/*if (SelectedMaterial == MaterialDictionary ["BeltVertical"]) 
-		{
-			if (y < LevelConstructorGridHeight -1)
-				ChangePiece(x,y+1,x,y, TileDirection.Down);
-			if(y > 0)
-				ChangePiece(x,y-1,x,y, TileDirection.Up);
-		}*/
 	}
 	void ChangePiece(int Xnew, int Ynew, int Xclicked, int Yclicked, TileDirection direction)
 	{
@@ -571,6 +563,11 @@ public class LevelConstructor : MonoBehaviour {
 		{
 			AffectMap(-1,0);
 		}
+		if (GUI.Button (new Rect (Screen.width- 100, 200, 60, 20), "+RG")) 
+		{
+			currentRG = new RotationGroup();
+			LevelConstructorRotationGroups.Add (currentRG);
+		}
 	}
 	void MakeSelected()
 	{
@@ -595,6 +592,19 @@ public class LevelConstructor : MonoBehaviour {
 					}
 					writer.Write("\n");
 				}
+				foreach(RotationGroup group in LevelConstructorRotationGroups)
+				{
+					writer.Write('#');
+					for(int i = 0; i < group.getCount(); i++)
+					{
+						if(i != 0)
+						{
+							writer.Write (',');
+						}
+						writer.Write (group.xAt(i) + ',' + group.yAt(i));
+					}
+					writer.Write("\n");
+				}
 			}
 		}
 		catch(Exception e)
@@ -611,16 +621,19 @@ public class LevelConstructor : MonoBehaviour {
 		int i = 0;
 		foreach(string key in MaterialDictionary.Keys)
 		{
-			if(GUI.Button(new Rect(0, i*70, 60, 60),MaterialDictionary[key].mainTexture))
+			//check if material is a tile
+			for(int tile = 0; tile < (int)TileType.Count; tile ++)
 			{
-				SelectedMaterial = MaterialDictionary[key]; 
-				for(int tile = 0; tile < (int)TileType.Count; tile ++)
+				if(key == Enum.GetName(typeof(TileType),(TileType)tile))
 				{
-					if(key == Enum.GetName(typeof(TileType),(TileType)tile))
+					if(GUI.Button(new Rect(0, i*70, 60, 60),MaterialDictionary[key].mainTexture))
+					{
+						SelectedMaterial = MaterialDictionary[key];
 						SelectedTile = (TileType)tile;
+					}
+					i++;
 				}
 			}
-			i++;
 		}
 		GUI.EndScrollView();
 	}
@@ -633,14 +646,10 @@ public class LevelConstructor : MonoBehaviour {
 		int i = 0;
 		foreach(RotationGroup group in LevelConstructorRotationGroups)
 		{
-			if(GUI.Button(new Rect(0, i*70, 60, 60),MaterialDictionary["Not"].mainTexture))
+			if(GUI.Button(new Rect(0, i*70, 60, 60),MaterialDictionary["RG"].mainTexture))
 			{
-				SelectedMaterial = MaterialDictionary["Not"]; 
-				for(int tile = 0; tile < (int)TileType.Count; tile ++)
-				{
-					if("Not" == Enum.GetName(typeof(TileType),(TileType)tile))
-						SelectedTile = (TileType)tile;
-				}
+				SelectedMaterial = MaterialDictionary["RG"]; 
+				currentRG = group;
 			}
 			i++;
 		}

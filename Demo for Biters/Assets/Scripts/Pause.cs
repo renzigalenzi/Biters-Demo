@@ -35,8 +35,9 @@ public class Pause : MonoBehaviour {
 
 		// reloads the level, thereby restarting it 
 		if (GUI.Button (new Rect ((Screen.width/2) - 50, (Screen.height/2) - 100, 100, 25), "Reset Level")) { 
-
+			UnPauseGame (); 
 			Application.LoadLevel (Application.loadedLevelName); 
+
 
 		} // end if 
 
@@ -66,6 +67,7 @@ public class Pause : MonoBehaviour {
 		// quit the application 
 		if (GUI.Button (new Rect ((Screen.width/2) - 50, (Screen.height/2) - 10, 100, 25), "Save and Quit")) { 
 
+			UnPauseGame (); 
 			level = Application.loadedLevelName; 
 			PlayerPrefs.SetString("SavedLevel",level);
 			// Application.Quit (); 
@@ -74,7 +76,7 @@ public class Pause : MonoBehaviour {
 		} // end if 
 
 		if (GUI.Button (new Rect ((Screen.width/2) - 50, (Screen.height/2) + 50, 100, 25), "Continue")) { 
-
+			UnPauseGame (); 
 			pauseMenu = false; 
 			isPause = false; 
 			
@@ -100,7 +102,7 @@ public class Pause : MonoBehaviour {
 
 		} else { 
 
-			UnPauseGame(); 
+			//UnPauseGame(); 
 
 		} // end if else 
 	
