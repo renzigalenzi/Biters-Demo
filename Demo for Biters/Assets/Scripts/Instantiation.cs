@@ -54,7 +54,6 @@ public class Instantiation : MonoBehaviour
 		// PrintMessage("The currLevel is currently: " + Game.current.player.currLevel);
 		LoadLevel(Game.current.player.currLevel);
     }
-
     public bool LoadLevel(string fileName)
     {
         string filePath = "Assets/Levels/" + fileName;
@@ -182,19 +181,20 @@ public class Instantiation : MonoBehaviour
 			{
 				// All cubes will need a ray layer later so that when you click the monster sprites, it won't interfere with changing gates
 				GameObject pObject = hit.transform.gameObject;
+				RotationGroup rg;
+				rg = GetRotationalGroup(XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y);
 				if(
-					pObject.renderer.sharedMaterial != MaterialDictionary["And"] && 
-					pObject.renderer.sharedMaterial != MaterialDictionary["Or"] &&
-					pObject.renderer.sharedMaterial != MaterialDictionary["Nand"] &&
-					pObject.renderer.sharedMaterial != MaterialDictionary["Xor"] &&
-					pObject.renderer.sharedMaterial != MaterialDictionary["Xnor"] &&
-					pObject.renderer.sharedMaterial != MaterialDictionary["Nor"]
+					pObject.GetComponent<Renderer>().sharedMaterial != MaterialDictionary["And"] && 
+					pObject.GetComponent<Renderer>().sharedMaterial != MaterialDictionary["Or"] &&
+					pObject.GetComponent<Renderer>().sharedMaterial != MaterialDictionary["Nand"] &&
+					pObject.GetComponent<Renderer>().sharedMaterial != MaterialDictionary["Xor"] &&
+					pObject.GetComponent<Renderer>().sharedMaterial != MaterialDictionary["Xnor"] &&
+					pObject.GetComponent<Renderer>().sharedMaterial != MaterialDictionary["Nor"] &&
+					rg == null
 					)
 				{
 					return;
 				}
-				RotationGroup rg;
-				rg = GetRotationalGroup(XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y);
 				if(rg != null)
 				{
 					RotateTiles(rg);
@@ -202,34 +202,34 @@ public class Instantiation : MonoBehaviour
 				else
 				{
 					TileType tileType = TileType.Or;
-					if(pObject.renderer.sharedMaterial == MaterialDictionary["Or"])
+					if(pObject.GetComponent<Renderer>().sharedMaterial == MaterialDictionary["Or"])
 					{
-						pObject.renderer.material = MaterialDictionary["And"];
+						pObject.GetComponent<Renderer>().material = MaterialDictionary["And"];
 						tileType = TileType.And;
 					}
-					else if(pObject.renderer.sharedMaterial == MaterialDictionary["And"])
+					else if(pObject.GetComponent<Renderer>().sharedMaterial == MaterialDictionary["And"])
 					{
-						pObject.renderer.material = MaterialDictionary["Nand"];
+						pObject.GetComponent<Renderer>().material = MaterialDictionary["Nand"];
 						tileType = TileType.Nand;
 					}
-					else if(pObject.renderer.sharedMaterial == MaterialDictionary["Nand"])
+					else if(pObject.GetComponent<Renderer>().sharedMaterial == MaterialDictionary["Nand"])
 					{
-						pObject.renderer.material = MaterialDictionary["Xor"];
+						pObject.GetComponent<Renderer>().material = MaterialDictionary["Xor"];
 						tileType = TileType.Xor;
 					}
-					else if(pObject.renderer.sharedMaterial == MaterialDictionary["Xor"])
+					else if(pObject.GetComponent<Renderer>().sharedMaterial == MaterialDictionary["Xor"])
 					{
-						pObject.renderer.material = MaterialDictionary["Xnor"];
+						pObject.GetComponent<Renderer>().material = MaterialDictionary["Xnor"];
 						tileType = TileType.Xnor;
 					}
-					else if(pObject.renderer.sharedMaterial == MaterialDictionary["Xnor"])
+					else if(pObject.GetComponent<Renderer>().sharedMaterial == MaterialDictionary["Xnor"])
 					{
-						pObject.renderer.material = MaterialDictionary["Nor"];
+						pObject.GetComponent<Renderer>().material = MaterialDictionary["Nor"];
 						tileType = TileType.Nor;
 					}
-					else if(pObject.renderer.sharedMaterial == MaterialDictionary["Nor"])
+					else if(pObject.GetComponent<Renderer>().sharedMaterial == MaterialDictionary["Nor"])
 					{
-						pObject.renderer.material = MaterialDictionary["Or"];
+						pObject.GetComponent<Renderer>().material = MaterialDictionary["Or"];
 						tileType = TileType.Or;
 					}
 					AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
@@ -257,17 +257,17 @@ public class Instantiation : MonoBehaviour
 	}
 	void MakeSureCameraCanSeeMap ()
 	{
-		float x = camera.transform.position.x;
-		float y = camera.transform.position.y;
-		float z = camera.transform.position.z;
+		float x = GetComponent<Camera>().transform.position.x;
+		float y = GetComponent<Camera>().transform.position.y;
+		float z = GetComponent<Camera>().transform.position.z;
 		if(x < -XOFFSET)
-			camera.transform.position = new Vector3(-XOFFSET, y, z);
+			GetComponent<Camera>().transform.position = new Vector3(-XOFFSET, y, z);
 		if(x > InstantiationGridWidth - XOFFSET)
-			camera.transform.position = new Vector3(InstantiationGridWidth - XOFFSET, y, z);
+			GetComponent<Camera>().transform.position = new Vector3(InstantiationGridWidth - XOFFSET, y, z);
 		if(y < 0 - InstantiationGridHeight)
-			camera.transform.position = new Vector3(x, 0 - InstantiationGridHeight, z);
+			GetComponent<Camera>().transform.position = new Vector3(x, 0 - InstantiationGridHeight, z);
 		if(y > 0)
-			camera.transform.position = new Vector3(x, 0, z);
+			GetComponent<Camera>().transform.position = new Vector3(x, 0, z);
 		
 	}
 
@@ -432,7 +432,7 @@ public class Instantiation : MonoBehaviour
 			case TileType.Not:
 			{
 				monster.MonsterNumberType = monster.MonsterNumberType == NumberType.Zero ? NumberType.One: NumberType.Zero; 
-				monster.MonsterGameObject.renderer.material = monster.MonsterGameObject.renderer.material == 
+				monster.MonsterGameObject.GetComponent<Renderer>().material = monster.MonsterGameObject.GetComponent<Renderer>().material == 
 							MaterialDictionary["BiterZero"] ? MaterialDictionary["BiterOne"] : MaterialDictionary["BiterZero"];
 				InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
 				break;
@@ -533,7 +533,7 @@ public class Instantiation : MonoBehaviour
 			cube.transform.position = new Vector3(0, 0, 0);
 			cube.transform.localScale = new Vector3(10, 10, 10);
 			cube.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
-			cube.renderer.material = MaterialDictionary["Lose"];
+			cube.GetComponent<Renderer>().material = MaterialDictionary["Lose"];
 		}
 		else if (numWinningExits == totalNumExits)
 		{
@@ -544,7 +544,7 @@ public class Instantiation : MonoBehaviour
 			cube.transform.position = new Vector3(0, 0, 0);
 			cube.transform.localScale = new Vector3(10, 10, 10);
 			cube.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
-			cube.renderer.material = MaterialDictionary["Win"];
+			cube.GetComponent<Renderer>().material = MaterialDictionary["Win"];
 		}
 		else
 		{
@@ -619,18 +619,18 @@ public class Instantiation : MonoBehaviour
 	public void RotateTiles (RotationGroup rg)
 	{
 		TileType tempTileType = InstantiationGridSquareGrid [rg.xAt (0), rg.yAt (0)].GridSquareTileType;
-		Material tempTileMaterial = InstantiationGridSquareGrid [rg.xAt (0), rg.yAt (0)].GridSquareGameObject.renderer.sharedMaterial;
+		Material tempTileMaterial = InstantiationGridSquareGrid [rg.xAt (0), rg.yAt (0)].GridSquareGameObject.GetComponent<Renderer>().sharedMaterial;
 
 		for (int i = 0; i < rg.getCount() -1 ; i++) 
 		{
 			InstantiationGridSquareGrid [rg.xAt (i), rg.yAt (i)].GridSquareTileType = 
 				InstantiationGridSquareGrid [rg.xAt (i + 1), rg.yAt (i + 1)].GridSquareTileType;
-			InstantiationGridSquareGrid [rg.xAt (i), rg.yAt (i)].GridSquareGameObject.renderer.material = 
-				InstantiationGridSquareGrid [rg.xAt (i+1), rg.yAt (i+1)].GridSquareGameObject.renderer.sharedMaterial;
+			InstantiationGridSquareGrid [rg.xAt (i), rg.yAt (i)].GridSquareGameObject.GetComponent<Renderer>().material = 
+				InstantiationGridSquareGrid [rg.xAt (i+1), rg.yAt (i+1)].GridSquareGameObject.GetComponent<Renderer>().sharedMaterial;
 		}
 
 		InstantiationGridSquareGrid [rg.xAt (rg.getCount () - 1), rg.yAt (rg.getCount () - 1)].GridSquareTileType = tempTileType;
-		InstantiationGridSquareGrid [rg.xAt (rg.getCount () - 1), rg.yAt (rg.getCount () - 1)].GridSquareGameObject.renderer.sharedMaterial = tempTileMaterial;
+		InstantiationGridSquareGrid [rg.xAt (rg.getCount () - 1), rg.yAt (rg.getCount () - 1)].GridSquareGameObject.GetComponent<Renderer>().sharedMaterial = tempTileMaterial;
 		
 		
 	}

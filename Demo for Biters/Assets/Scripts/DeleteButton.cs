@@ -9,7 +9,8 @@ public class DeleteButton : MonoBehaviour {
 	} // end Start
 	
 	public void OnClick() {
-		
+
+		// Note: I believe this is a memory leak. 
 		// PlayerPrefs.DeleteAll (); 
 		int temp = Game.current.id; 
 		Game.current = new Game ();

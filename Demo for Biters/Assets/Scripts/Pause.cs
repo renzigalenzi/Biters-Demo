@@ -57,7 +57,7 @@ public class Pause : MonoBehaviour {
 		} // end if  
 
 		// goes back to main menu, lose game progress in the process 
-		if (GUI.Button (new Rect ((Screen.width/2) - 50, (Screen.height/2) - 40, 100, 25), "Main Menu")) { 
+		if (GUI.Button (new Rect ((Screen.width/2) - 50, (Screen.height/2) - 40, 100, 25), "Player Menu")) { 
 
 			UnPauseGame (); 
 			Application.LoadLevel ("PlayerMenu"); 

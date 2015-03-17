@@ -37,10 +37,12 @@ public class GridSquare
     public int GridSquareYPosition { get; set; }
 	public int GridSquareTimeToNextSpawn { get; set; }
 	public List<GridSquare> MovePossibilities = new List<GridSquare>();
+	public Quaternion OriginalRotationValue { get; set; }
 
     public GridSquare()
     {
         GridSquareGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		OriginalRotationValue = GridSquareGameObject.transform.rotation;
         GridSquareInstantiation = new Instantiation();
         GridSquareTileType = TileType.Blank;
 		GridSquareTileDirection = TileDirection.None;
@@ -52,6 +54,7 @@ public class GridSquare
 	public GridSquare(GameObject gObject)
 	{
 		GridSquareGameObject = gObject;
+		OriginalRotationValue = GridSquareGameObject.transform.rotation;
 		GridSquareTileType = TileType.Blank;
 		GridSquareTileDirection = TileDirection.None;
 		GridSquareXPosition = 0;
@@ -71,6 +74,9 @@ public class GridSquare
 
         GridSquareGameObject.transform.position = new Vector3(GridSquareXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - GridSquareYPosition, 0);
 		GridSquareGameObject.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+		OriginalRotationValue = GridSquareGameObject.transform.rotation;
+
+		RotateSquareByMaterial ();
 		AssignMaterialToInstantiation ();
 		GridSquareTileDirection = TileDirection.None;
 		GridSquareHasWinningPiece = WinCondition.NoPiece;
@@ -78,13 +84,36 @@ public class GridSquare
         GridSquareInstantiation.InstantiationGridSquareGameObjectGrid[GridSquareXPosition, GridSquareYPosition] = GridSquareGameObject;
         GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition] = this;
     }
+	public void RotateSquareByMaterial()
+	{
+		GridSquareGameObject.transform.rotation = OriginalRotationValue;
+		switch (GridSquareTileType) 
+		{
+		case TileType.BeltUpRight:
+		case TileType.BeltUpT:
+		case TileType.BeltVertical:
+			//GridSquareGameObject.transform.rotation = Quaternion.AngleAxis(230, Vector3.up);
+			GridSquareGameObject.transform.Rotate(0,0,90);
+			Instantiation.print("hi");
+			break;
+		case TileType.BeltUpLeft:
+		case TileType.BeltRightT:
+			GridSquareGameObject.transform.Rotate(0,0,180);
+			break;
+		case TileType.BeltDownLeft:
+		case TileType.BeltDownT:
+			GridSquareGameObject.transform.Rotate(0,0,270);
+			break;
+
+		}
+	}
 	public void AssignMaterialToInstantiation()
 	{
-		GridSquareGameObject.renderer.material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
+		GridSquareGameObject.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
 	}
 	public void AssignMaterialToLevelConstructor(LevelConstructor parent)
 	{
-		GridSquareGameObject.renderer.material = parent.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
+		GridSquareGameObject.GetComponent<Renderer>().material = parent.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
 	}
 	public bool TileAccepts(GridSquare tile, TileDirection direction)
 	{

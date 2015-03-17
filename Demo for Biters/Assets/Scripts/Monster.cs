@@ -67,10 +67,10 @@ public class Monster
         switch(MonsterNumberType)
         {
             case NumberType.Zero:
-				MonsterGameObject.renderer.material = MonsterInstantiation.MaterialDictionary["BiterZero"];
+				MonsterGameObject.GetComponent<Renderer>().material = MonsterInstantiation.MaterialDictionary["BiterZero"];
                 break;
             case NumberType.One:
-				MonsterGameObject.renderer.material = MonsterInstantiation.MaterialDictionary["BiterOne"];
+				MonsterGameObject.GetComponent<Renderer>().material = MonsterInstantiation.MaterialDictionary["BiterOne"];
                 break;
             default:
                 Instantiation.PrintMessage("Invalid MonsterNumberType - Monster(Instantiation monsterInstantiation, int monsterId, MovementType monsterMovementType, NumberType monsterNumberType, int monsterXPosition, int monsterYPosition, MovementDirection monsterMovementDirection)");

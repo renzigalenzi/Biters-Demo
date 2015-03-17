@@ -37,6 +37,8 @@ public class LevelConstructor : MonoBehaviour {
 	private string LoadFileName = "Level - ";
 	public int[] LastClickedPoint{ get; set; }
 
+	private int RGXClicked = -1;
+	private int RGYClicked = -1;
 	//Light lightComp = lightGameObject.AddComponent<Light>();
 	//lightComp.color = Color.blue;
 	//lightGameObject.transform.position = new Vector3(0, 5, 0);/// <summary>
@@ -48,6 +50,7 @@ public class LevelConstructor : MonoBehaviour {
 		MaterialDictionary = new Dictionary<string, Material> ();
 		UnityEngine.Object[] Materials = Resources.LoadAll("", typeof(Material));
 		//Object[] Materials = Resources.LoadAll("Materials", typeof(Material));
+
 		foreach(Material mat in Materials)
 		{
 			MaterialDictionary.Add(mat.name, mat);
@@ -59,7 +62,6 @@ public class LevelConstructor : MonoBehaviour {
 
 		LoadBlankMap();
 	}
-
 	public void AffectMap (int colAffect, int rowAffect)
 	{
 
@@ -86,13 +88,13 @@ public class LevelConstructor : MonoBehaviour {
 				if(x < newx && x < oldx && y < newy && y < oldy)
 				{
 					tempGrid[x,y].GridSquareTileType = LevelConstructorGridSquareGrid[x,y].GridSquareTileType;
-					tempGrid[x,y].GridSquareGameObject.renderer.material = 
-						LevelConstructorGridSquareGrid[x,y].GridSquareGameObject.renderer.material;
+					tempGrid[x,y].GridSquareGameObject.GetComponent<Renderer>().material = 
+						LevelConstructorGridSquareGrid[x,y].GridSquareGameObject.GetComponent<Renderer>().material;
 				}
 				else
 				{
 					tempGrid[x,y].GridSquareTileType = TileType.Blank;
-					tempGrid[x,y].GridSquareGameObject.renderer.material = MaterialDictionary["Blank"];
+					tempGrid[x,y].GridSquareGameObject.GetComponent<Renderer>().material = MaterialDictionary["Blank"];
 				}
 			}
 		}
@@ -125,7 +127,9 @@ public class LevelConstructor : MonoBehaviour {
 				LevelConstructorGridSquareGrid[x,y].GridSquareYPosition = y;
 				LevelConstructorGridSquareGrid[x,y].GridSquareGameObject.transform.position = new Vector3(x - XOFFSET, YOFFSET - y, 0);
 				LevelConstructorGridSquareGrid[x,y].GridSquareGameObject.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
-				LevelConstructorGridSquareGrid[x,y].GridSquareGameObject.renderer.material = MaterialDictionary["Blank"];
+				LevelConstructorGridSquareGrid[x,y].OriginalRotationValue = LevelConstructorGridSquareGrid[x,y].GridSquareGameObject.transform.rotation;
+				LevelConstructorGridSquareGrid[x,y].GridSquareGameObject.GetComponent<Renderer>().material = MaterialDictionary["Blank"];
+				LevelConstructorGridSquareGrid[x,y].RotateSquareByMaterial();
 			}
 		}
 	}
@@ -142,7 +146,7 @@ public class LevelConstructor : MonoBehaviour {
 			{
 				int y = 0;
 				string line = reader.ReadLine();
-				while(line != null)
+				while(line != null && line[0] != '#')
 				{
 					string[] entries = line.Split(',');
 					for(int x = 0; x < entries.Length; x++)
@@ -155,10 +159,27 @@ public class LevelConstructor : MonoBehaviour {
 						LevelConstructorGridSquareGrid[x,y].GridSquareYPosition = y;
 						LevelConstructorGridSquareGrid[x,y].GridSquareGameObject.transform.position = new Vector3(x - XOFFSET, YOFFSET - y, 0);
 						LevelConstructorGridSquareGrid[x,y].GridSquareGameObject.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+						LevelConstructorGridSquareGrid[x,y].OriginalRotationValue = LevelConstructorGridSquareGrid[x,y].GridSquareGameObject.transform.rotation;
 						LevelConstructorGridSquareGrid[x,y].AssignMaterialToLevelConstructor(this);
+						LevelConstructorGridSquareGrid[x,y].RotateSquareByMaterial();
 					}
 					y++;
 					line = reader.ReadLine();
+				}
+				if(line != null && line[0] == '#')
+				{
+					do
+					{
+						RotationGroup g = new RotationGroup();
+						line = line.Trim( new char[] {'#'});
+						string[] entries = line.Split(',');
+						for(int x = 0; x < entries.Length; x+=2)
+						{
+							g.Add(Convert.ToInt32(entries[x]), Convert.ToInt32(entries[x+1]));
+						}
+						LevelConstructorRotationGroups.Add(g);
+						line = reader.ReadLine();
+					}while(line != null);
 				}
 				reader.Close();
 				return true;
@@ -178,14 +199,14 @@ public class LevelConstructor : MonoBehaviour {
 		using(reader)
 		{
 			string line = reader.ReadLine();
-			if(line != null)
+			if(line != null && line[0] != '#')
 			{
 				string[] entries = line.Split(',');
 				LevelConstructorGridWidth = entries.Length;
 				LevelConstructorGridHeight++;
 			}
 			line = reader.ReadLine();
-			while(line != null)
+			while(line != null && line[0] != '#')
 			{
 				LevelConstructorGridHeight++;
 				line = reader.ReadLine();
@@ -220,14 +241,14 @@ public class LevelConstructor : MonoBehaviour {
 
 				UpdateTilesAroundClicked();
 
-				pObject.renderer.material = SelectedMaterial;
+				pObject.GetComponent<Renderer>().material = SelectedMaterial;
 				LevelConstructorGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = SelectedTile;
+				LevelConstructorGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].RotateSquareByMaterial ();
 			}
 			else
 			{
-				int x = XOFFSET + (int)pObject.transform.position.x;
-				int y = YOFFSET - (int)pObject.transform.position.y;
-				currentRG.Add (x, y);
+				RGXClicked = XOFFSET + (int)pObject.transform.position.x;
+				RGYClicked = YOFFSET - (int)pObject.transform.position.y;
 			}
 		}
 	}
@@ -340,8 +361,9 @@ public class LevelConstructor : MonoBehaviour {
 
 
 
-			LevelConstructorGridSquareGrid[Xnew,Ynew].GridSquareGameObject.renderer.material = tempMat;
+			LevelConstructorGridSquareGrid[Xnew,Ynew].GridSquareGameObject.GetComponent<Renderer>().material = tempMat;
 			LevelConstructorGridSquareGrid[Xnew,Ynew].GridSquareTileType = tempTile;
+			LevelConstructorGridSquareGrid[Xnew,Ynew].RotateSquareByMaterial ();
 				
 		}
 	}
@@ -447,6 +469,12 @@ public class LevelConstructor : MonoBehaviour {
 		{
 			boolDragging = false;
 			LastClickedPoint = new int[]{-1,-1};
+			if(SelectedMaterial == MaterialDictionary["RG"] && RGXClicked >= 0 && RGYClicked >= 0)
+			{
+				currentRG.Add (RGXClicked, RGYClicked);
+				RGXClicked = -1;
+				RGYClicked = -1;
+			}
 		}
 		if (boolDragging)
 		{
@@ -472,17 +500,17 @@ public class LevelConstructor : MonoBehaviour {
 	}
 	void MakeSureCameraCanSeeMap ()
 	{
-		float x = camera.transform.position.x;
-		float y = camera.transform.position.y;
-		float z = camera.transform.position.z;
+		float x = GetComponent<Camera>().transform.position.x;
+		float y = GetComponent<Camera>().transform.position.y;
+		float z = GetComponent<Camera>().transform.position.z;
 		if(x < XOFFSET - 5)
-			camera.transform.position = new Vector3(XOFFSET - 5f, y, z);
+			GetComponent<Camera>().transform.position = new Vector3(XOFFSET - 5f, y, z);
 		if(x > LevelConstructorGridWidth)
-			camera.transform.position = new Vector3(LevelConstructorGridWidth, y, z);
+			GetComponent<Camera>().transform.position = new Vector3(LevelConstructorGridWidth, y, z);
 		if(y < YOFFSET - LevelConstructorGridHeight)
-			camera.transform.position = new Vector3(x, YOFFSET - LevelConstructorGridHeight, z);
+			GetComponent<Camera>().transform.position = new Vector3(x, YOFFSET - LevelConstructorGridHeight, z);
 		if(y > YOFFSET )
-			camera.transform.position = new Vector3(x, YOFFSET, z);
+			GetComponent<Camera>().transform.position = new Vector3(x, YOFFSET, z);
 
 	}
 	void OnGUI () 
@@ -525,7 +553,7 @@ public class LevelConstructor : MonoBehaviour {
 	}
 	void MakeExportButton()
 	{
-		if (GUI.Button (new Rect (Screen.width- 140, 40, 100, 20), "EXPORT")) 
+		if (GUI.Button (new Rect (Screen.width- 140, 40, 100, 20), "Save")) 
 		{
 			Saving = true;
 		}
@@ -600,10 +628,17 @@ public class LevelConstructor : MonoBehaviour {
 						if(i != 0)
 						{
 							writer.Write (',');
+							print (',');
 						}
-						writer.Write (group.xAt(i) + ',' + group.yAt(i));
+						int x = (int)group.xAt(i);
+						int y = (int)group.yAt (i);
+						string xstr = Convert.ToString(group.xAt(i));
+						string ystr = Convert.ToString(group.yAt(i));
+						print (Convert.ToString(group.xAt(i)) + ',' + Convert.ToString(group.yAt(i)));
+						writer.Write (Convert.ToString(group.xAt(i)) + ',' + Convert.ToString(group.yAt(i)));
 					}
 					writer.Write("\n");
+					print ("\n");
 				}
 			}
 		}
@@ -615,9 +650,10 @@ public class LevelConstructor : MonoBehaviour {
 	void MakeTilesScrollView()
 	{
 		int numButtons = (int)MaterialDictionary.Count;
+		Vector2 pivotPoint;
 		TileScrollPosition = GUI.BeginScrollView(new Rect(Math.Min(Screen.width,40), Math.Min(Screen.height,20),
 		                                              Math.Min(Screen.width-10,80), Screen.height-20), 
-		                                         TileScrollPosition, new Rect(0, 0, 100, numButtons * 70));
+		                                         TileScrollPosition, new Rect(0, 0, 60, numButtons * 70));
 		int i = 0;
 		foreach(string key in MaterialDictionary.Keys)
 		{
@@ -626,12 +662,16 @@ public class LevelConstructor : MonoBehaviour {
 			{
 				if(key == Enum.GetName(typeof(TileType),(TileType)tile))
 				{
+					Matrix4x4 matrixBackup = GUI.matrix;
+					pivotPoint = new Vector2(30, 30+ 70* i);
+					GUIUtility.RotateAroundPivot(GetRotation((TileType)tile), pivotPoint);
 					if(GUI.Button(new Rect(0, i*70, 60, 60),MaterialDictionary[key].mainTexture))
 					{
 						SelectedMaterial = MaterialDictionary[key];
 						SelectedTile = (TileType)tile;
 					}
 					i++;
+					GUI.matrix = matrixBackup;
 				}
 			}
 		}
@@ -654,6 +694,29 @@ public class LevelConstructor : MonoBehaviour {
 			i++;
 		}
 		GUI.EndScrollView();
+	}
+	public int GetRotation(TileType type)
+	{
+		int retValue = 0;
+		switch (type) 
+		{
+		case TileType.BeltUpRight:
+		case TileType.BeltUpT:
+		case TileType.BeltVertical:
+			retValue = 90;
+			break;
+		case TileType.BeltUpLeft:
+		case TileType.BeltRightT:
+			retValue = 180;
+			break;
+		case TileType.BeltDownLeft:
+		case TileType.BeltDownT:
+			retValue = 270;
+			break;
+			
+		}
+		return retValue;
+
 	}
 	public bool IsBeltMaterial(Material m)
 	{
