@@ -1,16 +1,8 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\PlayerMenuNewGame.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/VideoTexture_Lite.cs">
     <Files>
-      <File FileName="Assets\Scripts\ContinueButton.cs" Line="31" Column="43" />
-      <File FileName="Assets\Scripts\Instantiation.cs" Line="195" Column="6" />
-      <File FileName="Assets\Scripts\LevelConstructor.cs" Line="526" Column="23" />
-      <File FileName="Assets\Scripts\GridSquare.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\RotationGroup.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Pause.cs" Line="64" Column="4" />
-      <File FileName="Assets\Scripts\PlayerMenuNewGame.cs" Line="20" Column="3" />
-      <File FileName="Assets\Scripts\DeleteButton.cs" Line="24" Column="1" />
-      <File FileName="Assets\Scripts\StartButton.cs" Line="17" Column="3" />
+      <File FileName="Assets/Scripts/VideoTexture_Lite.cs" Line="53" Column="5" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
