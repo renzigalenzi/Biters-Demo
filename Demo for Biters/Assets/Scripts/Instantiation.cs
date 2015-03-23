@@ -162,13 +162,17 @@ public class Instantiation : MonoBehaviour
 		LevelText.material.color = color;
 		GetMouseRays();
 		
-		if (fLevelStartTimer <= 0) 
+		if (fLevelStartTimer <= 0 && !(bLevelWon || bLevelLost)) 
 		{ 
-			StartTextAlpha = 0.0f;
+			StartTextAlpha = Math.Max(0.0f,StartTextAlpha - 0.1f);
 			fLevelStartTimer = 0.0f;
 			UpdateSpawnTile();
 			UpdateMonsterAction();
 		} 
+		if(bLevelWon || bLevelLost)
+		{
+			StartTextAlpha = 1.0f;
+		}
 	}
 	void PauseGame() 
 	{ 
@@ -366,7 +370,6 @@ public class Instantiation : MonoBehaviour
 			}
 		}
 	}
-
 	void UpdateMonsterAction()
 	{
 		List<Monster> tempList = new List<Monster>();
@@ -422,7 +425,7 @@ public class Instantiation : MonoBehaviour
                 int index2 = 0;
                 foreach(Monster m in InstantiationMonsters)
                 {
-                    if(m.MonsterXPosition == x && m.MonsterYPosition == y && m.MonsterId != monster.MonsterId && m.MonsterMovementType == MovementType.Waiting)
+				if(m.MonsterXPosition == x && m.MonsterYPosition == y && m.MonsterId != monster.MonsterId && monster.MonsterMovementDirection != m.MonsterMovementDirection && m.MonsterMovementType == MovementType.Waiting)
                     {
 						InstantiationGridSquareGrid[x, y].SubtractDirection(m);
 						InstantiationGridSquareGrid[x, y].SubtractDirection(monster);
@@ -523,7 +526,7 @@ public class Instantiation : MonoBehaviour
         {
             moveX = -1;
         }
-
+		//int notwincheck = bLevelWon || bLevelLost ? 0 : 1;
 		monster.MonsterGameObject.transform.position += new Vector3(monster.MonsterMovementIncrement * moveX * Time.timeScale, monster.MonsterMovementIncrement * moveY * Time.timeScale, 0);
 
         if(monster.FinishedMovingTile())
@@ -538,8 +541,6 @@ public class Instantiation : MonoBehaviour
 		//check all tiles, if any of the end pieces are lose then return you lose
 		//if the amount of winning tiles == the number of end pieces then you win
 		bool PlayerLost = false;
-		int numWinningExits = 0;
-		int totalNumExits = 0;
 
 		if(monster.MonsterNumberType == NumberType.One && InstantiationGridSquareGrid[x,y].GridSquareTileType == TileType.ExitOne || 
 		   monster.MonsterNumberType == NumberType.Zero && InstantiationGridSquareGrid[x,y].GridSquareTileType == TileType.ExitZero)
@@ -563,13 +564,17 @@ public class Instantiation : MonoBehaviour
 				{
 					if(InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece == WinCondition.Incorrect)
 					{
-						PlayerHealth = Math.Max(PlayerHealth - 1, -1);
+						PlayerHealth = Math.Max(PlayerHealth - .6, -1);
 						InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece = WinCondition.NoPiece;
+						//LevelText.text = "Oh No!";
+						//StartTextAlpha = 1.0f;
 					}
 					if(InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece == WinCondition.Correct)
 					{
 						PlayerHealth = Math.Min(PlayerHealth + .3, 1);
 						InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece = WinCondition.NoPiece;
+						//LevelText.text = "Keep It Up!";
+						//StartTextAlpha = 1.0f;
 					}
 				}
 			}
@@ -584,24 +589,26 @@ public class Instantiation : MonoBehaviour
 		//TextureNeedle.gameObject.transform.rotation = new Quaternion(0,0,0,0);
 		if (PlayerHealth <= -1)
 		{
-			PrintMessage ("YOU LOSE!");
+			//PrintMessage ("YOU LOSE!");
 			bLevelLost = true;
-			GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			LevelText.text = "YOU LOSE!";
+			/*GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			cube.transform.position = new Vector3(0, 0, 0);
 			cube.transform.localScale = new Vector3(10, 10, 10);
 			cube.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
-			cube.GetComponent<Renderer>().material = MaterialDictionary["Lose"];
+			cube.GetComponent<Renderer>().material = MaterialDictionary["Lose"];*/
 		}
 		else if (PlayerHealth >= 1)
 		{
-			PrintMessage ("YOU WIN!");
+			//PrintMessage ("YOU WIN!");
 			SetNextPlayerLevel();
 			bLevelWon = true;
-			GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			LevelText.text = "YOU WIN!";
+			/*GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			cube.transform.position = new Vector3(0, 0, 0);
 			cube.transform.localScale = new Vector3(10, 10, 10);
 			cube.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
-			cube.GetComponent<Renderer>().material = MaterialDictionary["Win"];
+			cube.GetComponent<Renderer>().material = MaterialDictionary["Win"];*/
 		}
 		else
 		{
