@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System;
+using UnityEngine.UI;
 
 public class Instantiation : MonoBehaviour
 {
@@ -15,11 +16,25 @@ public class Instantiation : MonoBehaviour
 	public List<RotationGroup> InstantiationRotationGroups{ get; set; }
     public int InstantiationNextMonsterId { get; set; }
     public int InstantiationSpawnDelay { get; set; }
-	private float timer = 200.0f; 
+	public double PlayerHealth = 0;
 
+	private static float MaxTime = 3.0f;
+	private float fLevelStartTimer = MaxTime; 
+
+	private float StartTextAlpha = 1.0f;
+
+	bool bRightMouseClicked = false;
 	bool bLevelWon = false;
 	bool bLevelLost = false;
-	PersistentScript persistentScript;
+	public Text LevelText;
+	public Image TextureNeedle;
+	private Vector3 OriginalNeedlePosition;
+	public Image RotationPoint;
+
+	Vector3 RightClickedOriginPoint;
+	Vector3 RightClickedCurrentPoint;
+	float RayDistance = 4.5f;
+
 
 	public AudioClip gateSound;
 	
@@ -31,14 +46,11 @@ public class Instantiation : MonoBehaviour
 
     public void Start()
     {
-		GameObject persistentGameObject = GameObject.Find("PersistentData");
-		if( persistentGameObject != null)
-			persistentScript = (PersistentScript)persistentGameObject.GetComponent(typeof(PersistentScript));
-
+		OriginalNeedlePosition = TextureNeedle.gameObject.transform.position;
         InstantiationMonsters = new List<Monster>();
 		InstantiationRotationGroups = new List<RotationGroup> ();
         InstantiationNextMonsterId = 0;
-        InstantiationSpawnDelay = 10000;
+        InstantiationSpawnDelay = 100;
 
 		MaterialDictionary = new Dictionary<string, Material> ();
 		UnityEngine.Object[] Materials = Resources.LoadAll("", typeof(Material));
@@ -51,6 +63,10 @@ public class Instantiation : MonoBehaviour
        
 		Time.timeScale = 1.0f; 
 
+		//LevelText = gameObject.AddComponent<Text>();
+		LevelText.text = Game.current.player.currLevel.Split('.')[0];
+		//LevelText.font = (Resources.Load("Courier") as Font);
+		//LevelText.material.color = new Color(1, 0.92, 0.016, 1); 
 		// PrintMessage("The currLevel is currently: " + Game.current.player.currLevel);
 		LoadLevel(Game.current.player.currLevel);
     }
@@ -136,14 +152,22 @@ public class Instantiation : MonoBehaviour
 	
 	void Update () 
 	{
+		if (fLevelStartTimer > 0) 
+		{
+			StartTextAlpha = 1 - ((MaxTime-fLevelStartTimer)/(MaxTime));
+			fLevelStartTimer -= Time.deltaTime;
+		}
+		Color color = LevelText.material.color;
+		color.a = StartTextAlpha;
+		LevelText.material.color = color;
 		GetMouseRays();
-		UpdateSpawnTile();
-		UpdateMonsterAction();
-		timer -= Time.deltaTime; 
 		
-		if (timer <= 0) 
+		if (fLevelStartTimer <= 0) 
 		{ 
-			timer = 0.0f; 
+			StartTextAlpha = 0.0f;
+			fLevelStartTimer = 0.0f;
+			UpdateSpawnTile();
+			UpdateMonsterAction();
 		} 
 	}
 	void PauseGame() 
@@ -153,7 +177,7 @@ public class Instantiation : MonoBehaviour
 	void OnGUI () 
 	{
 		MakeMapControls ();
-		GUI.Box (new Rect (Screen.width - 50, 0, 50, 20), "" + timer.ToString ("f0")); 
+		GUI.Box (new Rect (Screen.width - 50, 0, 50, 20), "" + fLevelStartTimer.ToString ("f0")); 
 
 		if(bLevelWon)
 		{
@@ -162,7 +186,7 @@ public class Instantiation : MonoBehaviour
 				Application.LoadLevel (Application.loadedLevelName); 
 			} 
 		}
-		else if(bLevelLost || timer <= 0)
+		else if(bLevelLost)
 		{
 			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 100, 25), "Retry?")) 
 			{
@@ -237,15 +261,37 @@ public class Instantiation : MonoBehaviour
 				}
 			}
 		}
+		if(Input.GetMouseButtonDown(1)&& !bRightMouseClicked)
+		{
+			bRightMouseClicked=true;
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);    
+			RightClickedOriginPoint = ray.origin + (ray.direction * RayDistance); 
+			RightClickedCurrentPoint = ray.origin + (ray.direction * RayDistance);  
+		}
+		if(Input.GetMouseButtonUp(1))
+		{
+			bRightMouseClicked=false;
+		}
+		if(bRightMouseClicked)
+		{
+			bRightMouseClicked=true;
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);    
+			RightClickedCurrentPoint = ray.origin + (ray.direction * RayDistance);    
+		}
+
+
 		GameObject camera = GameObject.Find ("Main Camera");
 		int moveX = 0;
 		int moveY = 0;
 		float magicNumber = 5;
 		
-		if( Input.mousePosition.x < magicNumber && Input.mousePosition.x >= 0 )
-			moveX = (int)(-1*magicNumber/(Input.mousePosition.x+1));
-		if( Input.mousePosition.x > Screen.width - magicNumber && Input.mousePosition.x <= Screen.width)
-			moveX = (int)(1*magicNumber/(Screen.width-Input.mousePosition.x+1));
+		if( bRightMouseClicked )
+		{
+			camera.transform.position += new Vector3((float)(RightClickedOriginPoint.x - RightClickedCurrentPoint.x), (float)(RightClickedOriginPoint.y - RightClickedCurrentPoint.y) , 0f);
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);    
+			RightClickedOriginPoint = ray.origin + (ray.direction * RayDistance); 
+			RightClickedCurrentPoint = ray.origin + (ray.direction * RayDistance);  
+		}
 		if (Input.GetAxis ("Mouse ScrollWheel") != 0) 
 		{
 			moveY = (int)(20*Input.GetAxis ("Mouse ScrollWheel"));
@@ -516,16 +562,27 @@ public class Instantiation : MonoBehaviour
 				   InstantiationGridSquareGrid[i,j].GridSquareTileType == TileType.ExitZero)
 				{
 					if(InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece == WinCondition.Incorrect)
-						PlayerLost = true;
+					{
+						PlayerHealth = Math.Max(PlayerHealth - 1, -1);
+						InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece = WinCondition.NoPiece;
+					}
 					if(InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece == WinCondition.Correct)
-						numWinningExits ++;
-
-					totalNumExits++;
+					{
+						PlayerHealth = Math.Min(PlayerHealth + .3, 1);
+						InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece = WinCondition.NoPiece;
+					}
 				}
 			}
 		}
-
-		if (PlayerLost)
+		TextureNeedle.gameObject.transform.position = OriginalNeedlePosition;
+		TextureNeedle.gameObject.transform.rotation = new Quaternion(0,0,0,0);
+		Vector3 P = RotationPoint.gameObject.transform.position;
+		//Vector3 position = new Vector3(P.x, P.y-OriginalNeedleRotation.rectTransform.rect.height, P.z);
+		//Vector3 position = new Vector3(P.x,P.y,P.z);
+		TextureNeedle.gameObject.transform.RotateAround(P, Vector3.back,(float)PlayerHealth*35);
+		//TextureNeedle.gameObject.transform.position = OriginalNeedlePosition;
+		//TextureNeedle.gameObject.transform.rotation = new Quaternion(0,0,0,0);
+		if (PlayerHealth <= -1)
 		{
 			PrintMessage ("YOU LOSE!");
 			bLevelLost = true;
@@ -535,7 +592,7 @@ public class Instantiation : MonoBehaviour
 			cube.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
 			cube.GetComponent<Renderer>().material = MaterialDictionary["Lose"];
 		}
-		else if (numWinningExits == totalNumExits)
+		else if (PlayerHealth >= 1)
 		{
 			PrintMessage ("YOU WIN!");
 			SetNextPlayerLevel();

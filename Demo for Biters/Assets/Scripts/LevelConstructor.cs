@@ -630,11 +630,6 @@ public class LevelConstructor : MonoBehaviour {
 							writer.Write (',');
 							print (',');
 						}
-						int x = (int)group.xAt(i);
-						int y = (int)group.yAt (i);
-						string xstr = Convert.ToString(group.xAt(i));
-						string ystr = Convert.ToString(group.yAt(i));
-						print (Convert.ToString(group.xAt(i)) + ',' + Convert.ToString(group.yAt(i)));
 						writer.Write (Convert.ToString(group.xAt(i)) + ',' + Convert.ToString(group.yAt(i)));
 					}
 					writer.Write("\n");

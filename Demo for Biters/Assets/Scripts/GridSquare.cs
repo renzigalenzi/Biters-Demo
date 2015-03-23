@@ -92,9 +92,7 @@ public class GridSquare
 		case TileType.BeltUpRight:
 		case TileType.BeltUpT:
 		case TileType.BeltVertical:
-			//GridSquareGameObject.transform.rotation = Quaternion.AngleAxis(230, Vector3.up);
 			GridSquareGameObject.transform.Rotate(0,0,90);
-			Instantiation.print("hi");
 			break;
 		case TileType.BeltUpLeft:
 		case TileType.BeltRightT:
