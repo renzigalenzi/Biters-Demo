@@ -76,6 +76,7 @@ public class Instantiation : MonoBehaviour
         try
         {
             InitializeGrid(filePath);
+			CreateBorder();
             StreamReader reader = new StreamReader(filePath, Encoding.Default);
             using(reader)
             {
@@ -149,7 +150,42 @@ public class Instantiation : MonoBehaviour
         InstantiationGridSquareGameObjectGrid = new GameObject[InstantiationGridWidth, InstantiationGridHeight];
         InstantiationGridSquareGrid = new GridSquare[InstantiationGridWidth, InstantiationGridHeight];
 	}
-	
+	public void CreateBorder()
+	{
+		//create top
+		for(int i = -1; i < InstantiationGridWidth+1; i++)
+		{
+			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			go.transform.position = new Vector3(i - Instantiation.XOFFSET, Instantiation.YOFFSET + 1, 0);
+			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+			go.GetComponent<Renderer>().material = MaterialDictionary["Border"];
+		}
+		//create bottom
+		for(int i = -1; i < InstantiationGridWidth+1; i++)
+		{
+			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			go.transform.position = new Vector3(i - Instantiation.XOFFSET, Instantiation.YOFFSET - InstantiationGridHeight, 0);
+			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+			go.GetComponent<Renderer>().material = MaterialDictionary["Border"];
+		}
+		//create left
+		for(int i = 0; i < InstantiationGridHeight; i++)
+		{
+			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			go.transform.position = new Vector3(-1 - Instantiation.XOFFSET, Instantiation.YOFFSET - i, 0);
+			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+			go.GetComponent<Renderer>().material = MaterialDictionary["Border"];
+		}
+		//create right
+		for(int i = 0; i < InstantiationGridHeight; i++)
+		{
+			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			go.transform.position = new Vector3(InstantiationGridWidth - Instantiation.XOFFSET, Instantiation.YOFFSET - i, 0);
+			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+			go.GetComponent<Renderer>().material = MaterialDictionary["Border"];
+		}
+			
+	}
 	void Update () 
 	{
 		if (fLevelStartTimer > 0) 
@@ -299,9 +335,9 @@ public class Instantiation : MonoBehaviour
 		if (Input.GetAxis ("Mouse ScrollWheel") != 0) 
 		{
 			moveY = (int)(20*Input.GetAxis ("Mouse ScrollWheel"));
+			camera.transform.position += new Vector3(1/magicNumber*moveX, 1/magicNumber* moveY , 0f);
 		}
-		
-		camera.transform.position += new Vector3(1/magicNumber*moveX, 1/magicNumber* moveY , 0f);
+
 		MakeSureCameraCanSeeMap ();
 		
 	}
@@ -314,10 +350,10 @@ public class Instantiation : MonoBehaviour
 			GetComponent<Camera>().transform.position = new Vector3(-XOFFSET, y, z);
 		if(x > InstantiationGridWidth - XOFFSET)
 			GetComponent<Camera>().transform.position = new Vector3(InstantiationGridWidth - XOFFSET, y, z);
-		if(y < 0 - InstantiationGridHeight)
-			GetComponent<Camera>().transform.position = new Vector3(x, 0 - InstantiationGridHeight, z);
-		if(y > 0)
-			GetComponent<Camera>().transform.position = new Vector3(x, 0, z);
+		if(y < 2 - InstantiationGridHeight)
+			GetComponent<Camera>().transform.position = new Vector3(x, 2 - InstantiationGridHeight, z);
+		if(y > 2)
+			GetComponent<Camera>().transform.position = new Vector3(x, 2, z);
 		
 	}
 

@@ -644,16 +644,16 @@ public class LevelConstructor : MonoBehaviour {
 	}
 	void MakeTilesScrollView()
 	{
-		int numButtons = (int)MaterialDictionary.Count;
+		int numButtons = (int)TileType.Count;
 		Vector2 pivotPoint;
 		TileScrollPosition = GUI.BeginScrollView(new Rect(Math.Min(Screen.width,40), Math.Min(Screen.height,20),
 		                                              Math.Min(Screen.width-10,80), Screen.height-20), 
 		                                         TileScrollPosition, new Rect(0, 0, 60, numButtons * 70));
 		int i = 0;
-		foreach(string key in MaterialDictionary.Keys)
+		//check if material is a tile
+		for(int tile = 0; tile < (int)TileType.Count; tile ++)
 		{
-			//check if material is a tile
-			for(int tile = 0; tile < (int)TileType.Count; tile ++)
+			foreach(string key in MaterialDictionary.Keys)
 			{
 				if(key == Enum.GetName(typeof(TileType),(TileType)tile))
 				{
