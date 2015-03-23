@@ -608,6 +608,8 @@ public class Instantiation : MonoBehaviour
 					if(InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece == WinCondition.Correct)
 					{
 						PlayerHealth = Math.Min(PlayerHealth + .3, 1);
+						int next = InstantiationGridSquareGrid[i,j].GridSquareTileType == TileType.ExitOne ? 1 : 0;
+						InstantiationGridSquareGrid[i,j].SetNextCubeNumber(next);
 						InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece = WinCondition.NoPiece;
 						//LevelText.text = "Keep It Up!";
 						//StartTextAlpha = 1.0f;
