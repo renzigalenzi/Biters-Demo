@@ -84,18 +84,21 @@ public class LevelConstructor : MonoBehaviour {
 				tempGrid[x,y].GridSquareYPosition = y;
 				tempGrid[x,y].GridSquareGameObject.transform.position = new Vector3(x - XOFFSET, YOFFSET - y, 0);
 				tempGrid[x,y].GridSquareGameObject.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+				tempGrid[x,y].OriginalRotationValue = tempGrid[x,y].GridSquareGameObject.transform.rotation;
 
 				if(x < newx && x < oldx && y < newy && y < oldy)
 				{
 					tempGrid[x,y].GridSquareTileType = LevelConstructorGridSquareGrid[x,y].GridSquareTileType;
 					tempGrid[x,y].GridSquareGameObject.GetComponent<Renderer>().material = 
 						LevelConstructorGridSquareGrid[x,y].GridSquareGameObject.GetComponent<Renderer>().material;
+					tempGrid[x,y].RotateSquareByMaterial();
 				}
 				else
 				{
 					tempGrid[x,y].GridSquareTileType = TileType.Blank;
 					tempGrid[x,y].GridSquareGameObject.GetComponent<Renderer>().material = MaterialDictionary["Blank"];
 				}
+				tempGrid[x,y].RotateSquareByMaterial();
 			}
 		}
 		foreach (var tile in LevelConstructorGridSquareGrid) 
