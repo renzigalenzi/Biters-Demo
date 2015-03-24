@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System;
+using UnityEngine.UI;
 
 public class Instantiation : MonoBehaviour
 {
@@ -15,11 +16,25 @@ public class Instantiation : MonoBehaviour
 	public List<RotationGroup> InstantiationRotationGroups{ get; set; }
     public int InstantiationNextMonsterId { get; set; }
     public int InstantiationSpawnDelay { get; set; }
-	private float timer = 200.0f; 
+	public double PlayerHealth = 0;
 
+	private static float MaxTime = 3.0f;
+	private float fLevelStartTimer = MaxTime; 
+
+	private float StartTextAlpha = 1.0f;
+
+	bool bRightMouseClicked = false;
 	bool bLevelWon = false;
 	bool bLevelLost = false;
-	PersistentScript persistentScript;
+	public Text LevelText;
+	public Image TextureNeedle;
+	private Vector3 OriginalNeedlePosition;
+	public Image RotationPoint;
+
+	Vector3 RightClickedOriginPoint;
+	Vector3 RightClickedCurrentPoint;
+	float RayDistance = 4.5f;
+
 
 	public AudioClip gateSound;
 	
@@ -31,14 +46,11 @@ public class Instantiation : MonoBehaviour
 
     public void Start()
     {
-		GameObject persistentGameObject = GameObject.Find("PersistentData");
-		if( persistentGameObject != null)
-			persistentScript = (PersistentScript)persistentGameObject.GetComponent(typeof(PersistentScript));
-
+		OriginalNeedlePosition = TextureNeedle.gameObject.transform.position;
         InstantiationMonsters = new List<Monster>();
 		InstantiationRotationGroups = new List<RotationGroup> ();
         InstantiationNextMonsterId = 0;
-        InstantiationSpawnDelay = 10000;
+        InstantiationSpawnDelay = 100;
 
 		MaterialDictionary = new Dictionary<string, Material> ();
 		UnityEngine.Object[] Materials = Resources.LoadAll("", typeof(Material));
@@ -51,16 +63,20 @@ public class Instantiation : MonoBehaviour
        
 		Time.timeScale = 1.0f; 
 
+		//LevelText = gameObject.AddComponent<Text>();
+		LevelText.text = Game.current.player.currLevel.Split('.')[0];
+		//LevelText.font = (Resources.Load("Courier") as Font);
+		//LevelText.material.color = new Color(1, 0.92, 0.016, 1); 
 		// PrintMessage("The currLevel is currently: " + Game.current.player.currLevel);
 		LoadLevel(Game.current.player.currLevel);
     }
-
     public bool LoadLevel(string fileName)
     {
         string filePath = "Assets/Levels/" + fileName;
         try
         {
             InitializeGrid(filePath);
+			CreateBorder();
             StreamReader reader = new StreamReader(filePath, Encoding.Default);
             using(reader)
             {
@@ -134,18 +150,65 @@ public class Instantiation : MonoBehaviour
         InstantiationGridSquareGameObjectGrid = new GameObject[InstantiationGridWidth, InstantiationGridHeight];
         InstantiationGridSquareGrid = new GridSquare[InstantiationGridWidth, InstantiationGridHeight];
 	}
-	
+	public void CreateBorder()
+	{
+		//create top
+		for(int i = -1; i < InstantiationGridWidth+1; i++)
+		{
+			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			go.transform.position = new Vector3(i - Instantiation.XOFFSET, Instantiation.YOFFSET + 1, 0);
+			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+			go.GetComponent<Renderer>().material = MaterialDictionary["Border"];
+		}
+		//create bottom
+		for(int i = -1; i < InstantiationGridWidth+1; i++)
+		{
+			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			go.transform.position = new Vector3(i - Instantiation.XOFFSET, Instantiation.YOFFSET - InstantiationGridHeight, 0);
+			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+			go.GetComponent<Renderer>().material = MaterialDictionary["Border"];
+		}
+		//create left
+		for(int i = 0; i < InstantiationGridHeight; i++)
+		{
+			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			go.transform.position = new Vector3(-1 - Instantiation.XOFFSET, Instantiation.YOFFSET - i, 0);
+			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+			go.GetComponent<Renderer>().material = MaterialDictionary["Border"];
+		}
+		//create right
+		for(int i = 0; i < InstantiationGridHeight; i++)
+		{
+			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			go.transform.position = new Vector3(InstantiationGridWidth - Instantiation.XOFFSET, Instantiation.YOFFSET - i, 0);
+			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+			go.GetComponent<Renderer>().material = MaterialDictionary["Border"];
+		}
+			
+	}
 	void Update () 
 	{
+		if (fLevelStartTimer > 0) 
+		{
+			StartTextAlpha = 1 - ((MaxTime-fLevelStartTimer)/(MaxTime));
+			fLevelStartTimer -= Time.deltaTime;
+		}
+		Color color = LevelText.material.color;
+		color.a = StartTextAlpha;
+		LevelText.material.color = color;
 		GetMouseRays();
-		UpdateSpawnTile();
-		UpdateMonsterAction();
-		timer -= Time.deltaTime; 
 		
-		if (timer <= 0) 
+		if (fLevelStartTimer <= 0 && !(bLevelWon || bLevelLost)) 
 		{ 
-			timer = 0.0f; 
+			StartTextAlpha = Math.Max(0.0f,StartTextAlpha - 0.1f);
+			fLevelStartTimer = 0.0f;
+			UpdateSpawnTile();
+			UpdateMonsterAction();
 		} 
+		if(bLevelWon || bLevelLost)
+		{
+			StartTextAlpha = 1.0f;
+		}
 	}
 	void PauseGame() 
 	{ 
@@ -154,7 +217,7 @@ public class Instantiation : MonoBehaviour
 	void OnGUI () 
 	{
 		MakeMapControls ();
-		GUI.Box (new Rect (Screen.width - 50, 0, 50, 20), "" + timer.ToString ("f0")); 
+		GUI.Box (new Rect (Screen.width - 50, 0, 50, 20), "" + fLevelStartTimer.ToString ("f0")); 
 
 		if(bLevelWon)
 		{
@@ -163,7 +226,7 @@ public class Instantiation : MonoBehaviour
 				Application.LoadLevel (Application.loadedLevelName); 
 			} 
 		}
-		else if(bLevelLost || timer <= 0)
+		else if(bLevelLost)
 		{
 			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 100, 25), "Retry?")) 
 			{
@@ -182,19 +245,27 @@ public class Instantiation : MonoBehaviour
 			{
 				// All cubes will need a ray layer later so that when you click the monster sprites, it won't interfere with changing gates
 				GameObject pObject = hit.transform.gameObject;
+				RotationGroup rg;
+				foreach(GridSquare square in InstantiationGridSquareGrid)
+				{
+					if(pObject == square.subObject)
+					{
+						pObject = square.GridSquareGameObject;
+					}
+				}
+				rg = GetRotationalGroup(XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y);
 				if(
-					pObject.renderer.sharedMaterial != MaterialDictionary["And"] && 
-					pObject.renderer.sharedMaterial != MaterialDictionary["Or"] &&
-					pObject.renderer.sharedMaterial != MaterialDictionary["Nand"] &&
-					pObject.renderer.sharedMaterial != MaterialDictionary["Xor"] &&
-					pObject.renderer.sharedMaterial != MaterialDictionary["Xnor"] &&
-					pObject.renderer.sharedMaterial != MaterialDictionary["Nor"]
+					pObject.GetComponent<Renderer>().sharedMaterial != MaterialDictionary["And"] && 
+					pObject.GetComponent<Renderer>().sharedMaterial != MaterialDictionary["Or"] &&
+					pObject.GetComponent<Renderer>().sharedMaterial != MaterialDictionary["Nand"] &&
+					pObject.GetComponent<Renderer>().sharedMaterial != MaterialDictionary["Xor"] &&
+					pObject.GetComponent<Renderer>().sharedMaterial != MaterialDictionary["Xnor"] &&
+					pObject.GetComponent<Renderer>().sharedMaterial != MaterialDictionary["Nor"] &&
+					rg == null
 					)
 				{
 					return;
 				}
-				RotationGroup rg;
-				rg = GetRotationalGroup(XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y);
 				if(rg != null)
 				{
 					RotateTiles(rg);
@@ -202,72 +273,96 @@ public class Instantiation : MonoBehaviour
 				else
 				{
 					TileType tileType = TileType.Or;
-					if(pObject.renderer.sharedMaterial == MaterialDictionary["Or"])
+					if(pObject.GetComponent<Renderer>().sharedMaterial == MaterialDictionary["Or"])
 					{
-						pObject.renderer.material = MaterialDictionary["And"];
+						pObject.GetComponent<Renderer>().material = MaterialDictionary["And"];
 						tileType = TileType.And;
 					}
-					else if(pObject.renderer.sharedMaterial == MaterialDictionary["And"])
+					else if(pObject.GetComponent<Renderer>().sharedMaterial == MaterialDictionary["And"])
 					{
-						pObject.renderer.material = MaterialDictionary["Nand"];
+						pObject.GetComponent<Renderer>().material = MaterialDictionary["Nand"];
 						tileType = TileType.Nand;
 					}
-					else if(pObject.renderer.sharedMaterial == MaterialDictionary["Nand"])
+					else if(pObject.GetComponent<Renderer>().sharedMaterial == MaterialDictionary["Nand"])
 					{
-						pObject.renderer.material = MaterialDictionary["Xor"];
+						pObject.GetComponent<Renderer>().material = MaterialDictionary["Xor"];
 						tileType = TileType.Xor;
 					}
-					else if(pObject.renderer.sharedMaterial == MaterialDictionary["Xor"])
+					else if(pObject.GetComponent<Renderer>().sharedMaterial == MaterialDictionary["Xor"])
 					{
-						pObject.renderer.material = MaterialDictionary["Xnor"];
+						pObject.GetComponent<Renderer>().material = MaterialDictionary["Xnor"];
 						tileType = TileType.Xnor;
 					}
-					else if(pObject.renderer.sharedMaterial == MaterialDictionary["Xnor"])
+					else if(pObject.GetComponent<Renderer>().sharedMaterial == MaterialDictionary["Xnor"])
 					{
-						pObject.renderer.material = MaterialDictionary["Nor"];
+						pObject.GetComponent<Renderer>().material = MaterialDictionary["Nor"];
 						tileType = TileType.Nor;
 					}
-					else if(pObject.renderer.sharedMaterial == MaterialDictionary["Nor"])
+					else if(pObject.GetComponent<Renderer>().sharedMaterial == MaterialDictionary["Nor"])
 					{
-						pObject.renderer.material = MaterialDictionary["Or"];
+						pObject.GetComponent<Renderer>().material = MaterialDictionary["Or"];
 						tileType = TileType.Or;
 					}
 					AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
 	                InstantiationGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = tileType;
+					InstantiationGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].SetSubCubeAsMain();
 				}
+
 			}
 		}
+		if(Input.GetMouseButtonDown(1)&& !bRightMouseClicked)
+		{
+			bRightMouseClicked=true;
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);    
+			RightClickedOriginPoint = ray.origin + (ray.direction * RayDistance); 
+			RightClickedCurrentPoint = ray.origin + (ray.direction * RayDistance);  
+		}
+		if(Input.GetMouseButtonUp(1))
+		{
+			bRightMouseClicked=false;
+		}
+		if(bRightMouseClicked)
+		{
+			bRightMouseClicked=true;
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);    
+			RightClickedCurrentPoint = ray.origin + (ray.direction * RayDistance);    
+		}
+
+
 		GameObject camera = GameObject.Find ("Main Camera");
 		int moveX = 0;
 		int moveY = 0;
 		float magicNumber = 5;
 		
-		if( Input.mousePosition.x < magicNumber && Input.mousePosition.x >= 0 )
-			moveX = (int)(-1*magicNumber/(Input.mousePosition.x+1));
-		if( Input.mousePosition.x > Screen.width - magicNumber && Input.mousePosition.x <= Screen.width)
-			moveX = (int)(1*magicNumber/(Screen.width-Input.mousePosition.x+1));
+		if( bRightMouseClicked )
+		{
+			camera.transform.position += new Vector3((float)(RightClickedOriginPoint.x - RightClickedCurrentPoint.x), (float)(RightClickedOriginPoint.y - RightClickedCurrentPoint.y) , 0f);
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);    
+			RightClickedOriginPoint = ray.origin + (ray.direction * RayDistance); 
+			RightClickedCurrentPoint = ray.origin + (ray.direction * RayDistance);  
+		}
 		if (Input.GetAxis ("Mouse ScrollWheel") != 0) 
 		{
 			moveY = (int)(20*Input.GetAxis ("Mouse ScrollWheel"));
+			camera.transform.position += new Vector3(1/magicNumber*moveX, 1/magicNumber* moveY , 0f);
 		}
-		
-		camera.transform.position += new Vector3(1/magicNumber*moveX, 1/magicNumber* moveY , 0f);
+
 		MakeSureCameraCanSeeMap ();
 		
 	}
 	void MakeSureCameraCanSeeMap ()
 	{
-		float x = camera.transform.position.x;
-		float y = camera.transform.position.y;
-		float z = camera.transform.position.z;
+		float x = GetComponent<Camera>().transform.position.x;
+		float y = GetComponent<Camera>().transform.position.y;
+		float z = GetComponent<Camera>().transform.position.z;
 		if(x < -XOFFSET)
-			camera.transform.position = new Vector3(-XOFFSET, y, z);
+			GetComponent<Camera>().transform.position = new Vector3(-XOFFSET, y, z);
 		if(x > InstantiationGridWidth - XOFFSET)
-			camera.transform.position = new Vector3(InstantiationGridWidth - XOFFSET, y, z);
-		if(y < 0 - InstantiationGridHeight)
-			camera.transform.position = new Vector3(x, 0 - InstantiationGridHeight, z);
-		if(y > 0)
-			camera.transform.position = new Vector3(x, 0, z);
+			GetComponent<Camera>().transform.position = new Vector3(InstantiationGridWidth - XOFFSET, y, z);
+		if(y < 2 - InstantiationGridHeight)
+			GetComponent<Camera>().transform.position = new Vector3(x, 2 - InstantiationGridHeight, z);
+		if(y > 2)
+			GetComponent<Camera>().transform.position = new Vector3(x, 2, z);
 		
 	}
 
@@ -320,7 +415,6 @@ public class Instantiation : MonoBehaviour
 			}
 		}
 	}
-
 	void UpdateMonsterAction()
 	{
 		List<Monster> tempList = new List<Monster>();
@@ -376,7 +470,7 @@ public class Instantiation : MonoBehaviour
                 int index2 = 0;
                 foreach(Monster m in InstantiationMonsters)
                 {
-                    if(m.MonsterXPosition == x && m.MonsterYPosition == y && m.MonsterId != monster.MonsterId && m.MonsterMovementType == MovementType.Waiting)
+				if(m.MonsterXPosition == x && m.MonsterYPosition == y && m.MonsterId != monster.MonsterId && monster.MonsterMovementDirection != m.MonsterMovementDirection && m.MonsterMovementType == MovementType.Waiting)
                     {
 						InstantiationGridSquareGrid[x, y].SubtractDirection(m);
 						InstantiationGridSquareGrid[x, y].SubtractDirection(monster);
@@ -432,7 +526,7 @@ public class Instantiation : MonoBehaviour
 			case TileType.Not:
 			{
 				monster.MonsterNumberType = monster.MonsterNumberType == NumberType.Zero ? NumberType.One: NumberType.Zero; 
-				monster.MonsterGameObject.renderer.material = monster.MonsterGameObject.renderer.material == 
+				monster.MonsterGameObject.GetComponent<Renderer>().material = monster.MonsterGameObject.GetComponent<Renderer>().material == 
 							MaterialDictionary["BiterZero"] ? MaterialDictionary["BiterOne"] : MaterialDictionary["BiterZero"];
 				InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
 				break;
@@ -477,7 +571,7 @@ public class Instantiation : MonoBehaviour
         {
             moveX = -1;
         }
-
+		//int notwincheck = bLevelWon || bLevelLost ? 0 : 1;
 		monster.MonsterGameObject.transform.position += new Vector3(monster.MonsterMovementIncrement * moveX * Time.timeScale, monster.MonsterMovementIncrement * moveY * Time.timeScale, 0);
 
         if(monster.FinishedMovingTile())
@@ -492,8 +586,6 @@ public class Instantiation : MonoBehaviour
 		//check all tiles, if any of the end pieces are lose then return you lose
 		//if the amount of winning tiles == the number of end pieces then you win
 		bool PlayerLost = false;
-		int numWinningExits = 0;
-		int totalNumExits = 0;
 
 		if(monster.MonsterNumberType == NumberType.One && InstantiationGridSquareGrid[x,y].GridSquareTileType == TileType.ExitOne || 
 		   monster.MonsterNumberType == NumberType.Zero && InstantiationGridSquareGrid[x,y].GridSquareTileType == TileType.ExitZero)
@@ -516,35 +608,54 @@ public class Instantiation : MonoBehaviour
 				   InstantiationGridSquareGrid[i,j].GridSquareTileType == TileType.ExitZero)
 				{
 					if(InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece == WinCondition.Incorrect)
-						PlayerLost = true;
+					{
+						PlayerHealth = Math.Max(PlayerHealth - .6, -1);
+						InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece = WinCondition.NoPiece;
+						//LevelText.text = "Oh No!";
+						//StartTextAlpha = 1.0f;
+					}
 					if(InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece == WinCondition.Correct)
-						numWinningExits ++;
-
-					totalNumExits++;
+					{
+						PlayerHealth = Math.Min(PlayerHealth + .3, 1);
+						int next = InstantiationGridSquareGrid[i,j].GridSquareTileType == TileType.ExitOne ? 1 : 0;
+						InstantiationGridSquareGrid[i,j].SetNextCubeNumber(next);
+						InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece = WinCondition.NoPiece;
+						//LevelText.text = "Keep It Up!";
+						//StartTextAlpha = 1.0f;
+					}
 				}
 			}
 		}
-
-		if (PlayerLost)
+		TextureNeedle.gameObject.transform.position = OriginalNeedlePosition;
+		TextureNeedle.gameObject.transform.rotation = new Quaternion(0,0,0,0);
+		Vector3 P = RotationPoint.gameObject.transform.position;
+		//Vector3 position = new Vector3(P.x, P.y-OriginalNeedleRotation.rectTransform.rect.height, P.z);
+		//Vector3 position = new Vector3(P.x,P.y,P.z);
+		TextureNeedle.gameObject.transform.RotateAround(P, Vector3.back,(float)PlayerHealth*35);
+		//TextureNeedle.gameObject.transform.position = OriginalNeedlePosition;
+		//TextureNeedle.gameObject.transform.rotation = new Quaternion(0,0,0,0);
+		if (PlayerHealth <= -1)
 		{
-			PrintMessage ("YOU LOSE!");
+			//PrintMessage ("YOU LOSE!");
 			bLevelLost = true;
-			GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			LevelText.text = "YOU LOSE!";
+			/*GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			cube.transform.position = new Vector3(0, 0, 0);
 			cube.transform.localScale = new Vector3(10, 10, 10);
 			cube.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
-			cube.renderer.material = MaterialDictionary["Lose"];
+			cube.GetComponent<Renderer>().material = MaterialDictionary["Lose"];*/
 		}
-		else if (numWinningExits == totalNumExits)
+		else if (PlayerHealth >= 1)
 		{
-			PrintMessage ("YOU WIN!");
+			//PrintMessage ("YOU WIN!");
 			SetNextPlayerLevel();
 			bLevelWon = true;
-			GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			LevelText.text = "YOU WIN!";
+			/*GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			cube.transform.position = new Vector3(0, 0, 0);
 			cube.transform.localScale = new Vector3(10, 10, 10);
 			cube.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
-			cube.renderer.material = MaterialDictionary["Win"];
+			cube.GetComponent<Renderer>().material = MaterialDictionary["Win"];*/
 		}
 		else
 		{
@@ -555,55 +666,71 @@ public class Instantiation : MonoBehaviour
 	}
 
 	// returns true if the level has not already been reached by the Player -- Prevents duplicate entries 
-	public bool CheckLevel(string lvl) { 
+	public bool CheckLevel(string lvl) 
+	{ 
+		for(int worlds = 0 ; worlds <= Game.current.player.world; worlds ++)
+		{
+			if(Game.current.player.levelsList.Count > worlds)
+			{
+				for (int i = 0; i < Game.current.player.levelsList[worlds].Count; i++) 
+				{ 
+					int world = Game.current.player.world;
+					if (Game.current.player.levelsList[worlds].Count > i && lvl == Game.current.player.levelsList[worlds][i]) 
+					{ 
+						return false; 
+					} // end if statement 
 
-		for (int i = 0; i < Game.current.player.levelsList.Count; i++) { 
-
-			if (lvl == Game.current.player.levelsList[i]) { 
-
-				return false; 
-
-			} // end if statement 
-
-		} // end for loop  
-
+				} // end for loop  
+			}
+		}
 		return true; 
 
 	} // end CheckLevel  
 
 	public void SetNextPlayerLevel()
 	{
-		List<string> levelsList = new List<string>();
-		GetLevels (ref levelsList);
-
-		for(int i = 0; i < levelsList.Count; i++)
+		List<List<string>> levelsList = LevelMenu.GetLevels();
+		for(int worlds = 0; worlds < levelsList.Count; worlds++)
 		{
-			if(Game.current.player.currLevel == levelsList[i] && i < levelsList.Count - 1)
+			for(int i = 0; i < levelsList[worlds].Count; i++)
 			{
-				if(levelsList[i+1] != null) {
-					Game.current.player.currLevel = levelsList[i+1];
-					// Only call this if the level has not already been reached 
-					if (CheckLevel (levelsList[i+1])) { 
-						Game.current.player.highestLevel = levelsList[i+1];
-						Game.current.player.levelsList.Add(levelsList[i+1]); 
+				if(Game.current.player.currLevel == levelsList[worlds][i] && i < levelsList[worlds].Count - 1)
+				{
+					if(levelsList[worlds][i+1] != null) 
+					{
+						Game.current.player.currLevel = levelsList[worlds][i+1];
+						// Only call this if the level has not already been reached 
+						if (CheckLevel (levelsList[worlds][i+1])) 
+						{ 
+							Game.current.player.highestLevel = levelsList[worlds][i+1];
+							Game.current.player.levelsList[worlds].Add(levelsList[worlds][i+1]); 
+						} // end if statement 
+						Save.SaveThis (); 
 					} // end if statement 
-					Save.SaveThis (); 
-				} // end if statement 
-				break;
+					break;
+				}
+				else if(Game.current.player.currLevel == levelsList[worlds][i] && i == levelsList[worlds].Count - 1)
+				{
+					if(levelsList.Count > Game.current.player.world + 1)
+					{
+						if(levelsList[Game.current.player.world+1].Count > 0 && levelsList[Game.current.player.world+1][0] != null) 
+						{
+							Game.current.player.currLevel = levelsList[Game.current.player.world+1][0];
+							// Only call this if the level has not already been reached 
+							if (CheckLevel (levelsList[Game.current.player.world+1][0])) 
+							{ 
+								Game.current.player.world ++;
+								Game.current.player.highestLevel = levelsList[Game.current.player.world][0];
+								List<string> temp = new List<string>();
+								Game.current.player.levelsList.Add(temp);
+								Game.current.player.levelsList[Game.current.player.world].Add(levelsList[Game.current.player.world][0]); 
+							} // end if statement 
+							Save.SaveThis (); 
+							return;
+						} // end if statement 
+					}
+				}
 			}
-		}
-	}
-	void GetLevels(ref List<string> levelsList)
-	{
-		if (levelsList != null)
-			levelsList.Clear ();
-		levelsList = new List<string> ();
-		string dirName = Directory.GetCurrentDirectory () + "/Assets/Levels";
-		DirectoryInfo dir = new DirectoryInfo(dirName);
-		FileInfo[] info = dir.GetFiles("*.csv");
-		foreach (FileInfo f in info) 
-		{ 
-			levelsList.Add(f.Name);
 		}
 	}
 	public RotationGroup GetRotationalGroup(int x, int y)
@@ -619,19 +746,20 @@ public class Instantiation : MonoBehaviour
 	public void RotateTiles (RotationGroup rg)
 	{
 		TileType tempTileType = InstantiationGridSquareGrid [rg.xAt (0), rg.yAt (0)].GridSquareTileType;
-		Material tempTileMaterial = InstantiationGridSquareGrid [rg.xAt (0), rg.yAt (0)].GridSquareGameObject.renderer.sharedMaterial;
+		Material tempTileMaterial = InstantiationGridSquareGrid [rg.xAt (0), rg.yAt (0)].GridSquareGameObject.GetComponent<Renderer>().sharedMaterial;
 
 		for (int i = 0; i < rg.getCount() -1 ; i++) 
 		{
 			InstantiationGridSquareGrid [rg.xAt (i), rg.yAt (i)].GridSquareTileType = 
 				InstantiationGridSquareGrid [rg.xAt (i + 1), rg.yAt (i + 1)].GridSquareTileType;
-			InstantiationGridSquareGrid [rg.xAt (i), rg.yAt (i)].GridSquareGameObject.renderer.material = 
-				InstantiationGridSquareGrid [rg.xAt (i+1), rg.yAt (i+1)].GridSquareGameObject.renderer.sharedMaterial;
+			InstantiationGridSquareGrid [rg.xAt (i), rg.yAt (i)].GridSquareGameObject.GetComponent<Renderer>().material = 
+				InstantiationGridSquareGrid [rg.xAt (i+1), rg.yAt (i+1)].GridSquareGameObject.GetComponent<Renderer>().sharedMaterial;
+			InstantiationGridSquareGrid [rg.xAt (i), rg.yAt (i)].SetSubCubeAsMain();
 		}
 
 		InstantiationGridSquareGrid [rg.xAt (rg.getCount () - 1), rg.yAt (rg.getCount () - 1)].GridSquareTileType = tempTileType;
-		InstantiationGridSquareGrid [rg.xAt (rg.getCount () - 1), rg.yAt (rg.getCount () - 1)].GridSquareGameObject.renderer.sharedMaterial = tempTileMaterial;
-		
+		InstantiationGridSquareGrid [rg.xAt (rg.getCount () - 1), rg.yAt (rg.getCount () - 1)].GridSquareGameObject.GetComponent<Renderer>().sharedMaterial = tempTileMaterial;
+		InstantiationGridSquareGrid [rg.xAt (rg.getCount () - 1), rg.yAt (rg.getCount () - 1)].SetSubCubeAsMain();
 		
 	}
 	public static void PrintMessage(string printStatement)

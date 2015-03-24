@@ -16,3 +16,15 @@
 
 # Unity3D generated meta files
 *.pidb.meta
+*.sln
+
+*.userprefs
+
+Demo for Biters/Library
+Demo for Biters/Library/ScriptAssemblies
+
+*.csproj
+
+*.asset
+
+Demo for Biters/Library/assetDatabase3

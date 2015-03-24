@@ -51,7 +51,7 @@ public class Monster
     {
 		//DirectionsNotToGo.Add (monsterMovementDirection);
 
-        MonsterGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		MonsterGameObject = GameObject.CreatePrimitive (PrimitiveType.Quad);
         MonsterInstantiation = monsterInstantiation;
         MonsterId = monsterId;
         MonsterMovementType = monsterMovementType;
@@ -61,16 +61,17 @@ public class Monster
         MonsterMovementDirection = monsterMovementDirection;
         MonsterMovementIncrement = 0.01F;
 
-        MonsterGameObject.transform.position = new Vector3(MonsterXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - MonsterYPosition, -1);
-		MonsterGameObject.transform.rotation = Quaternion.AngleAxis(180, Vector3.back);
-		MonsterGameObject.transform.localScale = new Vector3(0.5F, 0.5F, 0.1F);
+        MonsterGameObject.transform.position = new Vector3(MonsterXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - MonsterYPosition, -0.8f);
+		MonsterGameObject.transform.Rotate (90.0f, 180.0f, 0.0f);
         switch(MonsterNumberType)
         {
             case NumberType.Zero:
-				MonsterGameObject.renderer.material = MonsterInstantiation.MaterialDictionary["BiterZero"];
+			MonsterGameObject.GetComponent<Renderer>().material = MonsterInstantiation.MaterialDictionary["BiterZero"];
+			MonsterGameObject.transform.localScale = new Vector3(0.25F, 0.5F, 0.0F);
                 break;
             case NumberType.One:
-				MonsterGameObject.renderer.material = MonsterInstantiation.MaterialDictionary["BiterOne"];
+			MonsterGameObject.GetComponent<Renderer>().material = MonsterInstantiation.MaterialDictionary["BiterOne"];
+			MonsterGameObject.transform.localScale = new Vector3(-0.25F, 0.5F, 0.0F);
                 break;
             default:
                 Instantiation.PrintMessage("Invalid MonsterNumberType - Monster(Instantiation monsterInstantiation, int monsterId, MovementType monsterMovementType, NumberType monsterNumberType, int monsterXPosition, int monsterYPosition, MovementDirection monsterMovementDirection)");
