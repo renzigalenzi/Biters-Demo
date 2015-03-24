@@ -91,6 +91,14 @@ public class GridSquare
 		{
 			MakeNextCube(GridSquareXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - GridSquareYPosition, gridSquareTileType);
 		}
+		if(IsGate())
+		{
+			MakeDepthGateCube(GridSquareXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - GridSquareYPosition);
+		}
+		if(IsEnter())
+		{
+			MakeDepthEnterCube(GridSquareXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - GridSquareYPosition);
+		}
 
     }
 	public void MakeNextCube(float x, float y, TileType gridSquareTileType)
@@ -102,8 +110,28 @@ public class GridSquare
 		go.transform.position = new Vector3(x+.25f,y-.25f,-.1f);
 		go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
 		go.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
-		nextType = gridSquareTileType;
+//		nextType = gridSquareTileType;
 		nextObject = go;
+	}
+	public void MakeDepthGateCube(float x, float y)
+	{
+		GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		Vector3 scale = go.transform.localScale;
+		scale.x = .90F; scale.y = .90F; scale.z = .90F;
+		go.transform.localScale = scale;
+		go.transform.position = new Vector3(x,y,-.5f);
+		go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+		go.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
+	}
+	public void MakeDepthEnterCube(float x, float y)
+	{
+		GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		Vector3 scale = go.transform.localScale;
+		scale.x = .90F; scale.y = .90F; scale.z = .90F;
+		go.transform.localScale = scale;
+		go.transform.position = new Vector3(x,y,-.5f);
+		go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+		go.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
 	}
 	public void SetNextCubeNumber(int num)
 	{
@@ -333,5 +361,19 @@ public class GridSquare
 			TileType.BeltUpT, TileType.BeltRightT, TileType.BeltDownT, TileType.BeltLeftT, TileType.BeltCross});
 
 		return Belts.Contains (GridSquareTileType);
+	}
+	public bool IsGate()
+	{
+		List<TileType> Gates = new List<TileType> (new TileType[] {TileType.And, TileType.Or, 
+			TileType.Nand, TileType.Nor, TileType.Xor, TileType.Xnor});
+		
+		return Gates.Contains (GridSquareTileType);
+	}
+	public bool IsEnter()
+	{
+		List<TileType> Enters = new List<TileType> (new TileType[] {TileType.EnterOne, TileType.EnterRandom, 
+			TileType.EnterZero});
+		
+		return Enters.Contains (GridSquareTileType);
 	}
 }
