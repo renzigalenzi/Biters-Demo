@@ -666,55 +666,71 @@ public class Instantiation : MonoBehaviour
 	}
 
 	// returns true if the level has not already been reached by the Player -- Prevents duplicate entries 
-	public bool CheckLevel(string lvl) { 
+	public bool CheckLevel(string lvl) 
+	{ 
+		for(int worlds = 0 ; worlds <= Game.current.player.world; worlds ++)
+		{
+			if(Game.current.player.levelsList.Count > worlds)
+			{
+				for (int i = 0; i < Game.current.player.levelsList[worlds].Count; i++) 
+				{ 
+					int world = Game.current.player.world;
+					if (Game.current.player.levelsList[worlds].Count > i && lvl == Game.current.player.levelsList[worlds][i]) 
+					{ 
+						return false; 
+					} // end if statement 
 
-		for (int i = 0; i < Game.current.player.levelsList.Count; i++) { 
-
-			if (lvl == Game.current.player.levelsList[i]) { 
-
-				return false; 
-
-			} // end if statement 
-
-		} // end for loop  
-
+				} // end for loop  
+			}
+		}
 		return true; 
 
 	} // end CheckLevel  
 
 	public void SetNextPlayerLevel()
 	{
-		List<string> levelsList = new List<string>();
-		GetLevels (ref levelsList);
-
-		for(int i = 0; i < levelsList.Count; i++)
+		List<List<string>> levelsList = LevelMenu.GetLevels();
+		for(int worlds = 0; worlds < levelsList.Count; worlds++)
 		{
-			if(Game.current.player.currLevel == levelsList[i] && i < levelsList.Count - 1)
+			for(int i = 0; i < levelsList[worlds].Count; i++)
 			{
-				if(levelsList[i+1] != null) {
-					Game.current.player.currLevel = levelsList[i+1];
-					// Only call this if the level has not already been reached 
-					if (CheckLevel (levelsList[i+1])) { 
-						Game.current.player.highestLevel = levelsList[i+1];
-						Game.current.player.levelsList.Add(levelsList[i+1]); 
+				if(Game.current.player.currLevel == levelsList[worlds][i] && i < levelsList[worlds].Count - 1)
+				{
+					if(levelsList[worlds][i+1] != null) 
+					{
+						Game.current.player.currLevel = levelsList[worlds][i+1];
+						// Only call this if the level has not already been reached 
+						if (CheckLevel (levelsList[worlds][i+1])) 
+						{ 
+							Game.current.player.highestLevel = levelsList[worlds][i+1];
+							Game.current.player.levelsList[worlds].Add(levelsList[worlds][i+1]); 
+						} // end if statement 
+						Save.SaveThis (); 
 					} // end if statement 
-					Save.SaveThis (); 
-				} // end if statement 
-				break;
+					break;
+				}
+				else if(Game.current.player.currLevel == levelsList[worlds][i] && i == levelsList[worlds].Count - 1)
+				{
+					if(levelsList.Count > Game.current.player.world + 1)
+					{
+						if(levelsList[Game.current.player.world+1].Count > 0 && levelsList[Game.current.player.world+1][0] != null) 
+						{
+							Game.current.player.currLevel = levelsList[Game.current.player.world+1][0];
+							// Only call this if the level has not already been reached 
+							if (CheckLevel (levelsList[Game.current.player.world+1][0])) 
+							{ 
+								Game.current.player.world ++;
+								Game.current.player.highestLevel = levelsList[Game.current.player.world][0];
+								List<string> temp = new List<string>();
+								Game.current.player.levelsList.Add(temp);
+								Game.current.player.levelsList[Game.current.player.world].Add(levelsList[Game.current.player.world][0]); 
+							} // end if statement 
+							Save.SaveThis (); 
+							return;
+						} // end if statement 
+					}
+				}
 			}
-		}
-	}
-	void GetLevels(ref List<string> levelsList)
-	{
-		if (levelsList != null)
-			levelsList.Clear ();
-		levelsList = new List<string> ();
-		string dirName = Directory.GetCurrentDirectory () + "/Assets/Levels";
-		DirectoryInfo dir = new DirectoryInfo(dirName);
-		FileInfo[] info = dir.GetFiles("*.csv");
-		foreach (FileInfo f in info) 
-		{ 
-			levelsList.Add(f.Name);
 		}
 	}
 	public RotationGroup GetRotationalGroup(int x, int y)
