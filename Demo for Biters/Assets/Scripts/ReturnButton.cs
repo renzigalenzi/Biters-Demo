@@ -10,7 +10,7 @@ public class ReturnButton : MonoBehaviour {
 	
 	public void OnClick() {
 		
-		Application.LoadLevel ("MainMenu"); 
+		Application.LoadLevel ("PlayerMenu"); 
 		
 	} // end OnClick
 
