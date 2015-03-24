@@ -117,10 +117,10 @@ public class GridSquare
 	{
 		GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
 		Vector3 scale = go.transform.localScale;
-		scale.x = .90F; scale.y = .90F; scale.z = .90F;
+		scale.x = .75F; scale.y = .75F; scale.z = .75F;
 		go.transform.localScale = scale;
-		go.transform.position = new Vector3(x,y,-.5f);
-		go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+		go.transform.position = new Vector3(x,y,-.75f);
+		go.transform.Rotate (0,180.0f,0);
 		go.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
 		subType = GridSquareTileType;
 		subObject = go;
@@ -129,10 +129,10 @@ public class GridSquare
 	{
 		GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
 		Vector3 scale = go.transform.localScale;
-		scale.x = .90F; scale.y = .90F; scale.z = .90F;
+		scale.x = 0.5F; scale.y = 0.5F; scale.z = 1F;
 		go.transform.localScale = scale;
-		go.transform.position = new Vector3(x,y,-.5f);
-		go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+		go.transform.position = new Vector3(x,y,-1.0f);
+		go.transform.Rotate (0, 180.0f, 0);
 		go.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
 		subType = GridSquareTileType;
 		subObject = go;
@@ -366,12 +366,16 @@ public class GridSquare
 	}
 	public bool IsBelt()
 	{
+		//Use a Dictionary (and make it static...), otherwise just use a switch statement: Both are faster in every case like this.
+		//Also add this function as a static function extension to TileType.
+
 		List<TileType> Belts = new List<TileType> (new TileType[] {TileType.BeltVertical, TileType.BeltHorizontal, 
 			TileType.BeltUpLeft, TileType.BeltUpRight, TileType.BeltDownRight, TileType.BeltDownLeft, 
 			TileType.BeltUpT, TileType.BeltRightT, TileType.BeltDownT, TileType.BeltLeftT, TileType.BeltCross});
 
 		return Belts.Contains (GridSquareTileType);
 	}
+
 	public bool IsGate()
 	{
 		List<TileType> Gates = new List<TileType> (new TileType[] {TileType.And, TileType.Or, 
@@ -379,11 +383,18 @@ public class GridSquare
 		
 		return Gates.Contains (GridSquareTileType);
 	}
+
 	public bool IsEnter()
 	{
-		List<TileType> Enters = new List<TileType> (new TileType[] {TileType.EnterOne, TileType.EnterRandom, 
-			TileType.EnterZero});
-		
-		return Enters.Contains (GridSquareTileType);
+		bool isEnter = false;
+
+		switch (this.GridSquareTileType) {
+		case TileType.EnterOne:
+		case TileType.EnterZero:
+		case TileType.EnterRandom:
+			isEnter = true; break;
+		}
+
+		return isEnter;
 	}
 }
