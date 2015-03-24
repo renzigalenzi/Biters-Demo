@@ -246,6 +246,13 @@ public class Instantiation : MonoBehaviour
 				// All cubes will need a ray layer later so that when you click the monster sprites, it won't interfere with changing gates
 				GameObject pObject = hit.transform.gameObject;
 				RotationGroup rg;
+				foreach(GridSquare square in InstantiationGridSquareGrid)
+				{
+					if(pObject == square.subObject)
+					{
+						pObject = square.GridSquareGameObject;
+					}
+				}
 				rg = GetRotationalGroup(XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y);
 				if(
 					pObject.GetComponent<Renderer>().sharedMaterial != MaterialDictionary["And"] && 
@@ -298,7 +305,9 @@ public class Instantiation : MonoBehaviour
 					}
 					AudioSource.PlayClipAtPoint(gateSound, Camera.main.transform.position);
 	                InstantiationGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].GridSquareTileType = tileType;
+					InstantiationGridSquareGrid[XOFFSET + (int)pObject.transform.position.x, YOFFSET - (int)pObject.transform.position.y].SetSubCubeAsMain();
 				}
+
 			}
 		}
 		if(Input.GetMouseButtonDown(1)&& !bRightMouseClicked)
@@ -729,11 +738,12 @@ public class Instantiation : MonoBehaviour
 				InstantiationGridSquareGrid [rg.xAt (i + 1), rg.yAt (i + 1)].GridSquareTileType;
 			InstantiationGridSquareGrid [rg.xAt (i), rg.yAt (i)].GridSquareGameObject.GetComponent<Renderer>().material = 
 				InstantiationGridSquareGrid [rg.xAt (i+1), rg.yAt (i+1)].GridSquareGameObject.GetComponent<Renderer>().sharedMaterial;
+			InstantiationGridSquareGrid [rg.xAt (i), rg.yAt (i)].SetSubCubeAsMain();
 		}
 
 		InstantiationGridSquareGrid [rg.xAt (rg.getCount () - 1), rg.yAt (rg.getCount () - 1)].GridSquareTileType = tempTileType;
 		InstantiationGridSquareGrid [rg.xAt (rg.getCount () - 1), rg.yAt (rg.getCount () - 1)].GridSquareGameObject.GetComponent<Renderer>().sharedMaterial = tempTileMaterial;
-		
+		InstantiationGridSquareGrid [rg.xAt (rg.getCount () - 1), rg.yAt (rg.getCount () - 1)].SetSubCubeAsMain();
 		
 	}
 	public static void PrintMessage(string printStatement)
