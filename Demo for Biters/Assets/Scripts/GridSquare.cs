@@ -39,7 +39,7 @@ public class GridSquare
 	public List<GridSquare> MovePossibilities = new List<GridSquare>();
 	public Quaternion OriginalRotationValue { get; set; }
 
-	private GameObject nextObject;
+	private GameObject subObject;
 	private TileType nextType;
 
     public GridSquare()
@@ -111,7 +111,8 @@ public class GridSquare
 		go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
 		go.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
 //		nextType = gridSquareTileType;
-		nextObject = go;
+		//go.
+		subObject = go;
 	}
 	public void MakeDepthGateCube(float x, float y)
 	{
@@ -122,6 +123,7 @@ public class GridSquare
 		go.transform.position = new Vector3(x,y,-.5f);
 		go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
 		go.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
+		subObject = go;
 	}
 	public void MakeDepthEnterCube(float x, float y)
 	{
@@ -132,21 +134,22 @@ public class GridSquare
 		go.transform.position = new Vector3(x,y,-.5f);
 		go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
 		go.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
+		subObject = go;
 	}
 	public void SetNextCubeNumber(int num)
 	{
 		GridSquareTileType = nextType;
 		GridSquareGameObject.GetComponent<Renderer>().material = 
-			nextObject.GetComponent<Renderer>().material;
+			subObject.GetComponent<Renderer>().material;
 		if(num == 0)
 		{
 			nextType = TileType.ExitZero;
-			nextObject.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)nextType)];
+			subObject.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)nextType)];
 		}
 		else if(num == 1)
 		{
 			nextType = TileType.ExitOne;
-			nextObject.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)nextType)];
+			subObject.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)nextType)];
 		}
 
 	}
@@ -154,16 +157,16 @@ public class GridSquare
 	{
 		GridSquareTileType = nextType;
 		GridSquareGameObject.GetComponent<Renderer>().material = 
-			nextObject.GetComponent<Renderer>().material;
+			subObject.GetComponent<Renderer>().material;
 		if(nextType == TileType.ExitOne)
 		{
 			nextType = TileType.ExitZero;
-			nextObject.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)nextType)];
+			subObject.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)nextType)];
 		}
 		else if(nextType == TileType.ExitZero)
 		{
 			nextType = TileType.ExitOne;
-			nextObject.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)nextType)];
+			subObject.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)nextType)];
 		}
 	}
 	public void RotateSquareByMaterial()
