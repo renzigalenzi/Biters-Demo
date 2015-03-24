@@ -71,7 +71,7 @@ public class Pause : MonoBehaviour {
 			level = Application.loadedLevelName; 
 			PlayerPrefs.SetString("SavedLevel",level);
 			// Application.Quit (); 
-			Application.LoadLevel ("MainMenu"); 
+			Application.LoadLevel ("PlayerMenu"); 
 
 		} // end if 
 

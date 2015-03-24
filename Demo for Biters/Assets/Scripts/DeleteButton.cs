@@ -16,7 +16,7 @@ public class DeleteButton : MonoBehaviour {
 		Game.current = new Game ();
 		Game.current.id = temp; 
 		Save.SaveThis (); 
-		Application.LoadLevel ("MainMenu"); 
+		Application.LoadLevel ("PlayerMenu"); 
 		
 	} // end OnClick
 

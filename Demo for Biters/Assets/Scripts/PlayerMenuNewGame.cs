@@ -14,7 +14,8 @@ public class PlayerMenuNewGame : MonoBehaviour {
 		// PlayerPrefs.DeleteAll (); 
 		int temp = Game.current.id; 
 		Game.current = new Game ();
-		Game.current.id = temp; 
+		Game.current.player.name = "Play";
+		Game.current.id = 1; 
 		Save.SaveThis (); 
 		Application.LoadLevel ("Demo");
 		
