@@ -55,6 +55,7 @@
      <Compile Include="Assets\Scripts\LevelMenu.cs" />
      <Compile Include="Assets\Scripts\LevelSelectButton.cs" />
      <Compile Include="Assets\Scripts\Monster.cs" />
+     <Compile Include="Assets\Scripts\Movie.cs" />
      <Compile Include="Assets\Scripts\NewGame.cs" />
      <Compile Include="Assets\Scripts\Pause.cs" />
      <Compile Include="Assets\Scripts\PersistentScript.cs" />

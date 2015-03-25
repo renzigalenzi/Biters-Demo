@@ -1,8 +1,10 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/VideoTexture_Lite.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Movie.cs">
     <Files>
-      <File FileName="Assets/Scripts/VideoTexture_Lite.cs" Line="53" Column="5" />
+      <File FileName="Assets/Scripts/Pause.cs" Line="1" Column="1" />
+      <File FileName="Assets/Scripts/VideoTexture_Lite.cs" Line="121" Column="110" />
+      <File FileName="Assets/Scripts/Movie.cs" Line="17" Column="60" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
