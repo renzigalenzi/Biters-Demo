@@ -82,10 +82,10 @@ public class Instantiation : MonoBehaviour
             {
                 int y = 0;
                 string line = reader.ReadLine();
-                while(line != null && line[0] != '#')
+				while(line != null && line[0] != '#' && line[0] != '^')
                 {
                     string[] entries = line.Split(',');
-					for(int x = 0; x < entries.Length; x++)
+					for(int x = 0; x < InstantiationGridWidth; x++)
                     {
 						int intType = Convert.ToInt32(entries[x]);
                         new GridSquare(this, (TileType)intType, x, y);
@@ -102,9 +102,29 @@ public class Instantiation : MonoBehaviour
 						string[] entries = line.Split(',');
 						for(int x = 0; x < entries.Length; x+=2)
 						{
-							g.Add(Convert.ToInt32(entries[x]), Convert.ToInt32(entries[x+1]));
+							if(entries[x].Length > 0)
+								g.Add(Convert.ToInt32(entries[x]), Convert.ToInt32(entries[x+1]));
 						}
 						InstantiationRotationGroups.Add(g);
+						line = reader.ReadLine();
+					}while(line != null && line[0] == '#');
+				}
+				if(line != null && line[0] == '^')
+				{
+					do
+					{
+						List<string> queue = new List<string>();
+						line = line.Trim( new char[] {'^'});
+						line = line.Trim( new char[] {','});
+						string[] entries = line.Split(',');
+						int xpos = Convert.ToInt32(entries[0]);
+						int ypos = Convert.ToInt32(entries[1]);
+						for(int x = 2; x < entries.Length; x++)
+						{
+							queue.Add(entries[x]);
+						}
+						InstantiationGridSquareGrid[xpos,ypos].GridSquareExitQueue = queue;
+						InstantiationGridSquareGrid[xpos,ypos].OnlyChangeSubCube(Convert.ToInt32(queue[0]));
 						line = reader.ReadLine();
 					}while(line != null);
 				}
@@ -134,14 +154,18 @@ public class Instantiation : MonoBehaviour
 		using(reader)
 		{
 			string line = reader.ReadLine();
-			if(line != null && line[0] != '#')
+			if(line != null && line[0] != '#' && line[0] != '^')
 			{
 				string[] entries = line.Split(',');
-                InstantiationGridWidth = entries.Length;
+				foreach (string entry in entries)
+				{
+					if(entry.Length > 0)
+						InstantiationGridWidth++;
+				}
                 InstantiationGridHeight++;
 			}
             line = reader.ReadLine();
-			while(line != null && line[0] != '#')
+			while(line != null && line[0] != '#' && line[0] != '^')
 			{
                 InstantiationGridHeight++;
                 line = reader.ReadLine();
@@ -617,7 +641,14 @@ public class Instantiation : MonoBehaviour
 					if(InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece == WinCondition.Correct)
 					{
 						PlayerHealth = Math.Min(PlayerHealth + .3, 1);
-						int next = InstantiationGridSquareGrid[i,j].GridSquareTileType == TileType.ExitOne ? 1 : 0;
+						int next;
+						if(InstantiationGridSquareGrid[i,j].GridSquareExitQueue.Count > 0)
+						{
+							next = Convert.ToInt32(InstantiationGridSquareGrid[i,j].GridSquareExitQueue[0]);
+							InstantiationGridSquareGrid[i,j].GridSquareExitQueue.Remove(InstantiationGridSquareGrid[i,j].GridSquareExitQueue[0]);
+						}
+						else
+							next = InstantiationGridSquareGrid[i,j].GridSquareTileType == TileType.ExitOne ? 1 : 0;
 						InstantiationGridSquareGrid[i,j].SetNextCubeNumber(next);
 						InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece = WinCondition.NoPiece;
 						//LevelText.text = "Keep It Up!";
