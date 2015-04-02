@@ -2,98 +2,155 @@
 using System.Collections;
 using System.IO;
 
-public class Movie : MonoBehaviour
-{
-	//public Texture2D[] slides = new Texture2D[9];  //this is removed, no need to set the size its auto detected
+public class Movie : MonoBehaviour {
+
 	private Texture2D[] slides;
-	
-	private float changeTime = 0.04f;
-	public float framePerSec = 24f;
+	private FileInfo[] info; 
 	private int currentSlide = 0;
-	private float timeSinceLast = 1.0f;
 	private Texture currTex;
-	private Rect currRec; 
+	// Original Path Extension: "/Users/laurenfuller/Documents/Biters-Demo/DemoBiters/Assets/Resources/Panel1"
+	private string myPath = Directory.GetCurrentDirectory () + "/Assets/Resources/Clip1";
+	public string extention = "png";   
+	public int start2;
+	public int start3;
+	public int start4;
+	public int start5; 
+	public AudioSource sound1;
+	public AudioSource sound2;
+	public AudioSource sound3;
+	public AudioSource sound4; 
+	public AudioSource sound5; 
+	private bool play = true; 
+	private int counter = 101; 
+	private int totalFrames; 
 	
-	public string myPath = @"/Assets/Resources/Panel1"; // directory where all the *.jpg files are that need to be animated
-	public string extention = "png";      //extension you looking for
-	
-	void Start()
-	{
-		Debug.Log ("Finding files....");
-		getFiles(); //new added function
-		
-		if (slides != null)
-		{
-			//calc the time to change from fps
-			changeTime = 1.0f / framePerSec;
-			Debug.Log ("FPS change time is: "+changeTime);
+	void Start() {
 
+		Debug.Log ("Locating files, please standby.");
+		getFiles(); 
+		Application.targetFrameRate = 24; 
 
-			currTex = slides[currentSlide];
-			//currRec = new Rect(-slides[currentSlide].width/2, -slides[currentSlide].height/2, slides[currentSlide].width, slides[currentSlide].height);
-			GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), currTex, ScaleMode.ScaleToFit, true, 2.0f);
+		if (slides != null) {
+			
+			currTex = slides[currentSlide] as Texture;
 			currentSlide++;
-		}
-		else
-		{
-			Debug.Log ("Set reading directory and file type please");
-		}
-	}
+			sound1.Play(); 
+
+		} else {
+
+			Debug.Log ("Error 404: File Not Found.");
+
+		} // end if statement 
+
+	} // end void Start() 
 	
-	void Update()
-	{
-		if (slides != null)
-		{
-			if(timeSinceLast > changeTime  && currentSlide < slides.Length)
-			{
-				currTex = slides[currentSlide];
-				//currRec = new Rect(-slides[currentSlide].width/2, -slides[currentSlide].height/2, slides[currentSlide].width, slides[currentSlide].height);
-				GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), currTex, ScaleMode.ScaleToFit, true, 2.0f);
-				timeSinceLast = 0.0f;
+	void Update() {
+
+		if (slides != null)  {
+
+			/*
+			if (counter < (totalFrames-1)) { 
+
+				string filePath = info[counter].Directory + "/" + info[counter].Name;
+				Debug.Log("["+counter+"] file found: "+filePath);
+				
+				var bytes = System.IO.File.ReadAllBytes(filePath);
+				var tex = new Texture2D(1, 1);
+				
+				tex.LoadImage(bytes);
+				slides[counter] = tex;
+				
+				counter++; 
+
+				filePath = info[counter].Directory + "/" + info[counter].Name;
+				Debug.Log("["+counter+"] file found: "+filePath);
+				
+				bytes = System.IO.File.ReadAllBytes(filePath);
+				tex = new Texture2D(1, 1);
+				
+				tex.LoadImage(bytes);
+				slides[counter] = tex;
+
+				counter++; 
+
+			} // end if statement 
+			*/
+
+			// start audio files 
+			if (currentSlide == start2) 
+				sound2.Play(); 
+			if (currentSlide == start3)
+				sound3.Play(); 
+			if (currentSlide == start4)
+				sound4.Play(); 
+			if (currentSlide == start5)
+				sound5.Play(); 
+
+			if(play && currentSlide < slides.Length) {
+		
+				currTex = slides[currentSlide] as Texture;
 				currentSlide++;
-			}
-			timeSinceLast += Time.deltaTime;
-			
-			if(currentSlide == slides.Length)
-			{
-				currentSlide = 0;
-			}
-		}
-	}
+				play = false; 
+
+			} else { 
+
+				play = true; 
+
+			} // end if statement inner	
+
+		} // end if statement outer
+
+		//Debug.Log("The FPS is: " + ((1.0f / Time.smoothDeltaTime))); 
+
+	} // end Update()
+
+	void OnGUI() {
+
+		GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), currTex, ScaleMode.ScaleToFit, true, 2.0f);
+
+	} // end OnGUI()
 	
-	internal void getFiles()
-	{
-		if (System.IO.Directory.Exists(myPath))
-		{
+	void getFiles() {
+
+		if (Directory.Exists(myPath)) {
+
 			DirectoryInfo dir = new DirectoryInfo(myPath);
-			Debug.Log("Looking for files in dir: "+myPath);
+			Debug.Log("Looking for files in directory: " + myPath);
 			
-			FileInfo[] info = dir.GetFiles("*."+extention);
+			info = dir.GetFiles("*." + extention);
 			
 			// Get number of files, and set the length for the texture2d array
 			int totalFiles =  info.Length;
+			totalFrames = info.Length; 
 			slides = new Texture2D[totalFiles];
-			
+
 			int i = 0;
 			
 			//Read all found files
-			foreach (FileInfo f in info)
-			{
+			foreach (FileInfo f in info) {
+
 				string filePath = f.Directory + "/" + f.Name;
 				Debug.Log("["+i+"] file found: "+filePath);
 				
-				var bytes     = System.IO.File.ReadAllBytes(filePath);
-				var tex         = new Texture2D(1, 1);
+				var bytes = System.IO.File.ReadAllBytes(filePath);
+				var tex = new Texture2D(1, 1);
 				
 				tex.LoadImage(bytes);
 				slides[i] = tex;
 				
 				i++;
-			}
-		}
-		else
-		{
+
+				//if (i == 101) 
+				//	break; 
+
+			} // end foreach statement 
+
+		} else {
+
 			Debug.Log ("Directory DOES NOT exist! ");
-		}
-	}
-}
+
+		} // end if else statement 
+
+	} // end void getFiles()
+
+} // end Movie.cs 
