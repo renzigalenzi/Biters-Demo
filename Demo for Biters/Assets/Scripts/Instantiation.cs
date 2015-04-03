@@ -72,7 +72,7 @@ public class Instantiation : MonoBehaviour
     }
     public bool LoadLevel(string fileName)
     {
-        string filePath = "Assets/Levels/" + fileName;
+		string filePath = "Assets/Levels/" + fileName;
         try
         {
             InitializeGrid(filePath);
@@ -642,7 +642,7 @@ public class Instantiation : MonoBehaviour
 					{
 						PlayerHealth = Math.Min(PlayerHealth + .3, 1);
 						int next;
-						if(InstantiationGridSquareGrid[i,j].GridSquareExitQueue.Count > 0)
+						if(InstantiationGridSquareGrid[i,j].GridSquareExitQueue != null && InstantiationGridSquareGrid[i,j].GridSquareExitQueue.Count > 0)
 						{
 							next = Convert.ToInt32(InstantiationGridSquareGrid[i,j].GridSquareExitQueue[0]);
 							InstantiationGridSquareGrid[i,j].GridSquareExitQueue.Remove(InstantiationGridSquareGrid[i,j].GridSquareExitQueue[0]);
