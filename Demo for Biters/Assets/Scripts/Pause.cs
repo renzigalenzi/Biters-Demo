@@ -7,7 +7,6 @@ public class Pause : MonoBehaviour {
 	private bool isPause = false; 
 	public GUISkin window;
 	static string level; 
-	private float timer = 60.0f; 
 
 	// Use this for initialization
 	void OnGUI () {
@@ -87,16 +86,8 @@ public class Pause : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		timer -= Time.deltaTime; 
-		
-		if (timer <= 0) { 
-
-			timer = 0.0f; 
-			
-		} // end if  
-
 		// pause the game 
-		if (isPause || timer <= 0) { 
+		if (isPause) { 
 
 			PauseGame(); 
 
