@@ -51,7 +51,7 @@ public class Instantiation : MonoBehaviour
         InstantiationMonsters = new List<Monster>();
 		InstantiationRotationGroups = new List<RotationGroup> ();
         InstantiationNextMonsterId = 0;
-        InstantiationSpawnDelay = 100;
+        InstantiationSpawnDelay = 1000;
 
 		MaterialDictionary = new Dictionary<string, Material> ();
 		UnityEngine.Object[] Materials = Resources.LoadAll("", typeof(Material));
@@ -73,7 +73,7 @@ public class Instantiation : MonoBehaviour
     }
     public bool LoadLevel(string fileName)
     {
-        string filePath = "Assets/Levels/" + fileName;
+		string filePath = "Assets/Levels/" + fileName;
         try
         {
             InitializeGrid(filePath);
