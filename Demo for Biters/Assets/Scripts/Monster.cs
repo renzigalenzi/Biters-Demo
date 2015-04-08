@@ -67,7 +67,7 @@ public class Monster
         {
             case NumberType.Zero:
 			MonsterGameObject.GetComponent<Renderer>().material = MonsterInstantiation.MaterialDictionary["BiterZero"];
-			MonsterGameObject.transform.localScale = new Vector3(0.25F, 0.5F, 0.0F);
+			MonsterGameObject.transform.localScale = new Vector3(-0.25F, 0.5F, 0.0F);
                 break;
             case NumberType.One:
 			MonsterGameObject.GetComponent<Renderer>().material = MonsterInstantiation.MaterialDictionary["BiterOne"];
