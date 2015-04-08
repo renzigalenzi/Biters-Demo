@@ -33,7 +33,7 @@ public class Pause : MonoBehaviour {
 	void ShowPause(int windowID) { 
 
 		// reloads the level, thereby restarting it 
-		if (GUI.Button (new Rect ((Screen.width/2) - 50, (Screen.height/2) - 100, 100, 25), "Reset Level")) { 
+		if (GUI.Button (new Rect ((Screen.width/2) - 100, (Screen.height/2) - 90, 200, 50), "Restart")) { 
 			UnPauseGame (); 
 			Application.LoadLevel (Application.loadedLevelName); 
 
@@ -41,7 +41,7 @@ public class Pause : MonoBehaviour {
 		} // end if 
 
 		// turns sound on and off 
-		if (GUI.Button (new Rect ((Screen.width/2) - 50, (Screen.height/2) - 70, 100, 25), "Sound")) { 
+		if (GUI.Button (new Rect ((Screen.width/2) - 100, (Screen.height/2) + 30, 200, 50), "Sound")) { 
 			
 			if (AudioListener.volume != 0) {
 
@@ -56,7 +56,7 @@ public class Pause : MonoBehaviour {
 		} // end if  
 
 		// goes back to main menu, lose game progress in the process 
-		if (GUI.Button (new Rect ((Screen.width/2) - 50, (Screen.height/2) - 40, 100, 25), "Player Menu")) { 
+		if (GUI.Button (new Rect ((Screen.width/2) - 100, (Screen.height/2) - 30, 200, 50), "Main Menu")) { 
 
 			UnPauseGame (); 
 			Application.LoadLevel ("PlayerMenu"); 
@@ -64,7 +64,7 @@ public class Pause : MonoBehaviour {
 		} // end if 
 
 		// quit the application 
-		if (GUI.Button (new Rect ((Screen.width/2) - 50, (Screen.height/2) - 10, 100, 25), "Save and Quit")) { 
+		if (GUI.Button (new Rect ((Screen.width/2) - 100, (Screen.height/2) + 90, 200, 50), "Save and Quit")) { 
 
 			UnPauseGame (); 
 			level = Application.loadedLevelName; 
@@ -74,7 +74,7 @@ public class Pause : MonoBehaviour {
 
 		} // end if 
 
-		if (GUI.Button (new Rect ((Screen.width/2) - 50, (Screen.height/2) + 50, 100, 25), "Continue")) { 
+		if (GUI.Button (new Rect ((Screen.width/2) - 100, (Screen.height/2) - 150, 200, 50), "Return")) { 
 			UnPauseGame (); 
 			pauseMenu = false; 
 			isPause = false; 
