@@ -28,6 +28,7 @@ public enum WinCondition
 
 public class GridSquare
 {
+	public List<string> GridSquareExitQueue{ get; set; }
     public GameObject GridSquareGameObject { get; set; }
     public Instantiation GridSquareInstantiation { get; set; }
     public TileType GridSquareTileType { get; set; }
@@ -142,6 +143,19 @@ public class GridSquare
 		subType = GridSquareTileType;
 		subObject.GetComponent<Renderer>().material = 
 			GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)subType)];
+	}
+	public void OnlyChangeSubCube(int num)
+	{
+		if(num == 0)
+		{
+			subType = TileType.ExitZero;
+			subObject.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)subType)];
+		}
+		else if(num == 1)
+		{
+			subType = TileType.ExitOne;
+			subObject.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)subType)];
+		}
 	}
 	public void SetNextCubeNumber(int num)
 	{
