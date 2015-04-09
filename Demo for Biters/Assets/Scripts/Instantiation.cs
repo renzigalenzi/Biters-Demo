@@ -35,6 +35,7 @@ public class Instantiation : MonoBehaviour
 	Vector3 RightClickedCurrentPoint;
 	float RayDistance = 4.5f;
 
+	String InstantiationTutorialString = "";
 
 	public AudioClip gateSound;
 	
@@ -50,7 +51,7 @@ public class Instantiation : MonoBehaviour
         InstantiationMonsters = new List<Monster>();
 		InstantiationRotationGroups = new List<RotationGroup> ();
         InstantiationNextMonsterId = 0;
-        InstantiationSpawnDelay = 100;
+        InstantiationSpawnDelay = 400;
 
 		MaterialDictionary = new Dictionary<string, Material> ();
 		UnityEngine.Object[] Materials = Resources.LoadAll("", typeof(Material));
@@ -72,7 +73,7 @@ public class Instantiation : MonoBehaviour
     }
     public bool LoadLevel(string fileName)
     {
-        string filePath = "Assets/Levels/" + fileName;
+		string filePath = "Assets/Levels/" + fileName;
         try
         {
             InitializeGrid(filePath);
@@ -82,7 +83,7 @@ public class Instantiation : MonoBehaviour
             {
                 int y = 0;
                 string line = reader.ReadLine();
-				while(line != null && line[0] != '#' && line[0] != '^')
+				while(line != null && line[0] != '#' && line[0] != '^' && line[0] != '&')
                 {
                     string[] entries = line.Split(',');
 					for(int x = 0; x < InstantiationGridWidth; x++)
@@ -126,7 +127,14 @@ public class Instantiation : MonoBehaviour
 						InstantiationGridSquareGrid[xpos,ypos].GridSquareExitQueue = queue;
 						InstantiationGridSquareGrid[xpos,ypos].OnlyChangeSubCube(Convert.ToInt32(queue[0]));
 						line = reader.ReadLine();
-					}while(line != null);
+					}while(line != null && line[0] == '^');
+				}
+				if(line != null && line[0] == '&')
+				{
+					line = line.Trim( new char[] {'&'});
+					InstantiationTutorialString = line;
+					InstantiationTutorialString = InstantiationTutorialString.Trim(',');
+					line = reader.ReadLine();
 				}
                 reader.Close();
 
@@ -154,7 +162,7 @@ public class Instantiation : MonoBehaviour
 		using(reader)
 		{
 			string line = reader.ReadLine();
-			if(line != null && line[0] != '#' && line[0] != '^')
+			if(line != null && line[0] != '#' && line[0] != '^' && line[0] != '&')
 			{
 				string[] entries = line.Split(',');
 				foreach (string entry in entries)
@@ -165,7 +173,7 @@ public class Instantiation : MonoBehaviour
                 InstantiationGridHeight++;
 			}
             line = reader.ReadLine();
-			while(line != null && line[0] != '#' && line[0] != '^')
+			while(line != null && line[0] != '#' && line[0] != '^' && line[0] != '&')
 			{
                 InstantiationGridHeight++;
                 line = reader.ReadLine();
@@ -179,6 +187,7 @@ public class Instantiation : MonoBehaviour
 		//create top
 		for(int i = -1; i < InstantiationGridWidth+1; i++)
 		{
+			CreateWall(i - Instantiation.XOFFSET, Instantiation.YOFFSET + 1);
 			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			go.transform.position = new Vector3(i - Instantiation.XOFFSET, Instantiation.YOFFSET + 1, 0);
 			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
@@ -210,6 +219,23 @@ public class Instantiation : MonoBehaviour
 		}
 			
 	}
+	public void CreateWall(int x, int y)
+	{
+		for( int z = 0; z < 4; z++)
+		{
+			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			go.transform.position = new Vector3(x, y, -z); 
+			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+			if(z == 1 && x == 1)
+				go.GetComponent<Renderer>().material = MaterialDictionary["WallF2"];
+			else if (z == 1)
+				go.GetComponent<Renderer>().material = MaterialDictionary["WallF1"];
+			else if (z == 2)
+				go.GetComponent<Renderer>().material = MaterialDictionary["WallC1"];
+			else if (z == 3)
+				go.GetComponent<Renderer>().material = MaterialDictionary["WallT1"];
+		}
+	}
 	void Update () 
 	{
 		if (fLevelStartTimer > 0) 
@@ -240,8 +266,20 @@ public class Instantiation : MonoBehaviour
 	} 
 	void OnGUI () 
 	{
+
 		MakeMapControls ();
 		GUI.Box (new Rect (Screen.width - 50, 0, 50, 20), "" + fLevelStartTimer.ToString ("f0")); 
+
+		if(InstantiationTutorialString.Length > 0)
+		{
+			GUIStyle style = new GUIStyle(GUI.skin.textField);
+			style.wordWrap = true;
+			InstantiationTutorialString = GUI.TextField(new Rect(20, Screen.height - 250, 200, 150), InstantiationTutorialString, style);
+			if (GUI.Button (new Rect (195, Screen.height - 273, 23, 23), "X")) 
+			{
+				InstantiationTutorialString = ""; 
+			}
+		}
 
 		if(bLevelWon)
 		{
@@ -412,19 +450,19 @@ public class Instantiation : MonoBehaviour
 		{
             for(int y = 0; y < InstantiationGridHeight; y++) 
 			{
-				if(InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterZero && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn == 0)
+				if(InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterZero && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn <= 0)
 				{
 					Monster monster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, NumberType.Zero, x, y, MovementDirection.None);
 					InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
                     InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn = InstantiationSpawnDelay;
 				}
-				if(InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn == 0)
+				if(InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn <= 0)
 				{
 					Monster monster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, NumberType.One, x, y, MovementDirection.None);
 					InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
 					InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn = InstantiationSpawnDelay;
 				}
-				else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterRandom && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn == 0)
+				else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterRandom && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn <= 0)
 				{
 					var number = UnityEngine.Random.Range(0,2);
 					NumberType numType = number == 0 ? NumberType.Zero : NumberType.One;
@@ -434,7 +472,7 @@ public class Instantiation : MonoBehaviour
 				}
 				else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterZero || InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne|| InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterRandom)
 				{
-					InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn--;
+					InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn-= (int) Time.timeScale;
 				}
 			}
 		}
@@ -609,8 +647,6 @@ public class Instantiation : MonoBehaviour
 		//assign the current tile to win or lose from blank. cant be assigned unless blank or win.(if you lose you lose)
 		//check all tiles, if any of the end pieces are lose then return you lose
 		//if the amount of winning tiles == the number of end pieces then you win
-		bool PlayerLost = false;
-
 		if(monster.MonsterNumberType == NumberType.One && InstantiationGridSquareGrid[x,y].GridSquareTileType == TileType.ExitOne || 
 		   monster.MonsterNumberType == NumberType.Zero && InstantiationGridSquareGrid[x,y].GridSquareTileType == TileType.ExitZero)
 		{
@@ -642,7 +678,7 @@ public class Instantiation : MonoBehaviour
 					{
 						PlayerHealth = Math.Min(PlayerHealth + .3, 1);
 						int next;
-						if(InstantiationGridSquareGrid[i,j].GridSquareExitQueue.Count > 0)
+						if(InstantiationGridSquareGrid[i,j].GridSquareExitQueue != null && InstantiationGridSquareGrid[i,j].GridSquareExitQueue.Count > 0)
 						{
 							next = Convert.ToInt32(InstantiationGridSquareGrid[i,j].GridSquareExitQueue[0]);
 							InstantiationGridSquareGrid[i,j].GridSquareExitQueue.Remove(InstantiationGridSquareGrid[i,j].GridSquareExitQueue[0]);
@@ -705,7 +741,6 @@ public class Instantiation : MonoBehaviour
 			{
 				for (int i = 0; i < Game.current.player.levelsList[worlds].Count; i++) 
 				{ 
-					int world = Game.current.player.world;
 					if (Game.current.player.levelsList[worlds].Count > i && lvl == Game.current.player.levelsList[worlds][i]) 
 					{ 
 						return false; 

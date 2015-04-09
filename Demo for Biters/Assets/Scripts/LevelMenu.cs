@@ -9,7 +9,6 @@ public class LevelMenu : MonoBehaviour {
 	private Vector2 scrollPosition = Vector2.zero;
 
 	private static List<List<string>> levelsList;
-	PersistentScript persistentScript;
 
 	public int WorldCount = 0;
 	// Use this for initialization
@@ -36,8 +35,6 @@ public class LevelMenu : MonoBehaviour {
 	
 	public void Start()
 	{
-		GameObject persistentGameObject = GameObject.Find("PersistentData");
-		persistentScript = (PersistentScript)persistentGameObject.GetComponent(typeof(PersistentScript));
 	}
 	
 	// Update is called once per frame

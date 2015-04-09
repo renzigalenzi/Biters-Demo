@@ -12,7 +12,6 @@ public class PlayerMenuNewGame : MonoBehaviour {
 		
 		// Note: I believe this is a memory leak. 
 		// PlayerPrefs.DeleteAll (); 
-		int temp = Game.current.id; 
 		Game.current = new Game ();
 		Game.current.player.name = "Play";
 		Game.current.id = 1; 
