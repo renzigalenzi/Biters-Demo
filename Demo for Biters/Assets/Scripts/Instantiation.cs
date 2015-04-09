@@ -51,7 +51,7 @@ public class Instantiation : MonoBehaviour
         InstantiationMonsters = new List<Monster>();
 		InstantiationRotationGroups = new List<RotationGroup> ();
         InstantiationNextMonsterId = 0;
-        InstantiationSpawnDelay = 1000;
+        InstantiationSpawnDelay = 400;
 
 		MaterialDictionary = new Dictionary<string, Material> ();
 		UnityEngine.Object[] Materials = Resources.LoadAll("", typeof(Material));
@@ -221,12 +221,19 @@ public class Instantiation : MonoBehaviour
 	}
 	public void CreateWall(int x, int y)
 	{
-		for( int z = 0; z < 5; z++)
+		for( int z = 0; z < 4; z++)
 		{
 			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			go.transform.position = new Vector3(x, y, -z); 
 			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
-			go.GetComponent<Renderer>().material = MaterialDictionary["Border"];
+			if(z == 1 && x == 1)
+				go.GetComponent<Renderer>().material = MaterialDictionary["WallF2"];
+			else if (z == 1)
+				go.GetComponent<Renderer>().material = MaterialDictionary["WallF1"];
+			else if (z == 2)
+				go.GetComponent<Renderer>().material = MaterialDictionary["WallC1"];
+			else if (z == 3)
+				go.GetComponent<Renderer>().material = MaterialDictionary["WallT1"];
 		}
 	}
 	void Update () 
@@ -443,19 +450,19 @@ public class Instantiation : MonoBehaviour
 		{
             for(int y = 0; y < InstantiationGridHeight; y++) 
 			{
-				if(InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterZero && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn == 0)
+				if(InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterZero && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn <= 0)
 				{
 					Monster monster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, NumberType.Zero, x, y, MovementDirection.None);
 					InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
                     InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn = InstantiationSpawnDelay;
 				}
-				if(InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn == 0)
+				if(InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn <= 0)
 				{
 					Monster monster = new Monster(this, InstantiationNextMonsterId, MovementType.Moving, NumberType.One, x, y, MovementDirection.None);
 					InstantiationGridSquareGrid[x, y].CalculateNewDirection(monster);
 					InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn = InstantiationSpawnDelay;
 				}
-				else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterRandom && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn == 0)
+				else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterRandom && InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn <= 0)
 				{
 					var number = UnityEngine.Random.Range(0,2);
 					NumberType numType = number == 0 ? NumberType.Zero : NumberType.One;
@@ -465,7 +472,7 @@ public class Instantiation : MonoBehaviour
 				}
 				else if (InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterZero || InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterOne|| InstantiationGridSquareGrid[x, y].GridSquareTileType == TileType.EnterRandom)
 				{
-					InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn--;
+					InstantiationGridSquareGrid[x, y].GridSquareTimeToNextSpawn-= (int) Time.timeScale;
 				}
 			}
 		}
