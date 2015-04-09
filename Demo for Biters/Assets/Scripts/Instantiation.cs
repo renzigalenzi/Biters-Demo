@@ -221,12 +221,19 @@ public class Instantiation : MonoBehaviour
 	}
 	public void CreateWall(int x, int y)
 	{
-		for( int z = 0; z < 5; z++)
+		for( int z = 0; z < 4; z++)
 		{
 			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			go.transform.position = new Vector3(x, y, -z); 
 			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
-			go.GetComponent<Renderer>().material = MaterialDictionary["Border"];
+			if(z == 1 && x == 1)
+				go.GetComponent<Renderer>().material = MaterialDictionary["WallF2"];
+			else if (z == 1)
+				go.GetComponent<Renderer>().material = MaterialDictionary["WallF1"];
+			else if (z == 2)
+				go.GetComponent<Renderer>().material = MaterialDictionary["WallC1"];
+			else if (z == 3)
+				go.GetComponent<Renderer>().material = MaterialDictionary["WallT1"];
 		}
 	}
 	void Update () 
