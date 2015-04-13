@@ -6,7 +6,6 @@ public class Movie : MonoBehaviour {
 
 	private Texture2D[] slides;
 	private FileInfo[] info; 
-	private int currentSlide = 0;
 	private Texture currTex;
 	// Original Path Extension: "/Users/laurenfuller/Documents/Biters-Demo/DemoBiters/Assets/Resources/Panel1"
 	private string myPath = Directory.GetCurrentDirectory () + "/Assets/Resources/Clip1";
@@ -21,19 +20,16 @@ public class Movie : MonoBehaviour {
 	public AudioSource sound4; 
 	public AudioSource sound5; 
 	private bool play = true; 
-	private int counter = 101; 
-	private int totalFrames; 
+	private int counter = 1; 
 	
 	void Start() {
 
 		Debug.Log ("Locating files, please standby.");
 		getFiles(); 
-		Application.targetFrameRate = 24; 
 
 		if (slides != null) {
 			
-			currTex = slides[currentSlide] as Texture;
-			currentSlide++;
+			currTex = slides[0] as Texture;
 			sound1.Play(); 
 
 		} else {
@@ -48,55 +44,42 @@ public class Movie : MonoBehaviour {
 
 		if (slides != null)  {
 
-			/*
-			if (counter < (totalFrames-1)) { 
+			// start audio files 
+			if (!sound1.isPlaying && counter == 1) {
 
-				string filePath = info[counter].Directory + "/" + info[counter].Name;
-				Debug.Log("["+counter+"] file found: "+filePath);
-				
-				var bytes = System.IO.File.ReadAllBytes(filePath);
-				var tex = new Texture2D(1, 1);
-				
-				tex.LoadImage(bytes);
-				slides[counter] = tex;
-				
+				sound2.Play(); 
 				counter++; 
-
-				filePath = info[counter].Directory + "/" + info[counter].Name;
-				Debug.Log("["+counter+"] file found: "+filePath);
-				
-				bytes = System.IO.File.ReadAllBytes(filePath);
-				tex = new Texture2D(1, 1);
-				
-				tex.LoadImage(bytes);
-				slides[counter] = tex;
-
-				counter++; 
+				currTex = slides[start2] as Texture;
 
 			} // end if statement 
-			*/
 
-			// start audio files 
-			if (currentSlide == start2) 
-				sound2.Play(); 
-			if (currentSlide == start3)
+			if (!sound2.isPlaying && counter == 2) {
+
 				sound3.Play(); 
-			if (currentSlide == start4)
+				counter++; 
+				currTex = slides[start3] as Texture;
+
+			} // end if statement 
+
+			if (!sound3.isPlaying && counter == 3) {
+
 				sound4.Play(); 
-			if (currentSlide == start5)
+				counter++; 
+				currTex = slides[start4] as Texture;
+
+			} // end if statement 
+
+			if (!sound4.isPlaying && counter == 4) {
+
 				sound5.Play(); 
+				counter++; 
+				currTex = slides[start5] as Texture;
 
-			if(play && currentSlide < slides.Length) {
-		
-				currTex = slides[currentSlide] as Texture;
-				currentSlide++;
-				play = false; 
+			} // end if statement 
 
-			} else { 
 
-				play = true; 
+			// currTex = slides[currentSlide] as Texture;
 
-			} // end if statement inner	
 
 		} // end if statement outer
 
@@ -121,7 +104,6 @@ public class Movie : MonoBehaviour {
 			
 			// Get number of files, and set the length for the texture2d array
 			int totalFiles =  info.Length;
-			totalFrames = info.Length; 
 			slides = new Texture2D[totalFiles];
 
 			int i = 0;
@@ -139,9 +121,6 @@ public class Movie : MonoBehaviour {
 				slides[i] = tex;
 				
 				i++;
-
-				//if (i == 101) 
-				//	break; 
 
 			} // end foreach statement 
 
