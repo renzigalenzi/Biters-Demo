@@ -62,16 +62,16 @@ public class Monster
         MonsterMovementIncrement = 0.01F;
 
         MonsterGameObject.transform.position = new Vector3(MonsterXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - MonsterYPosition, -0.8f);
-		MonsterGameObject.transform.Rotate (90.0f, 180.0f, 0.0f);
+		MonsterGameObject.transform.Rotate (270.0f, 0.0f, 0.0f);
         switch(MonsterNumberType)
         {
             case NumberType.Zero:
 			MonsterGameObject.GetComponent<Renderer>().material = MonsterInstantiation.MaterialDictionary["BiterZero"];
-			MonsterGameObject.transform.localScale = new Vector3(-0.25F, 0.5F, 0.0F);
+			MonsterGameObject.transform.localScale = new Vector3(0.25F, 0.5F, 0.01F);
                 break;
             case NumberType.One:
 			MonsterGameObject.GetComponent<Renderer>().material = MonsterInstantiation.MaterialDictionary["BiterOne"];
-			MonsterGameObject.transform.localScale = new Vector3(-0.25F, 0.5F, 0.0F);
+			MonsterGameObject.transform.localScale = new Vector3(0.25F, 0.5F, 0.01F);
                 break;
             default:
                 Instantiation.PrintMessage("Invalid MonsterNumberType - Monster(Instantiation monsterInstantiation, int monsterId, MovementType monsterMovementType, NumberType monsterNumberType, int monsterXPosition, int monsterYPosition, MovementDirection monsterMovementDirection)");
