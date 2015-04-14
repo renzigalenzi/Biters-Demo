@@ -51,7 +51,7 @@ public class Instantiation : MonoBehaviour
         InstantiationMonsters = new List<Monster>();
 		InstantiationRotationGroups = new List<RotationGroup> ();
         InstantiationNextMonsterId = 0;
-        InstantiationSpawnDelay = 400;
+        InstantiationSpawnDelay = 800;
 
 		MaterialDictionary = new Dictionary<string, Material> ();
 		UnityEngine.Object[] Materials = Resources.LoadAll("", typeof(Material));
@@ -274,8 +274,8 @@ public class Instantiation : MonoBehaviour
 		{
 			GUIStyle style = new GUIStyle(GUI.skin.textField);
 			style.wordWrap = true;
-			InstantiationTutorialString = GUI.TextField(new Rect(20, Screen.height - 250, 200, 150), InstantiationTutorialString, style);
-			if (GUI.Button (new Rect (195, Screen.height - 273, 23, 23), "X")) 
+			InstantiationTutorialString = GUI.TextField(new Rect(Screen.width/3, Screen.height/3, Screen.width/4, Screen.height/4), InstantiationTutorialString, style);
+			if (GUI.Button (new Rect (Screen.width/3 + Screen.width/4 - 23, Screen.height/3 - 23, 23, 23), "X")) 
 			{
 				InstantiationTutorialString = ""; 
 			}
@@ -430,6 +430,10 @@ public class Instantiation : MonoBehaviour
 
 	void MakeMapControls()
 	{
+		if (GUI.Button (new Rect (Screen.width- 300, 50, 50, 20), "1/2")) 
+		{
+			Time.timeScale = 0.5f;
+		}
 		if (GUI.Button (new Rect (Screen.width- 250, 50, 50, 20), ">")) 
 		{
 			Time.timeScale = 1.0f;
@@ -669,7 +673,7 @@ public class Instantiation : MonoBehaviour
 				{
 					if(InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece == WinCondition.Incorrect)
 					{
-						PlayerHealth = Math.Max(PlayerHealth - .6, -1);
+						PlayerHealth = Math.Max(PlayerHealth - .3, -1);
 						InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece = WinCondition.NoPiece;
 						//LevelText.text = "Oh No!";
 						//StartTextAlpha = 1.0f;
@@ -704,7 +708,7 @@ public class Instantiation : MonoBehaviour
 		if (PlayerHealth <= -1)
 		{
 			//PrintMessage ("YOU LOSE!");
-			bLevelLost = true;
+			bLevelLost = false;
 			LevelText.text = "YOU LOSE!";
 			/*GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			cube.transform.position = new Vector3(0, 0, 0);
