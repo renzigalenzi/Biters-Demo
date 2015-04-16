@@ -430,11 +430,11 @@ public class Instantiation : MonoBehaviour
 
 	void MakeMapControls()
 	{
-		if (GUI.Button (new Rect (Screen.width- 300, 50, 50, 20), "1/2")) 
+		if (GUI.Button (new Rect (Screen.width- 300, 50, 60, 40), "1/2")) 
 		{
 			Time.timeScale = 0.5f;
 		}
-		if (GUI.Button (new Rect (Screen.width- 250, 50, 50, 20), ">")) 
+		if (GUI.Button (new Rect (Screen.width- 250, 50, 60, 40), ">")) 
 		{
 			Time.timeScale = 1.0f;
 		}
