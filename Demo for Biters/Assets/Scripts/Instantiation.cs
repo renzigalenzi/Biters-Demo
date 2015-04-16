@@ -17,7 +17,7 @@ public class Instantiation : MonoBehaviour
     public int InstantiationNextMonsterId { get; set; }
     public int InstantiationSpawnDelay { get; set; }
 	public double PlayerHealth = 0;
-
+	public GUISkin window;//for GUI skin work
 	private static float MaxTime = 3.0f;
 	private float fLevelStartTimer = MaxTime; 
 
@@ -240,6 +240,7 @@ public class Instantiation : MonoBehaviour
 	} 
 	void OnGUI () 
 	{
+		GUI.skin = window; 
 		MakeMapControls ();
 		GUI.Box (new Rect (Screen.width - 50, 0, 50, 20), "" + fLevelStartTimer.ToString ("f0")); 
 
@@ -392,15 +393,15 @@ public class Instantiation : MonoBehaviour
 
 	void MakeMapControls()
 	{
-		if (GUI.Button (new Rect (Screen.width- 250, 50, 50, 20), ">")) 
+		if (GUI.Button (new Rect (Screen.width- 250, 50, 60, 40), ">")) 
 		{
 			Time.timeScale = 1.0f;
 		}
-		if (GUI.Button (new Rect (Screen.width- 200, 50, 50, 20), ">>")) 
+		if (GUI.Button (new Rect (Screen.width- 200, 50, 60, 40), ">>")) 
 		{
 			Time.timeScale = 2.0f;
 		}
-		if (GUI.Button (new Rect (Screen.width- 150, 50, 50, 20), ">>>")) 
+		if (GUI.Button (new Rect (Screen.width- 150, 50, 60, 40), ">>>")) 
 		{
 			Time.timeScale = 4.0f;
 		}
