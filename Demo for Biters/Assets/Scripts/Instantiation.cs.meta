@@ -1,11 +1,14 @@
 fileFormatVersion: 2
 guid: 8e4b24b8e2957494dba2e9d9802e342b
-timeCreated: 1426975071
+timeCreated: 1429029306
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
   defaultReferences:
-  - LevelText: {fileID: 11475740, guid: fe395e9e63c106e4bb79e5f071939c63, type: 2}
+  - window: {fileID: 11400000, guid: d36edfdfd70444c8389599fd7ed4a2c8, type: 2}
+  - LevelText: {instanceID: 0}
+  - TextureNeedle: {instanceID: 0}
+  - RotationPoint: {instanceID: 0}
   - gateSound: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
