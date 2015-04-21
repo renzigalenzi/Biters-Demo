@@ -31,6 +31,9 @@ public class Instantiation : MonoBehaviour
 	private Vector3 OriginalNeedlePosition;
 	public Image RotationPoint;
 
+	public int selGridInt = 0;
+	public string[] selStrings = new string[] {"1/2", ">", ">>", ">>>"};
+
 	Vector3 RightClickedOriginPoint;
 	Vector3 RightClickedCurrentPoint;
 	float RayDistance = 4.5f;
@@ -275,7 +278,7 @@ public class Instantiation : MonoBehaviour
 			GUIStyle style = new GUIStyle(GUI.skin.textField);
 			style.wordWrap = true;
 			InstantiationTutorialString = GUI.TextField(new Rect(Screen.width/3, Screen.height/3, Screen.width/4, Screen.height/4), InstantiationTutorialString, style);
-			if (GUI.Button (new Rect (Screen.width/3 + Screen.width/4 - 23, Screen.height/3 - 23, 23, 23), "X")) 
+			if (GUI.Button (new Rect (Screen.width/3 + Screen.width/4 - 23, Screen.height/3 - 23, 35, 35), "X")) 
 			{
 				InstantiationTutorialString = ""; 
 			}
@@ -430,21 +433,23 @@ public class Instantiation : MonoBehaviour
 
 	void MakeMapControls()
 	{
-		if (GUI.Button (new Rect (Screen.width- 300, 50, 60, 40), "1/2")) 
+		selGridInt = GUI.SelectionGrid(new Rect(Screen.width- 300, 50, 200, 50), selGridInt, selStrings, 4);
+		switch(selGridInt)
 		{
-			Time.timeScale = 0.5f;
-		}
-		if (GUI.Button (new Rect (Screen.width- 250, 50, 60, 40), ">")) 
-		{
-			Time.timeScale = 1.0f;
-		}
-		if (GUI.Button (new Rect (Screen.width- 200, 50, 60, 40), ">>")) 
-		{
-			Time.timeScale = 2.0f;
-		}
-		if (GUI.Button (new Rect (Screen.width- 150, 50, 60, 40), ">>>")) 
-		{
-			Time.timeScale = 4.0f;
+			case 0:
+				Time.timeScale = 0.5f;
+				break;
+			case 1:
+				Time.timeScale = 1.0f;
+				break;
+			case 2:
+				Time.timeScale = 2.0f;
+				break;
+			case 3:
+				Time.timeScale = 4.0f;
+				break;
+			default:
+				break;
 		}
 	}
 

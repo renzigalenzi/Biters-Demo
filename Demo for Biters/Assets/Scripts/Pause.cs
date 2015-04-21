@@ -14,7 +14,7 @@ public class Pause : MonoBehaviour {
 		GUI.skin = window; 
 
 		// button that pauses the game and brings up pause menu
-		if (GUI.Button (new Rect ((Screen.width/2)-450, (Screen.height/2)-350, 200, 50), "Menu")) {
+		if (GUI.Button (new Rect ((Screen.width/2)-500, (Screen.height/2)-350, 200, 50), "Menu")) {
 
 			isPause = true; 
 			pauseMenu = true; 
