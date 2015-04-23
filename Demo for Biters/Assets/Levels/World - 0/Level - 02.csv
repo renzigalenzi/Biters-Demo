@@ -1,11 +1,10 @@
-0,0,0,0,0,0,0,0,
-0,0,2,0,0,0,1,0,
-0,0,12,0,0,0,12,0,
-0,0,16,13,5,13,17,0,
-0,0,0,0,12,0,0,0,
-0,0,0,0,12,0,0,0,
-0,0,0,0,3,0,0,0,
-0,0,0,0,0,0,0,0,
-#4,3,4,3,,,,,
-^,4,6,0,0,0,0,0
-&,This game works by using GATES to combine biters together. The AND GATE outputs 1 if both inputs are 1,,,,,,,
+0,0,0,0,0,0,0
+0,2,0,9,0,1,0
+0,12,0,0,0,12,0
+0,16,13,5,13,17,0
+0,0,0,12,0,0,0
+0,0,0,12,0,0,0
+0,0,0,4,0,0,0
+0,0,0,0,0,0,0
+#3,1,3,3
+&,1,2,Sometimes you will need to SWITCH the GATES by CLICKING on them. Notice that the AND GATE will currently not produce a 1. But the OR GATE isnt on the path.

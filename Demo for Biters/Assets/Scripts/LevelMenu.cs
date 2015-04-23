@@ -14,21 +14,22 @@ public class LevelMenu : MonoBehaviour {
 	// Use this for initialization
 	public static List<List<string>> GetLevels()
 	{
-		if (levelsList != null)
-			levelsList.Clear ();
-		levelsList = new List<List<string>> ();
-		string dirName = Directory.GetCurrentDirectory () + "/Assets/Levels";
-		DirectoryInfo dir = new DirectoryInfo(dirName);
-		DirectoryInfo[] worlds = dir.GetDirectories();
-		foreach(DirectoryInfo world in worlds)
+		if (levelsList == null)
 		{
-			List<string> temp = new List<string>();
-			FileInfo[] info = world.GetFiles("*.csv");
-			foreach (FileInfo f in info) 
+			levelsList = new List<List<string>> ();
+			string dirName = Directory.GetCurrentDirectory () + "/Assets/Levels";
+			DirectoryInfo dir = new DirectoryInfo(dirName);
+			DirectoryInfo[] worlds = dir.GetDirectories();
+			foreach(DirectoryInfo world in worlds)
 			{
-				temp.Add(world.Name + "/" + f.Name);
+				List<string> temp = new List<string>();
+				FileInfo[] info = world.GetFiles("*.csv");
+				foreach (FileInfo f in info) 
+				{
+					temp.Add(world.Name + "/" + f.Name);
+				}
+				levelsList.Add(temp);
 			}
-			levelsList.Add(temp);
 		}
 		return levelsList;
 	}
