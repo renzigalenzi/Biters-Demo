@@ -18,6 +18,7 @@ public class Instantiation : MonoBehaviour
     public int InstantiationSpawnDelay { get; set; }
 	public double PlayerHealth = 0;
 	public GUISkin window;//for GUI skin work
+	public GUISkin tutorial;//for Tutorial Pop-ups
 	private static float MaxTime = 3.0f;
 	private float fLevelStartTimer = MaxTime; 
 
@@ -38,7 +39,7 @@ public class Instantiation : MonoBehaviour
 	Vector3 RightClickedCurrentPoint;
 	float RayDistance = 4.5f;
 
-	String InstantiationTutorialString = "";
+		String InstantiationTutorialString = "";
 
 	public AudioClip gateSound;
 	
