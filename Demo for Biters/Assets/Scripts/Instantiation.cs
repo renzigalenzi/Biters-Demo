@@ -23,6 +23,8 @@ public class Instantiation : MonoBehaviour
 	private float fLevelStartTimer = MaxTime; 
 
 	private float StartTextAlpha = 1.0f;
+	public AudioSource sound;
+	public AudioClip clip; 
 
 	bool bRightMouseClicked = false;
 	bool bLevelWon = false;
@@ -438,15 +440,19 @@ public class Instantiation : MonoBehaviour
 		switch(selGridInt)
 		{
 			case 0:
+			    sound.PlayOneShot (clip); 
 				Time.timeScale = 0.5f;
 				break;
 			case 1:
+				sound.PlayOneShot (clip); 
 				Time.timeScale = 1.0f;
 				break;
 			case 2:
+				sound.PlayOneShot (clip); 
 				Time.timeScale = 2.0f;
 				break;
 			case 3:
+				sound.PlayOneShot (clip); 
 				Time.timeScale = 4.0f;
 				break;
 			default:
