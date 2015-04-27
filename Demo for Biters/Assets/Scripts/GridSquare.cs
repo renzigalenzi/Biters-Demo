@@ -85,31 +85,35 @@ public class GridSquare
 		GridSquareTileDirection = TileDirection.None;
 		GridSquareHasWinningPiece = WinCondition.NoPiece;
 
-        GridSquareInstantiation.InstantiationGridSquareGameObjectGrid[GridSquareXPosition, GridSquareYPosition] = GridSquareGameObject;
-        GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition] = this;
+		//Spawn exit
+		if(IsExit()) {
+			
+			//Next becomes the "big"
+			MakeNextCube();
 
-		if(gridSquareTileType == TileType.ExitOne || gridSquareTileType == TileType.ExitZero)
-		{
-			MakeNextCube(GridSquareXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - GridSquareYPosition);
-		}
-		if(IsGate())
-		{
+			//Current becomes the "small". Done after since MakeNextCube relies on size of this game object.
+			Vector3 scale = new Vector3(0.6f, 0.6f, 0.1f);
+			GridSquareGameObject.transform.localScale = scale;
+			GridSquareGameObject.transform.position += new Vector3 (0,0,-0.4f);
+
+		} else if(IsGate()) {
+
 			MakeDepthGateCube(GridSquareXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - GridSquareYPosition);
-		}
-		if(IsEnter())
-		{
+		} else if(IsEnter()) {
+
 			MakeDepthEnterCube(GridSquareXPosition - Instantiation.XOFFSET, Instantiation.YOFFSET - GridSquareYPosition);
 		}
-
+		
+		GridSquareInstantiation.InstantiationGridSquareGameObjectGrid[GridSquareXPosition, GridSquareYPosition] = GridSquareGameObject;
+		GridSquareInstantiation.InstantiationGridSquareGrid[GridSquareXPosition, GridSquareYPosition] = this;
     }
-	public void MakeNextCube(float x, float y)
+
+	public void MakeNextCube()
 	{
 		GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-		Vector3 scale = go.transform.localScale;
-		scale.x = .5F; scale.y = .5F;
-		go.transform.localScale = scale;
-		go.transform.position = new Vector3(x+.25f,y-.25f,-.1f);
-		go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+		go.transform.localScale = GridSquareGameObject.transform.localScale;
+		go.transform.position = GridSquareGameObject.transform.position + new Vector3 (0,0,0.1f);
+		go.transform.rotation = GridSquareGameObject.transform.rotation;
 		go.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
 		subType = GridSquareTileType;
 		subObject = go;
@@ -120,7 +124,7 @@ public class GridSquare
 		Vector3 scale = go.transform.localScale;
 		scale.x = .75F; scale.y = .75F; scale.z = .75F;
 		go.transform.localScale = scale;
-		go.transform.position = new Vector3(x,y,-.75f);
+		go.transform.position = new Vector3(x,y,-0.875f);
 		go.transform.Rotate (0,180.0f,0);
 		go.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
 		subType = GridSquareTileType;
@@ -129,14 +133,23 @@ public class GridSquare
 	public void MakeDepthEnterCube(float x, float y)
 	{
 		GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		Renderer renderer = go.GetComponent<Renderer> ();
 		Vector3 scale = go.transform.localScale;
 		scale.x = 0.5F; scale.y = 0.5F; scale.z = 1F;
 		go.transform.localScale = scale;
 		go.transform.position = new Vector3(x,y,-1.0f);
 		go.transform.Rotate (0, 180.0f, 0);
-		go.GetComponent<Renderer>().material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
+		renderer.material = GridSquareInstantiation.MaterialDictionary[Enum.GetName(typeof(TileType),(TileType)GridSquareTileType)];
 		subType = GridSquareTileType;
 		subObject = go;
+
+		ParticleSystem system = go.AddComponent<ParticleSystem> ();
+		system.emissionRate = 2.0f;
+		system.startLifetime = 3.0f;
+		system.startSpeed = 0.8f;
+		system.startSize = 0.2f;
+		system.startColor = renderer.material.color;//  new Color (255, 255, 255);
+
 	}
 	public void SetSubCubeAsMain()
 	{
@@ -388,6 +401,10 @@ public class GridSquare
 			TileType.BeltUpT, TileType.BeltRightT, TileType.BeltDownT, TileType.BeltLeftT, TileType.BeltCross});
 
 		return Belts.Contains (GridSquareTileType);
+	}
+
+	public bool IsExit() {
+		return (GridSquareTileType == TileType.ExitOne || GridSquareTileType == TileType.ExitZero);
 	}
 
 	public bool IsGate()
