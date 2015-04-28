@@ -289,14 +289,14 @@ public class Instantiation : MonoBehaviour
 
 		if(bLevelWon)
 		{
-			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 100, 25), "Continue")) 
+			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 125, 50), "Continue")) 
 			{
 				Application.LoadLevel (Application.loadedLevelName); 
 			} 
 		}
 		else if(bLevelLost)
 		{
-			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 100, 25), "Retry?")) 
+			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 125, 50), "Retry?")) 
 			{
 				Application.LoadLevel (Application.loadedLevelName); 
 			} 

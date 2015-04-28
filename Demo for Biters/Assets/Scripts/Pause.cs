@@ -7,6 +7,7 @@ public class Pause : MonoBehaviour {
 	private bool isPause = false; 
 	public GUISkin window;
 	public AudioSource sound;
+	public string text;
 	static string level;  
 
 	// Use this for initialization
@@ -25,7 +26,8 @@ public class Pause : MonoBehaviour {
 
 		if (pauseMenu) { 
 
-			GUI.Window(0, new Rect(0, 0, Screen.width, Screen.height), ShowPause, "Game Menu");
+			GUI.Window(0, new Rect(0, 0, Screen.width, Screen.height), ShowPause, "Pause Menu");
+			//GUIText.text(0,0, "TESTING");
 
 		} // end if statement 
 	
@@ -44,7 +46,7 @@ public class Pause : MonoBehaviour {
 		} // end if 
 
 		// turns sound on and off 
-		if (GUI.Button (new Rect ((Screen.width/2) - 100, (Screen.height/2) + 30, 200, 50), "Sound")) { 
+		if (GUI.Button (new Rect ((Screen.width/2) - 100, (Screen.height/2) + 30, 200, 50), "Sound On/Off")) { 
 
 			sound.Play (); 
 			
