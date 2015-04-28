@@ -284,7 +284,7 @@ public class Instantiation : MonoBehaviour
 	{
 		GUI.skin = window; 
 		MakeMapControls ();
-		GUI.Box (new Rect (Screen.width - 50, 0, 50, 20), "" + fLevelStartTimer.ToString ("f0")); 
+		//GUI.Box (new Rect (Screen.width - 50, 0, 50, 20), "" + fLevelStartTimer.ToString ("f0")); 
 
 		foreach(TutorialEvent TE in InstantiationTutorialEvents)
 		{
@@ -294,7 +294,7 @@ public class Instantiation : MonoBehaviour
 				GUIStyle style = new GUIStyle(GUI.skin.textField);
 				style.wordWrap = true;
 				GUI.TextField(new Rect(Screen.width/3, Screen.height/3, Screen.width/4, Screen.height/4), TE.getMessage(), style);
-				if (GUI.Button (new Rect (Screen.width/3 + Screen.width/4 - 23, Screen.height/3 - 23, 23, 23), "X")) 
+				if (GUI.Button (new Rect (Screen.width/3 + Screen.width/4 - 23, Screen.height/3 - 23, 35, 35), "X")) 
 				{
 					Time.timeScale = 1.0f; 
 					TE.setTrigger(false);

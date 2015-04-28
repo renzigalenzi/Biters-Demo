@@ -7,6 +7,7 @@ using System.IO;
 public class LevelMenu : MonoBehaviour {
 
 	private Vector2 scrollPosition = Vector2.zero;
+	public GUISkin window; 
 
 	private static List<List<string>> levelsList;
 
@@ -45,8 +46,10 @@ public class LevelMenu : MonoBehaviour {
 
 	void OnGUI () { 
 
+		GUI.skin = window; 
+
 		// instructions 
-		GUI.Box (new Rect ((Screen.width /2) - 50, 100, 150, 25), "Select a Level");
+		GUI.Box (new Rect ((Screen.width /2) - 50, 100, 300, 50), "Select a Level");
 		// GetLevels();
 		levelsList = Game.current.player.levelsList; 
 		List<string> displayList;
@@ -70,7 +73,7 @@ public class LevelMenu : MonoBehaviour {
 		scrollPosition = GUI.BeginScrollView(new Rect(xStart, yStart, width, height-100), 
 		                                     scrollPosition, new Rect(0, 0, (displayList.Count + 1) * 200, height-100));
 		
-		GUI.color = Color.yellow;
+
 		if(Game.current.player.state == PlayerState.ChoosingWorld && GUI.Button(new Rect(0, 0, 190, height-100),"LevelCreator"))
 		{
 			Application.LoadLevel ("LevelBuilder"); 
@@ -105,7 +108,7 @@ public class LevelMenu : MonoBehaviour {
 		GUI.EndScrollView();
 		
 		// button that closes Level Select Window 
-		if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 30, 100, 25), "Close")) {
+		if (GUI.Button (new Rect (Screen.width/2 - 750, Screen.height/2 - 250 , 150, 35), "Main Menu")) {
 			
 			Application.LoadLevel ("PlayerMenu"); 
 			
