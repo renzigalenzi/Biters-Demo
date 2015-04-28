@@ -461,15 +461,15 @@ public class Instantiation : MonoBehaviour
 				break;
 			case 1:
 				sound.PlayOneShot (clip); 
-				Time.timeScale = 1.0f;
+				Time.timeScale = 1.5f;
 				break;
 			case 2:
 				sound.PlayOneShot (clip); 
-				Time.timeScale = 2.0f;
+				Time.timeScale = 3.0f;
 				break;
 			case 3:
-				sound.PlayOneShot (clip); 
-				Time.timeScale = 4.0f;
+				sound.PlayOneShot (clip);
+				Time.timeScale = 9.0f;
 				break;
 			default:
 				break;
