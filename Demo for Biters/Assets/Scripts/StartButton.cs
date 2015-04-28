@@ -7,7 +7,7 @@ public class StartButton : MonoBehaviour {
 	void Start () {
 
 		Time.timeScale = 1; 
-		AudioListener.volume = 10; 
+		AudioListener.volume = 5; 
 	}
 	
 	// Update is called once per frame

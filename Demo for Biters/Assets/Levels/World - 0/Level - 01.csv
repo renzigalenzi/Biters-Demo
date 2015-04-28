@@ -7,5 +7,5 @@
 0,0,0,0,3,0,0,0,0
 0,0,0,0,0,0,0,0,0
 #4,3,4,3,,,,,
-&,"OH BITERS ABOVE! Did you see that? Those two biters that just passed through the gate got combined!  Remember to keep an eye on what gates lie ahead, later they will need to be CHANGED to MATCH the PACKAGING STATION",,,,,,,
-&,"Remember to keep an eye on what gates lie ahead, later they will need to be CHANGED to MATCH the PACKAGING STATION",,,,,,,
+&,4,4,"OH BITERS ABOVE! Did you see that? Those two biters that just passed through the gate got combined! AND GATES will output a 1 if both inputs are 1 or they will output 0 otherwise.",,,,,,,
+&,4,6,"Remember to keep an eye on what gates lie ahead- later they will need to be CHANGED to MATCH the PACKAGING STATION",,,,,,,

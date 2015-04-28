@@ -19,7 +19,7 @@ public class Movie : MonoBehaviour {
 	public AudioSource sound3;
 	public AudioSource sound4; 
 	public AudioSource sound5; 
-	private bool play = true; 
+	//private bool play = true; 
 	private int counter = 1; 
 	
 	void Start() {

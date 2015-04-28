@@ -14,6 +14,7 @@ public class Instantiation : MonoBehaviour
     public int InstantiationGridHeight { get; set; }
 	public List<Monster> InstantiationMonsters { get; set; }
 	public List<RotationGroup> InstantiationRotationGroups{ get; set; }
+	public List<TutorialEvent> InstantiationTutorialEvents{ get; set; }
     public int InstantiationNextMonsterId { get; set; }
     public int InstantiationSpawnDelay { get; set; }
 	public double PlayerHealth = 0;
@@ -32,7 +33,7 @@ public class Instantiation : MonoBehaviour
 	private Vector3 OriginalNeedlePosition;
 	public Image RotationPoint;
 
-	public int selGridInt = 0;
+	public int selGridInt = 1;
 	public string[] selStrings = new string[] {"1/2", ">", ">>", ">>>"};
 
 	Vector3 RightClickedOriginPoint;
@@ -54,6 +55,7 @@ public class Instantiation : MonoBehaviour
 		OriginalNeedlePosition = TextureNeedle.gameObject.transform.position;
         InstantiationMonsters = new List<Monster>();
 		InstantiationRotationGroups = new List<RotationGroup> ();
+		InstantiationTutorialEvents = new List<TutorialEvent> ();
         InstantiationNextMonsterId = 0;
         InstantiationSpawnDelay = 800;
 
@@ -135,10 +137,18 @@ public class Instantiation : MonoBehaviour
 				}
 				if(line != null && line[0] == '&')
 				{
-					line = line.Trim( new char[] {'&'});
-					InstantiationTutorialString = line;
-					InstantiationTutorialString = InstantiationTutorialString.Trim(',');
-					line = reader.ReadLine();
+					do
+					{
+						line = line.Trim( new char[] {'&'});
+						line = line.Trim( new char[] {','});
+						string[] entries = line.Split(',');
+						int xpos = Convert.ToInt32(entries[0]);
+						int ypos = Convert.ToInt32(entries[1]);
+						string message = entries[2];
+
+						InstantiationTutorialEvents.Add(new TutorialEvent(xpos,ypos,message));
+						line = reader.ReadLine();
+					}while(line != null && line[0] == '&');
 				}
                 reader.Close();
 
@@ -274,14 +284,20 @@ public class Instantiation : MonoBehaviour
 		MakeMapControls ();
 		GUI.Box (new Rect (Screen.width - 50, 0, 50, 20), "" + fLevelStartTimer.ToString ("f0")); 
 
-		if(InstantiationTutorialString.Length > 0)
+		foreach(TutorialEvent TE in InstantiationTutorialEvents)
 		{
-			GUIStyle style = new GUIStyle(GUI.skin.textField);
-			style.wordWrap = true;
-			InstantiationTutorialString = GUI.TextField(new Rect(Screen.width/3, Screen.height/3, Screen.width/4, Screen.height/4), InstantiationTutorialString, style);
-			if (GUI.Button (new Rect (Screen.width/3 + Screen.width/4 - 23, Screen.height/3 - 23, 35, 35), "X")) 
+			if(TE.isTriggered() && !TE.isCompleted())
 			{
-				InstantiationTutorialString = ""; 
+				Time.timeScale = 0.000001f; 
+				GUIStyle style = new GUIStyle(GUI.skin.textField);
+				style.wordWrap = true;
+				GUI.TextField(new Rect(Screen.width/3, Screen.height/3, Screen.width/4, Screen.height/4), TE.getMessage(), style);
+				if (GUI.Button (new Rect (Screen.width/3 + Screen.width/4 - 23, Screen.height/3 - 23, 23, 23), "X")) 
+				{
+					Time.timeScale = 1.0f; 
+					TE.setTrigger(false);
+					TE.setCompleted(true);
+				}
 			}
 		}
 
@@ -648,6 +664,13 @@ public class Instantiation : MonoBehaviour
 
         if(monster.FinishedMovingTile())
 		{
+			foreach(TutorialEvent TE in InstantiationTutorialEvents)
+			{
+				if (!TE.isCompleted() && TE.x() == monster.MonsterXPosition && TE.y() == monster.MonsterYPosition)
+				{
+					TE.setTrigger(true);
+				}
+			}
             monster.MonsterMovementType = MovementType.Waiting;
         }
 	}
@@ -745,18 +768,14 @@ public class Instantiation : MonoBehaviour
 	// returns true if the level has not already been reached by the Player -- Prevents duplicate entries 
 	public bool CheckLevel(string lvl) 
 	{ 
-		for(int worlds = 0 ; worlds <= Game.current.player.world; worlds ++)
+		for(int worlds = 0; worlds < Game.current.player.levelsList.Count; worlds ++)
 		{
-			if(Game.current.player.levelsList.Count > worlds)
+			for(int levels = 0; levels < Game.current.player.levelsList[worlds].Count; levels ++)
 			{
-				for (int i = 0; i < Game.current.player.levelsList[worlds].Count; i++) 
-				{ 
-					if (Game.current.player.levelsList[worlds].Count > i && lvl == Game.current.player.levelsList[worlds][i]) 
-					{ 
-						return false; 
-					} // end if statement 
-
-				} // end for loop  
+				if(Game.current.player.levelsList[worlds][levels] == lvl)
+				{
+					return false;
+				}
 			}
 		}
 		return true; 
@@ -766,14 +785,19 @@ public class Instantiation : MonoBehaviour
 	public void SetNextPlayerLevel()
 	{
 		List<List<string>> levelsList = LevelMenu.GetLevels();
+		//go through each world
 		for(int worlds = 0; worlds < levelsList.Count; worlds++)
 		{
+			//go through each level in the world
 			for(int i = 0; i < levelsList[worlds].Count; i++)
 			{
+				//if the current level == a worlds level, and that level is not the last in the world
 				if(Game.current.player.currLevel == levelsList[worlds][i] && i < levelsList[worlds].Count - 1)
 				{
+					//check to make sure the next world isnt null.
 					if(levelsList[worlds][i+1] != null) 
 					{
+						//set the current level to the next level
 						Game.current.player.currLevel = levelsList[worlds][i+1];
 						// Only call this if the level has not already been reached 
 						if (CheckLevel (levelsList[worlds][i+1])) 
@@ -783,8 +807,9 @@ public class Instantiation : MonoBehaviour
 						} // end if statement 
 						Save.SaveThis (); 
 					} // end if statement 
-					break;
+					return;
 				}
+				//if the current level is a level and the last level in a world
 				else if(Game.current.player.currLevel == levelsList[worlds][i] && i == levelsList[worlds].Count - 1)
 				{
 					if(levelsList.Count > Game.current.player.world + 1)
