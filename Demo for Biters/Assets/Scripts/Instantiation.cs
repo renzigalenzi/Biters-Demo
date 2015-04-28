@@ -24,6 +24,8 @@ public class Instantiation : MonoBehaviour
 	private float fLevelStartTimer = MaxTime; 
 
 	private float StartTextAlpha = 1.0f;
+	public AudioSource sound;
+	public AudioClip clip; 
 
 	bool bRightMouseClicked = false;
 	bool bLevelWon = false;
@@ -303,14 +305,14 @@ public class Instantiation : MonoBehaviour
 
 		if(bLevelWon)
 		{
-			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 100, 25), "Continue")) 
+			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 125, 50), "Continue")) 
 			{
 				Application.LoadLevel (Application.loadedLevelName); 
 			} 
 		}
 		else if(bLevelLost)
 		{
-			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 100, 25), "Retry?")) 
+			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 125, 50), "Retry?")) 
 			{
 				Application.LoadLevel (Application.loadedLevelName); 
 			} 
@@ -454,16 +456,20 @@ public class Instantiation : MonoBehaviour
 		switch(selGridInt)
 		{
 			case 0:
+			    sound.PlayOneShot (clip); 
 				Time.timeScale = 0.5f;
 				break;
 			case 1:
-				Time.timeScale = 1.5f;
+				sound.PlayOneShot (clip); 
+				Time.timeScale = 1.0f;
 				break;
 			case 2:
-				Time.timeScale = 3.0f;
+				sound.PlayOneShot (clip); 
+				Time.timeScale = 2.0f;
 				break;
 			case 3:
-				Time.timeScale = 8.0f;
+				sound.PlayOneShot (clip); 
+				Time.timeScale = 4.0f;
 				break;
 			default:
 				break;

@@ -6,7 +6,9 @@ public class Pause : MonoBehaviour {
 	private bool pauseMenu = false; 
 	private bool isPause = false; 
 	public GUISkin window;
-	static string level; 
+	public AudioSource sound;
+	public string text;
+	static string level;  
 
 	// Use this for initialization
 	void OnGUI () {
@@ -18,12 +20,14 @@ public class Pause : MonoBehaviour {
 
 			isPause = true; 
 			pauseMenu = true; 
+			sound.Play (); 
 
 		} // end if 
 
 		if (pauseMenu) { 
 
-			GUI.Window(0, new Rect(0, 0, Screen.width, Screen.height), ShowPause, "Game Menu");
+			GUI.Window(0, new Rect(0, 0, Screen.width, Screen.height), ShowPause, "Pause Menu");
+			//GUIText.text(0,0, "TESTING");
 
 		} // end if statement 
 	
@@ -35,13 +39,16 @@ public class Pause : MonoBehaviour {
 		// reloads the level, thereby restarting it 
 		if (GUI.Button (new Rect ((Screen.width/2) - 100, (Screen.height/2) - 90, 200, 50), "Restart")) { 
 			UnPauseGame (); 
+			sound.Play (); 
 			Application.LoadLevel (Application.loadedLevelName); 
 
 
 		} // end if 
 
 		// turns sound on and off 
-		if (GUI.Button (new Rect ((Screen.width/2) - 100, (Screen.height/2) + 30, 200, 50), "Sound")) { 
+		if (GUI.Button (new Rect ((Screen.width/2) - 100, (Screen.height/2) + 30, 200, 50), "Sound On/Off")) { 
+
+			sound.Play (); 
 			
 			if (AudioListener.volume != 0) {
 
@@ -49,7 +56,7 @@ public class Pause : MonoBehaviour {
 
 			} else {
 
-				AudioListener.volume = 50;
+				AudioListener.volume = 15;
 
 			} // end if else 
 			
@@ -59,14 +66,16 @@ public class Pause : MonoBehaviour {
 		if (GUI.Button (new Rect ((Screen.width/2) - 100, (Screen.height/2) - 30, 200, 50), "Main Menu")) { 
 
 			UnPauseGame (); 
+			sound.Play (); 
 			Application.LoadLevel ("PlayerMenu"); 
 			
 		} // end if 
 
 		// quit the application 
 		if (GUI.Button (new Rect ((Screen.width/2) - 100, (Screen.height/2) + 90, 200, 50), "Save and Quit")) { 
-
+		
 			UnPauseGame (); 
+			sound.Play (); 
 			level = Application.loadedLevelName; 
 			PlayerPrefs.SetString("SavedLevel",level);
 			// Application.Quit (); 
@@ -78,6 +87,7 @@ public class Pause : MonoBehaviour {
 			UnPauseGame (); 
 			pauseMenu = false; 
 			isPause = false; 
+			sound.Play (); 
 			
 		} // end if 
 
