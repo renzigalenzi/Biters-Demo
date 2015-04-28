@@ -41,6 +41,7 @@ public class Instantiation : MonoBehaviour
 	Vector3 RightClickedOriginPoint;
 	Vector3 RightClickedCurrentPoint;
 	float RayDistance = 4.5f;
+	System.Random rand = new System.Random();
 
 		String InstantiationTutorialString = "";
 
@@ -200,10 +201,11 @@ public class Instantiation : MonoBehaviour
 	}
 	public void CreateBorder()
 	{
+		MakeHeMans();
 		//create top
 		for(int i = -1; i < InstantiationGridWidth+1; i++)
 		{
-			CreateWall(i - Instantiation.XOFFSET, Instantiation.YOFFSET + 1);
+			CreateWall(i - Instantiation.XOFFSET, Instantiation.YOFFSET + 1, 0);
 			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			go.transform.position = new Vector3(i - Instantiation.XOFFSET, Instantiation.YOFFSET + 1, 0);
 			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
@@ -212,6 +214,7 @@ public class Instantiation : MonoBehaviour
 		//create bottom
 		for(int i = -1; i < InstantiationGridWidth+1; i++)
 		{
+			//CreateWall(i - Instantiation.XOFFSET, Instantiation.YOFFSET + 1);
 			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			go.transform.position = new Vector3(i - Instantiation.XOFFSET, Instantiation.YOFFSET - InstantiationGridHeight, 0);
 			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
@@ -220,6 +223,7 @@ public class Instantiation : MonoBehaviour
 		//create left
 		for(int i = 0; i < InstantiationGridHeight; i++)
 		{
+			CreateWall(-1 - Instantiation.XOFFSET, Instantiation.YOFFSET - i, -1);
 			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			go.transform.position = new Vector3(-1 - Instantiation.XOFFSET, Instantiation.YOFFSET - i, 0);
 			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
@@ -228,6 +232,7 @@ public class Instantiation : MonoBehaviour
 		//create right
 		for(int i = 0; i < InstantiationGridHeight; i++)
 		{
+			CreateWall(InstantiationGridWidth - Instantiation.XOFFSET, Instantiation.YOFFSET - i, 1);
 			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			go.transform.position = new Vector3(InstantiationGridWidth - Instantiation.XOFFSET, Instantiation.YOFFSET - i, 0);
 			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
@@ -235,22 +240,69 @@ public class Instantiation : MonoBehaviour
 		}
 			
 	}
-	public void CreateWall(int x, int y)
+	public void CreateWall(int x, int y, int side)
 	{
-		for( int z = 0; z < 4; z++)
+		for( int z = 0; z < 6; z++)
 		{
 			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-			go.transform.position = new Vector3(x, y, -z); 
-			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+
+			go.transform.position = new Vector3(x, y, -z);
+			if (side == 0)//back wall
+				go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+			else
+				go.transform.rotation = Quaternion.AngleAxis(90, Vector3.left);
 			if(z == 1 && x == 1)
 				go.GetComponent<Renderer>().material = MaterialDictionary["WallF2"];
 			else if (z == 1)
 				go.GetComponent<Renderer>().material = MaterialDictionary["WallF1"];
 			else if (z == 2)
-				go.GetComponent<Renderer>().material = MaterialDictionary["WallC1"];
+			{
+				go.GetComponent<Renderer>().material = GenerateCenterWallTile();
+			}
 			else if (z == 3)
+			{
+				go.GetComponent<Renderer>().material = GenerateCenterWallTile();
+			}
+			else if (z == 4)
+				go.GetComponent<Renderer>().material = MaterialDictionary["WallC1"];
+			else if (z == 5)
 				go.GetComponent<Renderer>().material = MaterialDictionary["WallT1"];
 		}
+	}
+	Material GenerateCenterWallTile()
+	{
+		int tile = rand.Next(0,20);
+		switch(tile)
+		{
+		case 0: 
+			return MaterialDictionary["WallC2"];
+			break;
+		case 1: 
+			return MaterialDictionary["WallC3"];
+			break;
+		case 2: 
+			return MaterialDictionary["WallC4"];
+			break;
+		case 3: 
+			return MaterialDictionary["WallC5"];
+			break;
+		case 4: 
+			return MaterialDictionary["WallC6"];
+			break;
+		default:
+			return MaterialDictionary["WallC0"];
+			break;
+				
+		}
+	}
+	void MakeHeMans()
+	{
+		GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		go.transform.position = new Vector3(InstantiationGridWidth /2 - Instantiation.XOFFSET, Instantiation.YOFFSET +1.6f, -2.5f);
+		//go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+		Vector3 scale = new Vector3(InstantiationGridWidth+2.0f, 0.1f, 6.0f);
+		go.transform.localScale = scale;
+		go.GetComponent<Renderer>().material = MaterialDictionary["HeMan"];
 	}
 	void Update () 
 	{
@@ -443,8 +495,8 @@ public class Instantiation : MonoBehaviour
 			GetComponent<Camera>().transform.position = new Vector3(-XOFFSET, y, z);
 		if(x > InstantiationGridWidth - XOFFSET)
 			GetComponent<Camera>().transform.position = new Vector3(InstantiationGridWidth - XOFFSET, y, z);
-		if(y < 2 - InstantiationGridHeight)
-			GetComponent<Camera>().transform.position = new Vector3(x, 2 - InstantiationGridHeight, z);
+		if(y < 5 - InstantiationGridHeight)
+			GetComponent<Camera>().transform.position = new Vector3(x, 5 - InstantiationGridHeight, z);
 		if(y > 2)
 			GetComponent<Camera>().transform.position = new Vector3(x, 2, z);
 		
