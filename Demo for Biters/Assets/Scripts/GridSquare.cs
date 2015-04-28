@@ -144,10 +144,10 @@ public class GridSquare
 		subObject = go;
 
 		ParticleSystem system = go.AddComponent<ParticleSystem> ();
-		system.emissionRate = 2.0f;
-		system.startLifetime = 3.0f;
-		system.startSpeed = 0.8f;
-		system.startSize = 0.2f;
+		system.emissionRate = 1.0f;
+		system.startLifetime = 2.0f;
+		system.startSpeed = 0.5f;
+		system.startSize = 0.1f;
 		system.startColor = renderer.material.color;//  new Color (255, 255, 255);
 
 	}

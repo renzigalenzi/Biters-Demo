@@ -441,13 +441,13 @@ public class Instantiation : MonoBehaviour
 				Time.timeScale = 0.5f;
 				break;
 			case 1:
-				Time.timeScale = 1.0f;
+				Time.timeScale = 1.5f;
 				break;
 			case 2:
-				Time.timeScale = 2.0f;
+				Time.timeScale = 3.0f;
 				break;
 			case 3:
-				Time.timeScale = 4.0f;
+				Time.timeScale = 8.0f;
 				break;
 			default:
 				break;
