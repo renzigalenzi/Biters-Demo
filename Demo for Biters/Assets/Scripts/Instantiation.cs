@@ -307,17 +307,25 @@ public class Instantiation : MonoBehaviour
 		{
 			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 125, 50), "Continue")) 
 			{
-				Application.LoadLevel (Application.loadedLevelName); 
-			} 
-		}
+				if (Game.current.player.currLevel == "World - 1/Level - 01.csv") { 
+					
+					Application.LoadLevel ("Clip2");
+					
+				} else {
+					
+					Application.LoadLevel (Application.loadedLevelName);
+					
+				} // end if else statement   
+			} // end Continue if 
+		} // end bLevelWon if 
 		else if(bLevelLost)
 		{
 			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 125, 50), "Retry?")) 
 			{
 				Application.LoadLevel (Application.loadedLevelName); 
-			} 
-		}
-	}
+			} // end Retry? if 
+		} // end bLevelLost if 
+	} // end OnGUI
 
 	void GetMouseRays()
 	{
@@ -835,7 +843,11 @@ public class Instantiation : MonoBehaviour
 							Save.SaveThis (); 
 							return;
 						} // end if statement 
-					}
+					} else { 
+
+						Application.LoadLevel("Clip3"); 
+
+					} // end if else 
 				}
 			}
 		}

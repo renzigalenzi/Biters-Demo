@@ -8,25 +8,35 @@ public class Movie : MonoBehaviour {
 	private FileInfo[] info; 
 	private Texture currTex;
 	// Original Path Extension: "/Users/laurenfuller/Documents/Biters-Demo/DemoBiters/Assets/Resources/Panel1"
-	private string myPath = Directory.GetCurrentDirectory () + "/Assets/Resources/Clip1";
-	public string extention = "png";   
-	public int start2;
-	public int start3;
-	public int start4;
-	public int start5; 
+	private string myPath;
+	private string extention = "png";   
 	public AudioSource sound1;
 	public AudioSource sound2;
 	public AudioSource sound3;
 	public AudioSource sound4; 
 	public AudioSource sound5; 
+	public AudioSource sound6;
+	public AudioSource sound7;
+	public AudioSource sound8;
+	public AudioSource sound9; 
+	public AudioSource sound10;
+	public AudioSource sound11;
 	//private bool play = true; 
 	private int counter = 1; 
+	public int cutscene;        // make this "1" for cutscene 1, "2" for cutscene 2, or "3" for cutscene 3
 	
 	void Start() {
 
+		// get correct pictures for cutscene 
+		if (cutscene == 1) myPath = Directory.GetCurrentDirectory () + "/Assets/Resources/Clip1";
+		if (cutscene == 2) myPath = Directory.GetCurrentDirectory () + "/Assets/Resources/Clip2";
+		if (cutscene == 3) myPath = Directory.GetCurrentDirectory () + "/Assets/Resources/Clip3";
+
+		// get files 
 		Debug.Log ("Locating files, please standby.");
 		getFiles(); 
 
+		// start the clip 
 		if (slides != null) {
 			
 			currTex = slides[0] as Texture;
@@ -42,53 +52,180 @@ public class Movie : MonoBehaviour {
 	
 	void Update() {
 
+		// update picture shown 
 		if (slides != null)  {
 
-			// start audio files 
-			if (!sound1.isPlaying && counter == 1) {
+			if (cutscene == 1 || cutscene == 2) { 
 
-				sound2.Play(); 
-				counter++; 
-				currTex = slides[start2] as Texture;
+				// start audio files 
+				if (!sound1.isPlaying && counter == 1) {
 
-			} // end if statement 
+					sound2.Play(); 
+					counter++; 
+					currTex = slides[1] as Texture;
 
-			if (!sound2.isPlaying && counter == 2) {
+				} // end if statement 
 
-				sound3.Play(); 
-				counter++; 
-				currTex = slides[start3] as Texture;
+				if (!sound2.isPlaying && counter == 2) {
 
-			} // end if statement 
+					sound3.Play(); 
+					counter++; 
+					currTex = slides[2] as Texture;
 
-			if (!sound3.isPlaying && counter == 3) {
+				} // end if statement 
 
-				sound4.Play(); 
-				counter++; 
-				currTex = slides[start4] as Texture;
+				if (!sound3.isPlaying && counter == 3) {
 
-			} // end if statement 
+					sound4.Play(); 
+					counter++; 
+					currTex = slides[3] as Texture;
 
-			if (!sound4.isPlaying && counter == 4) {
+				} // end if statement 
 
-				sound5.Play(); 
-				counter++; 
-				currTex = slides[start5] as Texture;
+				if (!sound4.isPlaying && counter == 4) {
 
-			} // end if statement 
+					sound5.Play(); 
+					counter++; 
+					currTex = slides[4] as Texture;
 
+				} // end if statement 
 
-			// currTex = slides[currentSlide] as Texture;
+				if (!sound5.isPlaying && counter == 5) {
+					
+					sound6.Play(); 
+					counter++; 
+					currTex = slides[5] as Texture;
+					
+				} // end if statement 
 
+				if (!sound6.isPlaying && counter == 6) {
+					
+					sound7.Play(); 
+					counter++; 
+					currTex = slides[6] as Texture;
+					
+				} // end if statement 
 
-		} // end if statement outer
+				if (!sound7.isPlaying && counter == 7) {
+					
+					sound8.Play(); 
+					counter++; 
+					currTex = slides[7] as Texture;
+					
+				} // end if statement 
 
-		Debug.Log("The FPS is: " + ((1.0f / Time.smoothDeltaTime))); 
+				if (!sound8.isPlaying && counter == 8) {
+					
+					sound9.Play(); 
+					counter++; 
+					currTex = slides[8] as Texture;
+					
+				} // end if statement 
+
+				if (!sound9.isPlaying && counter == 9) {
+					
+					Application.LoadLevel ("Demo");
+					
+				} // end if statement 
+
+		    } else if (cutscene == 3) { 
+
+				// start audio files 
+				if (!sound1.isPlaying && counter == 1) {
+					
+					sound2.Play(); 
+					counter++; 
+					currTex = slides[1] as Texture;
+					
+				} // end if statement 
+				
+				if (!sound2.isPlaying && counter == 2) {
+					
+					sound3.Play(); 
+					counter++; 
+					currTex = slides[2] as Texture;
+					
+				} // end if statement 
+				
+				if (!sound3.isPlaying && counter == 3) {
+					
+					sound4.Play(); 
+					counter++; 
+					currTex = slides[3] as Texture;
+					
+				} // end if statement 
+				
+				if (!sound4.isPlaying && counter == 4) {
+					
+					sound5.Play(); 
+					counter++; 
+					currTex = slides[4] as Texture;
+					
+				} // end if statement 
+				
+				if (!sound5.isPlaying && counter == 5) {
+					
+					sound6.Play(); 
+					counter++; 
+					currTex = slides[5] as Texture;
+					
+				} // end if statement 
+				
+				if (!sound6.isPlaying && counter == 6) {
+					
+					sound7.Play(); 
+					counter++; 
+					currTex = slides[6] as Texture;
+					
+				} // end if statement 
+				
+				if (!sound7.isPlaying && counter == 7) {
+					
+					sound8.Play(); 
+					counter++; 
+					currTex = slides[7] as Texture;
+					
+				} // end if statement 
+				
+				if (!sound8.isPlaying && counter == 8) {
+					
+					sound9.Play(); 
+					counter++; 
+					currTex = slides[8] as Texture;
+					
+				} // end if statement 
+
+				if (!sound9.isPlaying && counter == 9) {
+					
+					sound10.Play(); 
+					counter++; 
+					currTex = slides[9] as Texture;
+					
+				} // end if statement 
+
+				if (!sound10.isPlaying && counter == 10) {
+					
+					sound11.Play(); 
+					counter++; 
+					currTex = slides[10] as Texture;
+					
+				} // end if statement 
+
+				if (!sound11.isPlaying && counter == 11) {
+					
+					Application.LoadLevel ("PlayerMenu");
+					
+				} // end if statement 
+	
+			} // end if else statement for cutscene 
+
+		} // end if statement for null 
 
 	} // end Update()
 
 	void OnGUI() {
 
+		// draw picture 
 		GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), currTex, ScaleMode.ScaleToFit, true, 2.0f);
 
 	} // end OnGUI()
