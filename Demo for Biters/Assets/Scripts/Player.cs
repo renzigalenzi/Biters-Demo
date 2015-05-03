@@ -29,9 +29,9 @@ public class Player {
 		this.name = "New Game";
 		this.score = 0; 
 		this.levelsList = new List<List<string>> ();
-		this.currLevel = "World - 0/Level - 01.csv";
-		this.highestLevel = "World - 0/Level - 01.csv"; 
-		this.world = 0;
+		this.currLevel = "World - 6/Level - 07.csv";
+		this.highestLevel = "World - 6/Level - 07.csv"; 
+		this.world = 6;
 		this.temp = new List<string> ();
 		this.temp.Add(currLevel);
 		this.state = PlayerState.ChoosingWorld;

@@ -30,6 +30,7 @@ public class Instantiation : MonoBehaviour
 	bool bRightMouseClicked = false;
 	bool bLevelWon = false;
 	bool bLevelLost = false;
+	bool bLastLevelCompleted = false;
 	public Text LevelText;
 	public Image TextureNeedle;
 	private Vector3 OriginalNeedlePosition;
@@ -355,7 +356,7 @@ public class Instantiation : MonoBehaviour
 			}
 		}
 
-		if(bLevelWon)
+		if(bLevelWon && !bLastLevelCompleted)
 		{
 			{
 				if (Game.current.player.currLevel == "World - 1/Level - 01.csv") { 
@@ -520,15 +521,15 @@ public class Instantiation : MonoBehaviour
 				break;
 			case 1:
 				sound.PlayOneShot (clip); 
-				Time.timeScale = 1.5f;
+				Time.timeScale = 2.0f;
 				break;
 			case 2:
 				sound.PlayOneShot (clip); 
-				Time.timeScale = 3.0f;
+				Time.timeScale = 5.0f;
 				break;
 			case 3:
 				sound.PlayOneShot (clip);
-				Time.timeScale = 9.0f;
+				Time.timeScale = 10.0f;
 				break;
 			default:
 				break;
@@ -742,6 +743,10 @@ public class Instantiation : MonoBehaviour
 
 	void CheckForWin(int x, int y, Monster monster)
 	{
+		if(bLevelWon)
+		{
+			return;
+		}
 		//assign the current tile to win or lose from blank. cant be assigned unless blank or win.(if you lose you lose)
 		//check all tiles, if any of the end pieces are lose then return you lose
 		//if the amount of winning tiles == the number of end pieces then you win
@@ -812,7 +817,7 @@ public class Instantiation : MonoBehaviour
 		}
 		else if (PlayerHealth >= 1)
 		{
-			//PrintMessage ("YOU WIN!");
+			PrintMessage ("YOU WIN!");
 			SetNextPlayerLevel();
 			bLevelWon = true;
 			LevelText.text = "YOU WIN!";
@@ -895,7 +900,8 @@ public class Instantiation : MonoBehaviour
 							return;
 						} // end if statement 
 					} else { 
-
+						bLastLevelCompleted = true;
+						print ("DONE WITH EVERYTHING");
 						Application.LoadLevel("Clip3"); 
 
 					} // end if else 
