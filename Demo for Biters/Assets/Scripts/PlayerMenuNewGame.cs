@@ -16,7 +16,7 @@ public class PlayerMenuNewGame : MonoBehaviour {
 		Game.current.player.name = "Play";
 		Game.current.id = 1; 
 		Save.SaveThis (); 
-		Application.LoadLevel ("Demo");
+		Application.LoadLevel ("Clip1");
 		
 	} // end OnClick
 }

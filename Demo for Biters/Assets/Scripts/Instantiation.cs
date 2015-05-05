@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -14,28 +14,37 @@ public class Instantiation : MonoBehaviour
     public int InstantiationGridHeight { get; set; }
 	public List<Monster> InstantiationMonsters { get; set; }
 	public List<RotationGroup> InstantiationRotationGroups{ get; set; }
+	public List<TutorialEvent> InstantiationTutorialEvents{ get; set; }
     public int InstantiationNextMonsterId { get; set; }
     public int InstantiationSpawnDelay { get; set; }
 	public double PlayerHealth = 0;
-
+	public GUISkin window;//for GUI skin work
+	public GUISkin tutorial;//for Tutorial Pop-ups
 	private static float MaxTime = 3.0f;
 	private float fLevelStartTimer = MaxTime; 
 
 	private float StartTextAlpha = 1.0f;
+	public AudioSource sound;
+	public AudioClip clip; 
 
 	bool bRightMouseClicked = false;
 	bool bLevelWon = false;
 	bool bLevelLost = false;
+	bool bLastLevelCompleted = false;
 	public Text LevelText;
 	public Image TextureNeedle;
 	private Vector3 OriginalNeedlePosition;
 	public Image RotationPoint;
 
+	public int selGridInt = 1;
+	public string[] selStrings = new string[] {"1/2", ">", ">>", ">>>"};
+
 	Vector3 RightClickedOriginPoint;
 	Vector3 RightClickedCurrentPoint;
 	float RayDistance = 4.5f;
+	System.Random rand = new System.Random();
 
-	String InstantiationTutorialString = "";
+		String InstantiationTutorialString = "";
 
 	public AudioClip gateSound;
 	
@@ -50,8 +59,9 @@ public class Instantiation : MonoBehaviour
 		OriginalNeedlePosition = TextureNeedle.gameObject.transform.position;
         InstantiationMonsters = new List<Monster>();
 		InstantiationRotationGroups = new List<RotationGroup> ();
+		InstantiationTutorialEvents = new List<TutorialEvent> ();
         InstantiationNextMonsterId = 0;
-        InstantiationSpawnDelay = 400;
+        InstantiationSpawnDelay = 800;
 
 		MaterialDictionary = new Dictionary<string, Material> ();
 		UnityEngine.Object[] Materials = Resources.LoadAll("", typeof(Material));
@@ -131,10 +141,18 @@ public class Instantiation : MonoBehaviour
 				}
 				if(line != null && line[0] == '&')
 				{
-					line = line.Trim( new char[] {'&'});
-					InstantiationTutorialString = line;
-					InstantiationTutorialString = InstantiationTutorialString.Trim(',');
-					line = reader.ReadLine();
+					do
+					{
+						line = line.Trim( new char[] {'&'});
+						line = line.Trim( new char[] {','});
+						string[] entries = line.Split(',');
+						int xpos = Convert.ToInt32(entries[0]);
+						int ypos = Convert.ToInt32(entries[1]);
+						string message = entries[2];
+
+						InstantiationTutorialEvents.Add(new TutorialEvent(xpos,ypos,message));
+						line = reader.ReadLine();
+					}while(line != null && line[0] == '&');
 				}
                 reader.Close();
 
@@ -184,10 +202,11 @@ public class Instantiation : MonoBehaviour
 	}
 	public void CreateBorder()
 	{
+		MakeHeMans();
 		//create top
 		for(int i = -1; i < InstantiationGridWidth+1; i++)
 		{
-			CreateWall(i - Instantiation.XOFFSET, Instantiation.YOFFSET + 1);
+			CreateWall(i - Instantiation.XOFFSET, Instantiation.YOFFSET + 1, 0);
 			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			go.transform.position = new Vector3(i - Instantiation.XOFFSET, Instantiation.YOFFSET + 1, 0);
 			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
@@ -196,6 +215,7 @@ public class Instantiation : MonoBehaviour
 		//create bottom
 		for(int i = -1; i < InstantiationGridWidth+1; i++)
 		{
+			//CreateWall(i - Instantiation.XOFFSET, Instantiation.YOFFSET + 1);
 			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			go.transform.position = new Vector3(i - Instantiation.XOFFSET, Instantiation.YOFFSET - InstantiationGridHeight, 0);
 			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
@@ -204,6 +224,7 @@ public class Instantiation : MonoBehaviour
 		//create left
 		for(int i = 0; i < InstantiationGridHeight; i++)
 		{
+			CreateWall(-1 - Instantiation.XOFFSET, Instantiation.YOFFSET - i, -1);
 			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			go.transform.position = new Vector3(-1 - Instantiation.XOFFSET, Instantiation.YOFFSET - i, 0);
 			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
@@ -212,6 +233,7 @@ public class Instantiation : MonoBehaviour
 		//create right
 		for(int i = 0; i < InstantiationGridHeight; i++)
 		{
+			CreateWall(InstantiationGridWidth - Instantiation.XOFFSET, Instantiation.YOFFSET - i, 1);
 			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			go.transform.position = new Vector3(InstantiationGridWidth - Instantiation.XOFFSET, Instantiation.YOFFSET - i, 0);
 			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
@@ -219,22 +241,69 @@ public class Instantiation : MonoBehaviour
 		}
 			
 	}
-	public void CreateWall(int x, int y)
+	public void CreateWall(int x, int y, int side)
 	{
-		for( int z = 0; z < 4; z++)
+		for( int z = 0; z < 6; z++)
 		{
 			GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-			go.transform.position = new Vector3(x, y, -z); 
-			go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+
+			go.transform.position = new Vector3(x, y, -z);
+			if (side == 0)//back wall
+				go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+			else
+				go.transform.rotation = Quaternion.AngleAxis(90, Vector3.left);
 			if(z == 1 && x == 1)
 				go.GetComponent<Renderer>().material = MaterialDictionary["WallF2"];
 			else if (z == 1)
 				go.GetComponent<Renderer>().material = MaterialDictionary["WallF1"];
 			else if (z == 2)
-				go.GetComponent<Renderer>().material = MaterialDictionary["WallC1"];
+			{
+				go.GetComponent<Renderer>().material = GenerateCenterWallTile();
+			}
 			else if (z == 3)
+			{
+				go.GetComponent<Renderer>().material = GenerateCenterWallTile();
+			}
+			else if (z == 4)
+				go.GetComponent<Renderer>().material = MaterialDictionary["WallC1"];
+			else if (z == 5)
 				go.GetComponent<Renderer>().material = MaterialDictionary["WallT1"];
 		}
+	}
+	Material GenerateCenterWallTile()
+	{
+		int tile = rand.Next(0,20);
+		switch(tile)
+		{
+		case 0: 
+			return MaterialDictionary["WallC2"];
+			break;
+		case 1: 
+			return MaterialDictionary["WallC3"];
+			break;
+		case 2: 
+			return MaterialDictionary["WallC4"];
+			break;
+		case 3: 
+			return MaterialDictionary["WallC5"];
+			break;
+		case 4: 
+			return MaterialDictionary["WallC6"];
+			break;
+		default:
+			return MaterialDictionary["WallC0"];
+			break;
+				
+		}
+	}
+	void MakeHeMans()
+	{
+		GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		go.transform.position = new Vector3(InstantiationGridWidth /2 - Instantiation.XOFFSET, Instantiation.YOFFSET +1.6f, -2.5f);
+		//go.transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
+		Vector3 scale = new Vector3(InstantiationGridWidth+2.0f, 0.1f, 6.0f);
+		go.transform.localScale = scale;
+		go.GetComponent<Renderer>().material = MaterialDictionary["HeMan"];
 	}
 	void Update () 
 	{
@@ -266,36 +335,49 @@ public class Instantiation : MonoBehaviour
 	} 
 	void OnGUI () 
 	{
-
+		GUI.skin = window; 
 		MakeMapControls ();
-		GUI.Box (new Rect (Screen.width - 50, 0, 50, 20), "" + fLevelStartTimer.ToString ("f0")); 
+		//GUI.Box (new Rect (Screen.width - 50, 0, 50, 20), "" + fLevelStartTimer.ToString ("f0")); 
 
-		if(InstantiationTutorialString.Length > 0)
+		foreach(TutorialEvent TE in InstantiationTutorialEvents)
 		{
-			GUIStyle style = new GUIStyle(GUI.skin.textField);
-			style.wordWrap = true;
-			InstantiationTutorialString = GUI.TextField(new Rect(20, Screen.height - 250, 200, 150), InstantiationTutorialString, style);
-			if (GUI.Button (new Rect (195, Screen.height - 273, 23, 23), "X")) 
+			if(TE.isTriggered() && !TE.isCompleted())
 			{
-				InstantiationTutorialString = ""; 
+				Time.timeScale = 0.000001f; 
+				GUIStyle style = new GUIStyle(GUI.skin.textField);
+				style.wordWrap = true;
+				GUI.TextField(new Rect(Screen.width/3, Screen.height/3, Screen.width/4, Screen.height/4), TE.getMessage(), style);
+				if (GUI.Button (new Rect (Screen.width/3 + Screen.width/4 - 23, Screen.height/3 - 23, 35, 35), "X")) 
+				{
+					Time.timeScale = 1.0f; 
+					TE.setTrigger(false);
+					TE.setCompleted(true);
+				}
 			}
 		}
 
-		if(bLevelWon)
+		if(bLevelWon && !bLastLevelCompleted)
 		{
-			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 100, 25), "Continue")) 
 			{
-				Application.LoadLevel (Application.loadedLevelName); 
-			} 
-		}
+				if (Game.current.player.currLevel == "World - 1/Level - 01.csv") { 
+					
+					Application.LoadLevel ("Clip2");
+					
+				} else {
+					
+					Application.LoadLevel (Application.loadedLevelName);
+					
+				} // end if else statement   
+			} // end Continue if 
+		} // end bLevelWon if 
 		else if(bLevelLost)
 		{
-			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 100, 25), "Retry?")) 
+			if (GUI.Button (new Rect (Screen.width - 105, Screen.height - 60, 125, 50), "Retry?")) 
 			{
 				Application.LoadLevel (Application.loadedLevelName); 
-			} 
-		}
-	}
+			} // end Retry? if 
+		} // end bLevelLost if 
+	} // end OnGUI
 
 	void GetMouseRays()
 	{
@@ -421,8 +503,8 @@ public class Instantiation : MonoBehaviour
 			GetComponent<Camera>().transform.position = new Vector3(-XOFFSET, y, z);
 		if(x > InstantiationGridWidth - XOFFSET)
 			GetComponent<Camera>().transform.position = new Vector3(InstantiationGridWidth - XOFFSET, y, z);
-		if(y < 2 - InstantiationGridHeight)
-			GetComponent<Camera>().transform.position = new Vector3(x, 2 - InstantiationGridHeight, z);
+		if(y < 5 - InstantiationGridHeight)
+			GetComponent<Camera>().transform.position = new Vector3(x, 5 - InstantiationGridHeight, z);
 		if(y > 2)
 			GetComponent<Camera>().transform.position = new Vector3(x, 2, z);
 		
@@ -430,17 +512,27 @@ public class Instantiation : MonoBehaviour
 
 	void MakeMapControls()
 	{
-		if (GUI.Button (new Rect (Screen.width- 250, 50, 50, 20), ">")) 
+		selGridInt = GUI.SelectionGrid(new Rect(Screen.width- 300, 50, 200, 50), selGridInt, selStrings, 4);
+		switch(selGridInt)
 		{
-			Time.timeScale = 1.0f;
-		}
-		if (GUI.Button (new Rect (Screen.width- 200, 50, 50, 20), ">>")) 
-		{
-			Time.timeScale = 2.0f;
-		}
-		if (GUI.Button (new Rect (Screen.width- 150, 50, 50, 20), ">>>")) 
-		{
-			Time.timeScale = 4.0f;
+			case 0:
+			    sound.PlayOneShot (clip); 
+				Time.timeScale = 0.5f;
+				break;
+			case 1:
+				sound.PlayOneShot (clip); 
+				Time.timeScale = 2.0f;
+				break;
+			case 2:
+				sound.PlayOneShot (clip); 
+				Time.timeScale = 5.0f;
+				break;
+			case 3:
+				sound.PlayOneShot (clip);
+				Time.timeScale = 10.0f;
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -638,12 +730,23 @@ public class Instantiation : MonoBehaviour
 
         if(monster.FinishedMovingTile())
 		{
+			foreach(TutorialEvent TE in InstantiationTutorialEvents)
+			{
+				if (!TE.isCompleted() && TE.x() == monster.MonsterXPosition && TE.y() == monster.MonsterYPosition)
+				{
+					TE.setTrigger(true);
+				}
+			}
             monster.MonsterMovementType = MovementType.Waiting;
         }
 	}
 
 	void CheckForWin(int x, int y, Monster monster)
 	{
+		if(bLevelWon)
+		{
+			return;
+		}
 		//assign the current tile to win or lose from blank. cant be assigned unless blank or win.(if you lose you lose)
 		//check all tiles, if any of the end pieces are lose then return you lose
 		//if the amount of winning tiles == the number of end pieces then you win
@@ -669,7 +772,7 @@ public class Instantiation : MonoBehaviour
 				{
 					if(InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece == WinCondition.Incorrect)
 					{
-						PlayerHealth = Math.Max(PlayerHealth - .6, -1);
+						PlayerHealth = Math.Max(PlayerHealth - .3, -1);
 						InstantiationGridSquareGrid[i,j].GridSquareHasWinningPiece = WinCondition.NoPiece;
 						//LevelText.text = "Oh No!";
 						//StartTextAlpha = 1.0f;
@@ -704,7 +807,7 @@ public class Instantiation : MonoBehaviour
 		if (PlayerHealth <= -1)
 		{
 			//PrintMessage ("YOU LOSE!");
-			bLevelLost = true;
+			bLevelLost = false;
 			LevelText.text = "YOU LOSE!";
 			/*GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			cube.transform.position = new Vector3(0, 0, 0);
@@ -714,7 +817,7 @@ public class Instantiation : MonoBehaviour
 		}
 		else if (PlayerHealth >= 1)
 		{
-			//PrintMessage ("YOU WIN!");
+			PrintMessage ("YOU WIN!");
 			SetNextPlayerLevel();
 			bLevelWon = true;
 			LevelText.text = "YOU WIN!";
@@ -735,18 +838,14 @@ public class Instantiation : MonoBehaviour
 	// returns true if the level has not already been reached by the Player -- Prevents duplicate entries 
 	public bool CheckLevel(string lvl) 
 	{ 
-		for(int worlds = 0 ; worlds <= Game.current.player.world; worlds ++)
+		for(int worlds = 0; worlds < Game.current.player.levelsList.Count; worlds ++)
 		{
-			if(Game.current.player.levelsList.Count > worlds)
+			for(int levels = 0; levels < Game.current.player.levelsList[worlds].Count; levels ++)
 			{
-				for (int i = 0; i < Game.current.player.levelsList[worlds].Count; i++) 
-				{ 
-					if (Game.current.player.levelsList[worlds].Count > i && lvl == Game.current.player.levelsList[worlds][i]) 
-					{ 
-						return false; 
-					} // end if statement 
-
-				} // end for loop  
+				if(Game.current.player.levelsList[worlds][levels] == lvl)
+				{
+					return false;
+				}
 			}
 		}
 		return true; 
@@ -756,14 +855,19 @@ public class Instantiation : MonoBehaviour
 	public void SetNextPlayerLevel()
 	{
 		List<List<string>> levelsList = LevelMenu.GetLevels();
+		//go through each world
 		for(int worlds = 0; worlds < levelsList.Count; worlds++)
 		{
+			//go through each level in the world
 			for(int i = 0; i < levelsList[worlds].Count; i++)
 			{
+				//if the current level == a worlds level, and that level is not the last in the world
 				if(Game.current.player.currLevel == levelsList[worlds][i] && i < levelsList[worlds].Count - 1)
 				{
+					//check to make sure the next world isnt null.
 					if(levelsList[worlds][i+1] != null) 
 					{
+						//set the current level to the next level
 						Game.current.player.currLevel = levelsList[worlds][i+1];
 						// Only call this if the level has not already been reached 
 						if (CheckLevel (levelsList[worlds][i+1])) 
@@ -773,8 +877,9 @@ public class Instantiation : MonoBehaviour
 						} // end if statement 
 						Save.SaveThis (); 
 					} // end if statement 
-					break;
+					return;
 				}
+				//if the current level is a level and the last level in a world
 				else if(Game.current.player.currLevel == levelsList[worlds][i] && i == levelsList[worlds].Count - 1)
 				{
 					if(levelsList.Count > Game.current.player.world + 1)
@@ -794,7 +899,12 @@ public class Instantiation : MonoBehaviour
 							Save.SaveThis (); 
 							return;
 						} // end if statement 
-					}
+					} else { 
+						bLastLevelCompleted = true;
+						print ("DONE WITH EVERYTHING");
+						Application.LoadLevel("Clip3"); 
+
+					} // end if else 
 				}
 			}
 		}
