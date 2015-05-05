@@ -1,8 +1,14 @@
 fileFormatVersion: 2
 guid: a15d42da6f755764d8754b7eb3868d96
+timeCreated: 1430841948
+licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - window: {fileID: 11400000, guid: d36edfdfd70444c8389599fd7ed4a2c8, type: 2}
+  - sound: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
+  assetBundleName: 
+  assetBundleVariant: 

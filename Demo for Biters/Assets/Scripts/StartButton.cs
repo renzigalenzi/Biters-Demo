@@ -7,7 +7,7 @@ public class StartButton : MonoBehaviour {
 	void Start () {
 
 		Time.timeScale = 1; 
-		AudioListener.volume = 10; 
+		AudioListener.volume = 5; 
 	}
 	
 	// Update is called once per frame
@@ -17,7 +17,19 @@ public class StartButton : MonoBehaviour {
 		//Game.current.id = 1; 
 		Game.current.player.currLevel = Game.current.player.highestLevel; 
 		Save.SaveThis ();
-		Application.LoadLevel ("Demo");
+		if (Game.current.player.currLevel == "World - 0/Level - 01.csv") { 
+
+			Application.LoadLevel ("Clip1"); 
+
+		} else if (Game.current.player.currLevel == "World - 1/Level - 01.csv") { 
+
+			Application.LoadLevel ("Clip2");
+
+		} else {
+
+			Application.LoadLevel ("Demo");
+
+		} // end if else statement  
 	
-	}
-}
+	} // end OnClick 
+} // end StartButton 

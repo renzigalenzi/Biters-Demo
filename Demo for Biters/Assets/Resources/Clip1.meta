@@ -1,7 +1,11 @@
 fileFormatVersion: 2
 guid: d1f7a186ed303440db43841c9f0673fd
 folderAsset: yes
+<<<<<<< HEAD
 timeCreated: 1429029069
+=======
+timeCreated: 1429199870
+>>>>>>> origin/UI-Update-Mid-April
 licenseType: Free
 DefaultImporter:
   userData: 
