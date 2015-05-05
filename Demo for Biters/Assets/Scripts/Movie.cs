@@ -24,6 +24,7 @@ public class Movie : MonoBehaviour {
 	//private bool play = true; 
 	private int counter = 1; 
 	public int cutscene;        // make this "1" for cutscene 1, "2" for cutscene 2, or "3" for cutscene 3
+	public GUISkin window;
 	
 	void Start() {
 
@@ -227,6 +228,13 @@ public class Movie : MonoBehaviour {
 
 		// draw picture 
 		GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), currTex, ScaleMode.ScaleToFit, true, 2.0f);
+
+		// Sarah adding skip button
+		GUI.skin = window; 
+
+		if (GUI.Button (new Rect ((Screen.width/2)+500, /*(Screen.height/2)-350*/650, 200, 50), "SKIP")) {
+			Application.LoadLevel("Demo");
+		}
 
 	} // end OnGUI()
 	
