@@ -1,0 +1,235 @@
+Initialize engine version: 5.0.0f4 (5b98b70ebeb9)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: NVIDIA GeForce GT 540M  (ID=0xdf4)
+    Vendor:   NVIDIA
+    VRAM:     978 MB
+Begin MonoManager ReloadAssembly
+Platform assembly: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\BinaryBiters_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\BinaryBiters_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\BinaryBiters_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\BinaryBiters_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\BinaryBiters_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\BinaryBiters_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+- Completed reload, in  0.057 seconds
+desktop: 1600x900 60Hz; virtual: 1600x900 at 0,0
+<RI> Initializing input.
+<RI> Input initialized.
+<RI> Initialized touch support.
+Platform assembly: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\BinaryBiters_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\BinaryBiters_Data\Managed\System.dll (this message is harmless)
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 5.006237 ms
+
+Unloading 29 unused Assets to reduce memory usage. Loaded Objects now: 222.
+Total: 0.600379 ms (FindLiveObjects: 0.039512 ms CreateObjectMapping: 0.035920 ms MarkObjects: 0.294544 ms  DeleteObjects: 0.228862 ms)
+
+Locating files, please standby.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Looking for files in directory: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters/Assets/Resources/Clip1
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[0] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_01.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[1] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_02.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[2] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_03.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[3] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_04.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[4] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_05.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[5] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_06.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[6] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_07.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[7] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_08.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[8] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_09.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Unloading 1 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.425909 ms
+
+Unloading 20 unused Assets to reduce memory usage. Loaded Objects now: 271.
+Total: 0.282229 ms (FindLiveObjects: 0.014368 ms CreateObjectMapping: 0.016933 ms MarkObjects: 0.234507 ms  DeleteObjects: 0.015907 ms)
+
+GOOD JOB KEEP GOING!
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+GOOD JOB KEEP GOING!
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+GOOD JOB KEEP GOING!
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+YOU WIN!
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Unloading 4 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.708771 ms
+
+Unloading 181 unused Assets to reduce memory usage. Loaded Objects now: 278.
+Total: 0.718915 ms (FindLiveObjects: 0.057985 ms CreateObjectMapping: 0.063116 ms MarkObjects: 0.363306 ms  DeleteObjects: 0.232967 ms)
+
+Unloading 0 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.085300 ms
+
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 282.
+Total: 0.434120 ms (FindLiveObjects: 0.043104 ms CreateObjectMapping: 0.035406 ms MarkObjects: 0.351503 ms  DeleteObjects: 0.003078 ms)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.397292 ms
+
+Unloading 179 unused Assets to reduce memory usage. Loaded Objects now: 370.
+Total: 0.703007 ms (FindLiveObjects: 0.039512 ms CreateObjectMapping: 0.024117 ms MarkObjects: 0.364332 ms  DeleteObjects: 0.273505 ms)
+
+Unloading 0 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.811794 ms
+
+Unloading 28 unused Assets to reduce memory usage. Loaded Objects now: 265.
+Total: 0.489026 ms (FindLiveObjects: 0.015394 ms CreateObjectMapping: 0.017446 ms MarkObjects: 0.217573 ms  DeleteObjects: 0.238099 ms)
+
+Locating files, please standby.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Looking for files in directory: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters/Assets/Resources/Clip1
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[0] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_01.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[1] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_02.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[2] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_03.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[3] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_04.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[4] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_05.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[5] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_06.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[6] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_07.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[7] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_08.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[8] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_09.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Unloading 0 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.324820 ms
+
+Unloading 20 unused Assets to reduce memory usage. Loaded Objects now: 300.
+Total: 0.319175 ms (FindLiveObjects: 0.015907 ms CreateObjectMapping: 0.017446 ms MarkObjects: 0.266321 ms  DeleteObjects: 0.018986 ms)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.655917 ms
+
+Unloading 179 unused Assets to reduce memory usage. Loaded Objects now: 381.
+Total: 0.867214 ms (FindLiveObjects: 0.076971 ms CreateObjectMapping: 0.092366 ms MarkObjects: 0.405384 ms  DeleteObjects: 0.290439 ms)
+
+Unloading 0 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.724046 ms
+
+Unloading 28 unused Assets to reduce memory usage. Loaded Objects now: 276.
+Total: 0.693771 ms (FindLiveObjects: 0.051314 ms CreateObjectMapping: 0.054393 ms MarkObjects: 0.337649 ms  DeleteObjects: 0.248875 ms)
+
+Locating files, please standby.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Looking for files in directory: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters/Assets/Resources/Clip1
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[0] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_01.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[1] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_02.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[2] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_03.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[3] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_04.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[4] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_05.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[5] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_06.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[6] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_07.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[7] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_08.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+[8] file found: C:\Users\Asusinator\Documents\GitHub\Biters-Demo\Demo for Biters\Assets\Resources\Clip1/S1_09.png
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Unloading 0 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.381266 ms
+
+Unloading 20 unused Assets to reduce memory usage. Loaded Objects now: 311.
+Total: 0.531617 ms (FindLiveObjects: 0.045156 ms CreateObjectMapping: 0.049775 ms MarkObjects: 0.416160 ms  DeleteObjects: 0.018473 ms)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.552261 ms
+
+Unloading 179 unused Assets to reduce memory usage. Loaded Objects now: 392.
+Total: 0.951882 ms (FindLiveObjects: 0.082616 ms CreateObjectMapping: 0.131878 ms MarkObjects: 0.452080 ms  DeleteObjects: 0.283768 ms)
+
